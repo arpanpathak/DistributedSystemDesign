@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meetup App - System Design & API Documentation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f9;
+    }
+    h1, h2, h3 {
+      color: #333;
+    }
+    code {
+      background-color: #eaeaea;
+      padding: 10px;
+      border-radius: 5px;
+      font-family: Consolas, monospace;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .api-section {
+      padding: 20px;
+      margin-bottom: 40px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .api-description {
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    .highlight {
+      background-color: #e0f7fa;
+    }
+    .requirement-list {
+      list-style: none;
+      padding: 0;
+    }
+    .requirement-list li {
+      background-color: #f0f0f0;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+    }
+    .api-description code {
+      background-color: #f9f9f9;
+      display: block;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    .hld-section {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+        font-family: 'Arial', sans-serif;
+    }
+    .responsive-img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: auto;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Meetup App - System Design & API Documentation</h1>
+
+    <!-- Problem Statement -->
+    <section class="api-section">
+      <h2>Problem Statement</h2>
+      <p>
+        The goal is to design a scalable Meetup App that allows users to:
+      </p>
+      <ul class="requirement-list">
+        <li>Register and create user profiles.</li>
+        <li>Create, update, and manage events.</li>
+        <li>Browse/Search and RSVP (join/leave) to events.</li>
+        <li>Interact with other users attending the same events.</li>
+        <li>Search for events by category, location, date, etc.</li>
+        <li>Comment on events.</li>
+      </ul>
+      <p>
+        The app needs to be user-friendly, scalable, and efficient to support millions of users and events.
+      </p>
+    </section>
+
+    <!-- Functional Requirements -->
+    <section class="api-section">
+      <h2>Functional Requirements</h2>
+      <ul class="requirement-list">
+        <li>Users should be able to register, update, and delete profiles.</li>
+        <li>Users should be able to create, list, update, and delete events.</li>
+        <li>Users can join or leave events (RSVP functionality).</li>
+        <li>We must recommend a personalized newsfeed of events in the homepage</li>
+        <li>Users should be able to search for events by category, location, and date.</li>
+        <li>Users should receive notifications about event updates and reminders.</li>
+        <li>Admin functionality to manage and moderate events.</li>
+        <li>Each event should support multiple users attending, with details of who is attending visible to all users.</li>
+        <li>Users should be able to post, read, and delete comments on events.</li>
+      </ul>
+    </section>
+
+    <!-- Non-Functional Requirements -->
+    <section class="api-section">
+      <h2>Non-Functional Requirements</h2>
+      <ul class="requirement-list">
+        <li>Scalability: The app should handle up to 100 million monthly active users (MAU).</li>
+        <li>Performance: The response time for each API request should be less than 200ms.</li>
+        <li>Reliability: The system should be available 99.9% of the time (high availability).</li>
+        <li>Security: Sensitive data like user passwords must be encrypted, and data access must be authenticated and authorized.</li>
+        <li>Extensibility: The system should support adding new features like messaging, image uploads, etc.</li>
+        <li>Maintainability: The codebase should follow best practices, and the system should have automated testing and continuous deployment pipelines.</li>
+      </ul>
+    </section>
+
+    <!-- System Scale and Estimations -->
+    <section class="api-section">
+      <h2>System Scalability</h2>
+      <p>
+        The system is designed to handle a large scale of users and events, with the following estimates:
+      </p>
+      <ul class="requirement-list">
+        <li><strong>DAU (Daily Active Users):</strong> 10 million users accessing the platform daily.</li>
+        <li><strong>MAU (Monthly Active Users):</strong> 100 million users actively using the app monthly.</li>
+        <li><strong>Total Data Size:</strong> The app will store user profiles, event data, and RSVP data, estimated at around 100TB for user data and 50TB for event data.</li>
+        <li><strong>Throughput:</strong> The system should be capable of handling 100,000 API requests per second (QPS) under peak load.</li>
+        <li><strong>Database Size:</strong> Event data grows at around 1 million new events per year, with each event having an average of 100 users attending. This leads to an estimated database growth of 10TB per year.</li>
+      </ul>
+    </section>
+
+    <!-- Core Entities -->
+    <section class="api-section">
+      <h2>Core Entities</h2>
+      <ul class="requirement-list">
+        <li><strong>User:</strong> Represents a user in the system, with attributes like ID, name, email, location, and preferences.</li>
+        <li><strong>Event:</strong> Represents an event, with attributes like ID, title, description, date, location, category, and comments.</li>
+        <li><strong>User-Event Relationship:</strong> Represents the relationship between a user and an event, indicating whether the user has joined or left the event.</li>
+        <li><strong>Comment:</strong> Represents a comment on an event, with attributes like ID, userId, eventId, text, and timestamp.</li>
+      </ul>
+    </section>
+
+    <!-- High-Level Design (HLD) -->
+    <section class="api-section">
+      <h2>High-Level Design (HLD)</h2>
+      <p>
+        The system architecture is designed for scalability and fault-tolerance with the following key components:
+      </p>
+      <ul class="requirement-list">
+        <li><strong>User Service:</strong> Handles user registration, login, profile management, and authentication.</li>
+        <li><strong>Event Service:</strong> Handles event creation, listing, management, and comment functionality.</li>
+        <li><strong>Notification Service:</strong> Sends notifications about event updates and reminders via email or push notifications.</li>
+        <li><strong>Database:</strong> Stores user profiles, event data, comments, and user-event relationships. PostgreSQL is used for structured data, while Redis is used for caching.</li>
+        <li><strong>API Gateway:</strong> Exposes all RESTful endpoints and routes traffic to appropriate backend services.</li>
+        <li><strong>Load Balancer:</strong> Distributes incoming traffic across multiple server instances to ensure high availability and reliability.</li>
+      </ul>
+    </section>
+
+    <!-- API Documentation -->
+    <section class="api-section">
+      <h2>API Documentation</h2>
+
+      <div class="api-description">
+        <h3>POST /users</h3>
+        <p>Create a new user profile.</p>
+        <code>
+{
+  "name": "John Doe",
+  "email": "johndoe@example.com",
+  "location": "Seattle, WA",
+  "interests": ["tech", "hiking", "food"]
+}
+        </code>
+        <p>Response:</p>
+        <code>
+{
+  "userId": "1234",
+  "message": "User registered successfully."
+}
+        </code>
+      </div>
+
+      <div class="api-description">
+        <h3>POST /events</h3>
+        <p>Create a new event.</p>
+        <code>
+{
+  "title": "Hiking Trip",
+  "description": "Join us for a scenic hike!",
+  "date": "2025-04-20T08:00:00Z",
+  "location": "Mount Rainier, WA",
+  "category": "Outdoor"
+}
+        </code>
+        <p>Response:</p>
+        <code>
+{
+  "eventId": "5678",
+  "message": "Event created successfully."
+}
+        </code>
+      </div>
+
+      <div class="api-description">
+        <h3>POST /user-events</h3>
+        <p>Create a relationship between a user and an event.</p>
+        <code>
+{
+  "userId": "1234",
+  "eventId": "5678"
+}
+        </code>
+        <p>Response:</p>
+        <code>
+{
+  "message": "User successfully associated with the event."
+}
+        </code>
+      </div>
+
+      <!-- New APIs -->
+      <div class="api-description">
+        <h3>POST /events/{eventId}/comments</h3>
+        <p>Add a comment to an event.</p>
+        <code>
+{
+  "userId": "1234",
+  "text": "Looking forward to this event!"
+}
+        </code>
+        <p>Response:</p>
+        <code>
+{
+  "commentId": "7890",
+  "message": "Comment added successfully."
+}
+        </code>
+      </div>
+
+      <div class="api-description">
+        <h3>GET /events/{eventId}/comments</h3>
+        <p>Retrieve all comments for a specific event.</p>
+        <code>
+{}
+        </code>
+        <p>Response:</p>
+        <code>
+[
+  {
+    "commentId": "7890",
+    "userId": "1234",
+    "text": "Looking forward to this event!",
+    "timestamp": "2025-03-30T12:00:00Z"
+  }
+]
+        </code>
+      </div>
+
+      <div class="api-description">
+        <h3>DELETE /events/{eventId}/comments/{commentId}</h3>
+        <p>Delete a comment from an event.</p>
+        <code>
+{}
+        </code>
+        <p>Response:</p>
+        <code>
+{
+  "message": "Comment deleted successfully."
+}
+        </code>
+      </div>
+
+      <div class="api-description">
+        <h3>GET /events</h3>
+        <p>Retrieve a list of events based on filters like name, location, category, and date.</p>
+        
+        <p><strong>Query Parameters:</strong></p>
+        <ul>
+            <li><code>name</code> (string) - Filter events by name.</li>
+            <li><code>location</code> (string) - Filter events by location.</li>
+            <li><code>category</code> (string) - Filter events by category.</li>
+            <li><code>startDate</code> (ISO date) - Filter events occurring after this date.</li>
+            <li><code>endDate</code> (ISO date) - Filter events occurring before this date.</li>
+            <li><code>page</code> (integer) - Page number for pagination (default: 1).</li>
+            <li><code>limit</code> (integer) - Number of results per page (default: 10).</li>
+        </ul>
+    
+        <p><strong>Example Request:</strong></p>
+        <code>
+            GET /events?name=tech&location=seattle&category=Technology&startDate=2025-04-01T00:00:00Z&page=1&limit=10
+        </code>
+    
+        <p><strong>Response:</strong></p>
+        <code>
+        {
+          "events": [
+            {
+              "eventId": "123",
+              "name": "Tech Meetup",
+              "description": "Networking and tech talks",
+              "location": "Seattle, WA",
+              "category": "Technology",
+              "date": "2025-04-21T09:00:00Z"
+            }
+          ],
+          "pagination": {
+            "currentPage": 1,
+            "totalPages": 5,
+            "totalEvents": 50
+          }
+        }
+        </code>
+    </div>
+    
+    <div class="api-description">
+        <h3>GET /users/{userId}/feed</h3>
+        <p>Retrieve a personalized event feed for a user.</p>
+    
+        <p><strong>Query Parameters (Optional):</strong></p>
+        <ul>
+            <li><code>location</code> (string) - Filter events near the user's location.</li>
+            <li><code>category</code> (string) - Filter by category.</li>
+            <li><code>startDate</code> (ISO date) - Filter events happening after this date.</li>
+            <li><code>limit</code> (integer) - Number of results per page (default: 10).</li>
+        </ul>
+    
+        <p><strong>Example Request:</strong></p>
+        <code>
+            GET /users/1234/feed?location=Seattle&category=Technology&startDate=2025-04-01T00:00:00Z&limit=10
+        </code>
+    
+        <p><strong>Response:</strong></p>
+        <code>
+        {
+          "events": [
+            {
+              "eventId": "567",
+              "name": "AI & Cloud Networking",
+              "description": "Exclusive networking event for AI professionals.",
+              "location": "Seattle, WA",
+              "category": "Technology",
+              "date": "2025-04-21T09:00:00Z",
+              "isRecommended": true,
+              "reason": "Based on past RSVPs and followed categories"
+            },
+            {
+              "eventId": "890",
+              "name": "Music Festival 2025",
+              "description": "Annual music festival with top artists.",
+              "location": "Seattle, WA",
+              "category": "Music",
+              "date": "2025-05-10T18:00:00Z",
+              "isRecommended": false
+            }
+          ],
+          "pagination": {
+            "currentPage": 1,
+            "totalPages": 3,
+            "totalEvents": 25
+          }
+        }
+        </code>
+    </div>    
+
+    </section>
+    
+
+    <section class="hld-section">
+        <h3>High Level Design</h3>
+        <img src="meetup.png" class="responsive-img" alt="Meetup High Level Design"/>
+    </section>
+    
+  </div>
+</body>
+</html>
