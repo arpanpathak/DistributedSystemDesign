@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Safari/605.1.15" version="29.6.1">
   <diagram name="Page-1" id="L1n7vQX_cAmFuRkqSQdm">
-    <mxGraphModel dx="1693" dy="1269" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1823" dy="1335" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -71,6 +71,15 @@
         </mxCell>
         <mxCell id="14XWBXCMzyJ4H4npd5av-25" parent="1" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.topic_2;" value="Publish&amp;nbsp;&lt;div&gt;Event&lt;/div&gt;" vertex="1">
           <mxGeometry height="59" width="40.09" x="1023" y="136" as="geometry" />
+        </mxCell>
+        <mxCell id="-PdO5j3VYIhM09BBDl1R-1" parent="1" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/databases/Azure_Database_PostgreSQL_Server.svg;" value="Events" vertex="1">
+          <mxGeometry height="86" width="64.5" x="589" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="-PdO5j3VYIhM09BBDl1R-2" parent="1" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/databases/Azure_Database_PostgreSQL_Server.svg;" value="Tribes" vertex="1">
+          <mxGeometry height="86" width="64.5" x="582" y="239" as="geometry" />
+        </mxCell>
+        <mxCell id="-PdO5j3VYIhM09BBDl1R-3" parent="1" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/databases/Azure_Database_PostgreSQL_Server.svg;" value="Users" vertex="1">
+          <mxGeometry height="86" width="64.5" x="576" y="57" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
