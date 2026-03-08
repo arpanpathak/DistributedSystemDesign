@@ -73,7 +73,7 @@
           <mxGeometry height="59" width="40.09" x="1023" y="136" as="geometry" />
         </mxCell>
         <mxCell id="-PdO5j3VYIhM09BBDl1R-1" parent="1" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/databases/Azure_Database_PostgreSQL_Server.svg;" value="Events" vertex="1">
-          <mxGeometry height="86" width="64.5" x="595" y="423" as="geometry" />
+          <mxGeometry height="86" width="64.5" x="594" y="426" as="geometry" />
         </mxCell>
         <mxCell id="-PdO5j3VYIhM09BBDl1R-2" parent="1" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/databases/Azure_Database_PostgreSQL_Server.svg;" value="Tribes" vertex="1">
           <mxGeometry height="86" width="64.5" x="587" y="239" as="geometry" />
