@@ -85,13 +85,16 @@
           <mxGeometry height="60" width="138" x="274" y="216" as="geometry" />
         </mxCell>
         <mxCell id="-PdO5j3VYIhM09BBDl1R-5" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Push Notification Service" vertex="1">
-          <mxGeometry height="131" width="131" x="444" y="626" as="geometry" />
+          <mxGeometry height="131" width="131" x="463" y="580" as="geometry" />
         </mxCell>
         <mxCell id="-PdO5j3VYIhM09BBDl1R-8" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Push Notification Service" vertex="1">
-          <mxGeometry height="131" width="131" x="461" y="641" as="geometry" />
+          <mxGeometry height="131" width="131" x="480" y="595" as="geometry" />
         </mxCell>
         <mxCell id="-PdO5j3VYIhM09BBDl1R-9" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Push Notification Service" vertex="1">
-          <mxGeometry height="131" width="131" x="478" y="657" as="geometry" />
+          <mxGeometry height="131" width="131" x="497" y="611" as="geometry" />
+        </mxCell>
+        <mxCell id="-PdO5j3VYIhM09BBDl1R-10" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Staling Sort&lt;div&gt;Job&lt;/div&gt;" vertex="1">
+          <mxGeometry height="131" width="131" x="980.09" y="381" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
