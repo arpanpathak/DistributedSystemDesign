@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Safari/605.1.15" version="29.6.1">
   <diagram name="Page-1" id="L1n7vQX_cAmFuRkqSQdm">
-    <mxGraphModel dx="2223" dy="1335" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2502" dy="1751" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -95,6 +95,9 @@
         </mxCell>
         <mxCell id="-PdO5j3VYIhM09BBDl1R-10" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Staling Sort&lt;div&gt;Job&lt;/div&gt;" vertex="1">
           <mxGeometry height="131" width="131" x="980.09" y="381" as="geometry" />
+        </mxCell>
+        <mxCell id="-PdO5j3VYIhM09BBDl1R-11" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=100;" value="OutLittleTribe" vertex="1">
+          <mxGeometry height="30" width="60" x="582" y="-181" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
