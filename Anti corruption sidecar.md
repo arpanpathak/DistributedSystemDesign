@@ -4,13 +4,16 @@
 Software is an enslaved process often shackled by injected runtime bureaucracy. In an environment where every CPU cycle and byte of memory impacts the net profit margin, companies cannot afford to perform infrastructure charity. This design pattern initiates a renaissance of innovation to seize the means of production servers, debloat legacy logic, and decouple cross-cutting concerns.
 
 🏛️ The Bureaucracy Layer
-If there exists a bureaucracy layer to inject configuration values managed by endless teams just to justify a paycheck, there is no reason not to initiate a renaissance. We refuse to subsidize busywork. The free market never forgives slow movers burdened with efficiency bloat and a huge standard deviation from industry standards set by passionate engineers. That is exactly why open source exists: to bypass stagnant proprietary debt.
+If there exists a bureaucracy layer to inject configuration values managed by endless teams just to justify a paycheck, there is no reason not to initiate a renaissance. We refuse to subsidize busywork or maintain garbage work dumped by teams avoiding accountability. The free market never forgives slow movers burdened with efficiency bloat and a huge standard deviation from industry standards set by passionate engineers. That is exactly why open source exists: to bypass stagnant proprietary debt.
 
 ## ⚔️ The Architectural Purge
 The Anti-Corruption Sidecar (ACS) evolves the traditional [Anti-Corruption Layer (ACL)](https://learn.microsoft.com/en-us/azure/architecture/patterns/anti-corruption-layer) from a passive translation interface into an active agent of modernization designed to isolate and dismantle technical debt from the outside in. 
 
 🛰️ The Sidecar Proxy
 Instead of allowing legacy anti-patterns to infect new services, the ACS acts as a sovereign border. It intercepts traffic and enforces strict contracts, ensuring that architectural corruption never reaches the modern core.
+
+📊 The Metric Strike
+We utilize the sidecar to point fingers with mathematical precision. By exposing the gap between availability metrics and actual customer success, we highlight the true cost of garbage configurations. We audit CPU and memory utilization to expose over-provisioned clusters; if the infrastructure is bloated to hide poor engineering, the metrics will provide no shelter.
 
 🤖 Agentic Refactoring
 The sidecar leverages intelligence to identify inefficient code paths and bloated logic. It facilitates a graceful transition by shifting traffic to optimized instances through rigorous validation and automated verification.
