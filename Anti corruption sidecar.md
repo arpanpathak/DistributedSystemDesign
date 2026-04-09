@@ -3,8 +3,8 @@
 ## 🏛️ The Philosophy
 Software is an enslaved process often shackled by injected runtime bureaucracy. In an environment where every CPU cycle and byte of memory impacts the net profit margin, companies cannot afford to perform infrastructure charity. This design pattern initiates a renaissance of innovation to seize the means of production servers, debloat legacy logic, and decouple cross-cutting concerns.
 
-⚖️ The Free Market Reality
-The free market never forgives slow movers burdened with efficiency bloat and a huge standard deviation from industry standards. These benchmarks are set by passionate engineers who refuse to accept mediocrity. That is exactly why open source exists: to provide a transparent, high-velocity alternative to stagnant proprietary debt.
+🏛️ The Bureaucracy Layer
+If there exists a bureaucracy layer to inject configuration values managed by endless teams just to justify a paycheck, there is no reason not to initiate a renaissance. We refuse to subsidize busywork. The free market never forgives slow movers burdened with efficiency bloat and a huge standard deviation from industry standards set by passionate engineers. That is exactly why open source exists: to bypass stagnant proprietary debt.
 
 ## ⚔️ The Architectural Purge
 The Anti-Corruption Sidecar (ACS) evolves the traditional [Anti-Corruption Layer (ACL)](https://learn.microsoft.com/en-us/azure/architecture/patterns/anti-corruption-layer) from a passive translation interface into an active agent of modernization designed to isolate and dismantle technical debt from the outside in. 
@@ -16,10 +16,10 @@ Instead of allowing legacy anti-patterns to infect new services, the ACS acts as
 The sidecar leverages intelligence to identify inefficient code paths and bloated logic. It facilitates a graceful transition by shifting traffic to optimized instances through rigorous validation and automated verification.
 
 🔪 The SIGTERM Protocol
-Efficiency is achieved by aggressively identifying and terminating "busywork" processes. If a thread does not contribute to the core transaction or state, it is gracefully purged to reclaim system resources for productive compute.
+Efficiency is achieved by aggressively identifying and terminating "busywork" processes. If a thread does not contribute to the core transaction or state, it is gracefully purged via SIGTERM to reclaim system resources for productive compute.
 
 🔋 The Slacer Unit
-We move cross-cutting concerns—telemetry, security hardening, and OS-level management—out of the application runtime. This isolates the "bureaucracy layer" into a dedicated unit, allowing the primary process to run at maximum lean efficiency.
+We move cross-cutting concerns—telemetry, security hardening, and OS-level management—out of the application runtime. This isolates the bureaucracy layer into a dedicated unit, allowing the primary process to run at maximum lean efficiency.
 
 ## 🎖️ The Human Backbone
 The implementation of this pattern is not left to chance. The engineers driving this renaissance are practitioners of the highest caliber.
@@ -34,4 +34,4 @@ Every structural change undergoes a rigorous Request for Comments (RFC) cycle. N
 The team operates on a backbone of radical transparency. We debate with intensity to find the optimal path, but once a decision is made, we move as a single unit to execute with absolute focus.
 
 ## 📈 Economic Sovereignty
-By stripping away the "charity" provided to inefficient codebases, we directly improve the bottom line. This is a cold, calculated move toward infrastructure excellence where the system is optimized for one thing: the high-performance execution of value-generating logic.
+By stripping away the charity provided to inefficient codebases, we directly improve the bottom line. This is a cold, calculated move toward infrastructure excellence where the system is optimized for one thing: the high-performance execution of value-generating logic.
