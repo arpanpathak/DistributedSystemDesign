@@ -1130,11 +1130,11 @@ func triggerBackup(
 				},
 			},
 			"spec": map[string]interface{}{
-				"ttl":                          ttl,
-				"defaultVolumesToFsBackup":     cluster.IncludeVolumes,
-				"includedNamespaces":           cluster.Namespaces,
-				"storageLocation":              "default",
-				"volumeSnapshotLocations":      []interface{}{"default"},
+				"ttl":                      ttl,
+				"defaultVolumesToFsBackup": cluster.IncludeVolumes,
+				"includedNamespaces":       cluster.Namespaces,
+				"storageLocation":          "default",
+				"volumeSnapshotLocations":  []interface{}{"default"},
 			},
 		},
 	}

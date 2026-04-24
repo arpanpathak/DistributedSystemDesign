@@ -1110,9 +1110,9 @@ This program runs outside the cluster and uses a kubeconfig file:
 //
 // The program uses the following precedence for finding the
 // kubeconfig:
-//   1. --kubeconfig flag (if provided)
-//   2. KUBECONFIG environment variable
-//   3. ~/.kube/config (default path)
+//  1. --kubeconfig flag (if provided)
+//  2. KUBECONFIG environment variable
+//  3. ~/.kube/config (default path)
 package main
 
 import (
@@ -1151,7 +1151,7 @@ func main() {
 	// Build the config using the specified kubeconfig and context.
 	// clientcmd handles all the complexity of:
 	//   - Loading and merging multiple kubeconfig files (KUBECONFIG can
-		//     contain multiple paths separated by the OS path delimiter)
+	//     contain multiple paths separated by the OS path delimiter)
 	//   - Resolving the current context
 	//   - Executing credential plugins (exec-based authentication)
 	//   - Loading certificates from files or inline data
@@ -1201,8 +1201,8 @@ func main() {
 	// performing a self-subject access review. This tells us
 	// what the API server thinks our identity is.
 	selfReview, err := clientset.AuthenticationV1().
-	SelfSubjectReviews().
-	Create(ctx, &authv1.SelfSubjectReview{}, metav1.CreateOptions{})
+		SelfSubjectReviews().
+		Create(ctx, &authv1.SelfSubjectReview{}, metav1.CreateOptions{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error checking identity: %v\n", err)
 	} else {
@@ -1316,7 +1316,7 @@ func main() {
 	// CreateToken issues the token through the TokenRequest API.
 	// This requires the "create" verb on "serviceaccounts/token".
 	tokenResponse, err := clientset.CoreV1().ServiceAccounts(namespace).
-	CreateToken(ctx, createdSA.Name, tokenRequest, metav1.CreateOptions{})
+		CreateToken(ctx, createdSA.Name, tokenRequest, metav1.CreateOptions{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error creating token: %v\n", err)
 		os.Exit(1)

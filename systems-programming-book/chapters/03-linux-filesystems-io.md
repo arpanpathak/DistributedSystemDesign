@@ -287,8 +287,9 @@ Symbolic Links:
 // metadata that lives in the inode structure.
 //
 // Build and run:
-//   go build -o explore_inodes explore_inodes.go
-//   sudo ./explore_inodes    # (sudo for some /proc access)
+//
+//	go build -o explore_inodes explore_inodes.go
+//	sudo ./explore_inodes    # (sudo for some /proc access)
 package main
 
 import (
@@ -789,10 +790,10 @@ func main() {
 //
 // When a shell processes: ./program > output.txt 2>&1
 // It does exactly what this program does:
-//   1. Open output.txt
-//   2. dup2(output_fd, 1)   — redirect stdout to the file
-//   3. dup2(1, 2)           — redirect stderr to wherever stdout goes
-//   4. exec(./program)
+//  1. Open output.txt
+//  2. dup2(output_fd, 1)   — redirect stdout to the file
+//  3. dup2(1, 2)           — redirect stderr to wherever stdout goes
+//  4. exec(./program)
 //
 // After dup2(oldfd, newfd), newfd refers to the same open file description
 // as oldfd. The original file that newfd pointed to is closed.
@@ -1306,7 +1307,8 @@ import (
 
 // record represents a fixed-size record in our file-based "database".
 // Each record is exactly 64 bytes, making offset calculation trivial:
-//   offset = recordNumber * 64
+//
+//	offset = recordNumber * 64
 type record struct {
 	ID    uint64   // 8 bytes: unique record identifier
 	Value uint64   // 8 bytes: the data value
@@ -1638,12 +1640,12 @@ gives you the **simplicity** of blocking I/O with the **performance** of event-d
 // servers like nginx.
 //
 // Architecture:
-//   1. Create a listening socket (socket → bind → listen)
-//   2. Create an epoll instance
-//   3. Add the listener to epoll
-//   4. Event loop: epoll_wait → handle events
-//      - Listener ready: accept new connections, add to epoll
-//      - Connection ready: read data, echo it back
+//  1. Create a listening socket (socket → bind → listen)
+//  2. Create an epoll instance
+//  3. Add the listener to epoll
+//  4. Event loop: epoll_wait → handle events
+//     - Listener ready: accept new connections, add to epoll
+//     - Connection ready: read data, echo it back
 //
 // Run: go build -o epoll_server epoll_server.go && ./epoll_server
 // Test: echo "hello" | nc localhost 8080
@@ -1701,10 +1703,10 @@ func setNonBlocking(fd int) error {
 // This is the low-level equivalent of net.Listen("tcp", ":8080").
 //
 // Steps:
-//   1. socket()  — create a socket fd
-//   2. setsockopt() — set SO_REUSEADDR (allows immediate rebind after restart)
-//   3. bind()    — associate the socket with an address and port
-//   4. listen()  — mark the socket as passive (accepts connections)
+//  1. socket()  — create a socket fd
+//  2. setsockopt() — set SO_REUSEADDR (allows immediate rebind after restart)
+//  3. bind()    — associate the socket with an address and port
+//  4. listen()  — mark the socket as passive (accepts connections)
 func createListenSocket(port int) (int, error) {
 	// Create a TCP socket (AF_INET = IPv4, SOCK_STREAM = TCP)
 	// SOCK_NONBLOCK makes the socket non-blocking from creation
@@ -2071,11 +2073,12 @@ int io_uring_enter(int ring_fd, unsigned to_submit,
 //
 // We'll perform asynchronous file reads — something that's impossible
 // with regular epoll (epoll only works for network/pipe fds, not
-	// regular files on most systems).
+// regular files on most systems).
 //
 // Prerequisites:
-//   go get github.com/iceber/iouring-go
-//   Linux 5.1+ kernel
+//
+//	go get github.com/iceber/iouring-go
+//	Linux 5.1+ kernel
 //
 // Build: go build -o iouring_demo iouring_demo.go
 package main
@@ -2126,9 +2129,9 @@ func asyncReadFile(ring *iouring.IOURing, path string) ([]byte, error) {
 	//   len:    buffer size
 	//   off:    0 (read from beginning)
 	request, err := ring.PrepareRead(
-		int(f.Fd()),           // File descriptor
-		buf,                   // Buffer to read into
-		uint64(0),             // Offset (0 = beginning of file)
+		int(f.Fd()), // File descriptor
+		buf,         // Buffer to read into
+		uint64(0),   // Offset (0 = beginning of file)
 	)
 	if err != nil {
 		return nil, fmt.Errorf("prepare read: %w", err)
@@ -2311,8 +2314,9 @@ Useful for:
 // when you serve files with http.ServeFile() or http.FileServer().
 //
 // Architecture:
-//   Client ←──[sendfile]──→ Kernel ←──[page cache]──→ Disk
-//   (No user-space data copies!)
+//
+//	Client ←──[sendfile]──→ Kernel ←──[page cache]──→ Disk
+//	(No user-space data copies!)
 //
 // Run: go build -o zerocopy_server zerocopy_server.go && ./zerocopy_server
 // Test: curl http://localhost:8082/etc/hosts
@@ -2340,11 +2344,11 @@ import (
 // Returns the total number of bytes transferred.
 //
 // Under the hood, sendfile:
-//   1. Checks if the source file's pages are in the page cache
-//   2. If not, triggers a page fault to bring them in from disk
-//   3. Sets up DMA scatter/gather to transfer directly from
-//      page cache pages to the network card's buffer
-//   4. No CPU copy involved (with modern hardware/kernels)
+//  1. Checks if the source file's pages are in the page cache
+//  2. If not, triggers a page fault to bring them in from disk
+//  3. Sets up DMA scatter/gather to transfer directly from
+//     page cache pages to the network card's buffer
+//  4. No CPU copy involved (with modern hardware/kernels)
 func sendFileZeroCopy(socketFD, fileFD int, offset *int64, count int) (int, error) {
 	totalSent := 0
 
@@ -2431,14 +2435,14 @@ func handleConnection(conn net.Conn) {
 	var sendErr error
 	var bytesSent int
 	rawConn.Control(func(socketFD uintptr) {
-			offset := int64(0)
-			bytesSent, sendErr = sendFileZeroCopy(
-				int(socketFD),
-				int(f.Fd()),
-				&offset,
-				int(fileSize),
-			)
-		})
+		offset := int64(0)
+		bytesSent, sendErr = sendFileZeroCopy(
+			int(socketFD),
+			int(f.Fd()),
+			&offset,
+			int(fileSize),
+		)
+	})
 
 	if sendErr != nil {
 		fmt.Fprintf(os.Stderr, "sendfile error: %v\n", sendErr)
@@ -2453,10 +2457,10 @@ func handleConnection(conn net.Conn) {
 func sendHTTPError(conn net.Conn, code int, message string) {
 	body := fmt.Sprintf("<h1>%d %s</h1>", code, message)
 	response := "HTTP/1.1 " + strconv.Itoa(code) + " " + message + "\r\n" +
-	"Content-Length: " + strconv.Itoa(len(body)) + "\r\n" +
-	"Content-Type: text/html\r\n" +
-	"\r\n" +
-	body
+		"Content-Length: " + strconv.Itoa(len(body)) + "\r\n" +
+		"Content-Type: text/html\r\n" +
+		"\r\n" +
+		body
 	conn.Write([]byte(response))
 }
 
@@ -2660,17 +2664,18 @@ import (
 // Returns the path to the merged directory.
 //
 // The mount options for overlayfs are:
-//   lowerdir=<path>  — read-only base layer(s), separated by ':'
-//   upperdir=<path>  — writable layer for modifications
-//   workdir=<path>   — internal directory used by overlayfs (must be empty,
-	//                       on the same filesystem as upperdir)
+//
+//	lowerdir=<path>  — read-only base layer(s), separated by ':'
+//	upperdir=<path>  — writable layer for modifications
+//	workdir=<path>   — internal directory used by overlayfs (must be empty,
+//	                    on the same filesystem as upperdir)
 func setupOverlayFS(baseDir string) (string, error) {
 	// Create the four directories needed for overlayfs
 	dirs := map[string]string{
-		"lower":  filepath.Join(baseDir, "lower"),   // Read-only base layer
-		"upper":  filepath.Join(baseDir, "upper"),   // Writable layer
-		"work":   filepath.Join(baseDir, "work"),    // Internal scratch space
-		"merged": filepath.Join(baseDir, "merged"),  // The unified mount point
+		"lower":  filepath.Join(baseDir, "lower"),  // Read-only base layer
+		"upper":  filepath.Join(baseDir, "upper"),  // Writable layer
+		"work":   filepath.Join(baseDir, "work"),   // Internal scratch space
+		"merged": filepath.Join(baseDir, "merged"), // The unified mount point
 	}
 
 	for name, path := range dirs {
@@ -2776,17 +2781,17 @@ func main() {
 	} {
 		fmt.Printf("   %s:\n", layer.name)
 		filepath.Walk(layer.path, func(path string, info os.FileInfo, err error) error {
-				if err != nil || path == layer.path {
-					return nil
-				}
-				rel, _ := filepath.Rel(layer.path, path)
-				if info.IsDir() {
-					fmt.Printf("     📁 %s/\n", rel)
-				} else {
-					fmt.Printf("     📄 %s (%d bytes)\n", rel, info.Size())
-				}
+			if err != nil || path == layer.path {
 				return nil
-			})
+			}
+			rel, _ := filepath.Rel(layer.path, path)
+			if info.IsDir() {
+				fmt.Printf("     📁 %s/\n", rel)
+			} else {
+				fmt.Printf("     📄 %s (%d bytes)\n", rel, info.Size())
+			}
+			return nil
+		})
 	}
 
 	fmt.Println("\n=== Key Takeaways ===")
@@ -2892,8 +2897,9 @@ fcntl(fd, F_GETLK, &lock);   // Test for lock
 //   - Implementing distributed locks on shared filesystems (NFS)
 //
 // Run two instances simultaneously:
-//   go run file_mutex.go &
-//   go run file_mutex.go &
+//
+//	go run file_mutex.go &
+//	go run file_mutex.go &
 //
 // You'll see them take turns entering the critical section.
 package main
@@ -2910,17 +2916,18 @@ import (
 // a single process, FileMutex coordinates between separate processes.
 //
 // The lock is associated with the file's inode (not the file descriptor
-	// or path), so any process that opens the same file can participate in
+// or path), so any process that opens the same file can participate in
 // the locking protocol.
 //
 // The lock is automatically released when:
-//   1. Unlock() is called explicitly
-//   2. The file descriptor is closed
-//   3. The process exits (clean or crash)
+//  1. Unlock() is called explicitly
+//  2. The file descriptor is closed
+//  3. The process exits (clean or crash)
+//
 // Property #3 makes file locks crash-safe — no stale locks after crashes.
 type FileMutex struct {
-	path string   // Path to the lock file
-	fd   int      // File descriptor for the lock file
+	path string // Path to the lock file
+	fd   int    // File descriptor for the lock file
 }
 
 // NewFileMutex creates a new file-based mutex. The lock file is created
@@ -2963,9 +2970,10 @@ func (m *FileMutex) Lock() error {
 // Returns true if the lock was acquired, false if it's held by another process.
 //
 // This is useful for "check if another instance is running" patterns:
-//   if !mutex.TryLock() {
-	//       log.Fatal("Another instance is already running")
-	//   }
+//
+//	if !mutex.TryLock() {
+//	    log.Fatal("Another instance is already running")
+//	}
 func (m *FileMutex) TryLock() (bool, error) {
 	// LOCK_NB: non-blocking — return immediately if lock is held
 	err := syscall.Flock(m.fd, syscall.LOCK_EX|syscall.LOCK_NB)
@@ -3198,7 +3206,7 @@ func maskToString(mask uint32) string {
 // Watcher wraps an inotify file descriptor and provides a higher-level
 // API for watching file system events.
 type Watcher struct {
-	fd      int            // inotify file descriptor
+	fd      int              // inotify file descriptor
 	watches map[int32]string // wd → path mapping for human-readable output
 }
 
@@ -3225,9 +3233,10 @@ func NewWatcher() (*Watcher, error) {
 // Returns a watch descriptor that identifies this watch in future events.
 //
 // The mask specifies which events to watch for. Common combinations:
-//   IN_ALL_EVENTS: everything
-//   IN_MODIFY | IN_CREATE | IN_DELETE: file content changes
-//   IN_CLOSE_WRITE: file write completed (good for triggering rebuilds)
+//
+//	IN_ALL_EVENTS: everything
+//	IN_MODIFY | IN_CREATE | IN_DELETE: file content changes
+//	IN_CLOSE_WRITE: file write completed (good for triggering rebuilds)
 func (w *Watcher) AddWatch(path string, mask uint32) (int32, error) {
 	wd, err := syscall.InotifyAddWatch(w.fd, path, mask)
 	if err != nil {
@@ -3243,18 +3252,18 @@ func (w *Watcher) AddWatch(path string, mask uint32) (int32, error) {
 // a watch on /foo does NOT watch /foo/bar/baz.
 func (w *Watcher) AddRecursiveWatch(root string, mask uint32) error {
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil // Skip inaccessible directories
+		}
+		if info.IsDir() {
+			_, err := w.AddWatch(path, mask)
 			if err != nil {
-				return nil // Skip inaccessible directories
+				fmt.Fprintf(os.Stderr, "Warning: cannot watch %s: %v\n", path, err)
+				return nil
 			}
-			if info.IsDir() {
-				_, err := w.AddWatch(path, mask)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Warning: cannot watch %s: %v\n", path, err)
-					return nil
-				}
-			}
-			return nil
-		})
+		}
+		return nil
+	})
 }
 
 // ReadEvents reads and processes inotify events in a loop.
@@ -3512,10 +3521,11 @@ $ ionice -p $(pidof postgres)
 // iostat, iotop, and other monitoring tools do.
 //
 // Key files:
-//   /proc/diskstats     — per-disk I/O counters
-//   /proc/self/io       — per-process I/O counters
-//   /sys/block/*/stat   — per-device statistics
-//   /sys/block/*/queue/ — scheduler configuration
+//
+//	/proc/diskstats     — per-disk I/O counters
+//	/proc/self/io       — per-process I/O counters
+//	/sys/block/*/stat   — per-device statistics
+//	/sys/block/*/queue/ — scheduler configuration
 //
 // Run: go run io_stats.go
 package main
@@ -3531,7 +3541,7 @@ import (
 // diskStats holds parsed statistics from /proc/diskstats.
 // These counters are cumulative since boot.
 type diskStats struct {
-	Device      string
+	Device          string
 	ReadsCompleted  uint64
 	ReadsMerged     uint64
 	SectorsRead     uint64
@@ -3547,9 +3557,10 @@ type diskStats struct {
 
 // parseDiskStats reads /proc/diskstats and returns parsed statistics
 // for all block devices. Each line has 14+ fields:
-//   major minor name reads_completed reads_merged sectors_read ms_reading
-//   writes_completed writes_merged sectors_written ms_writing
-//   ios_in_progress ms_io weighted_ms_io
+//
+//	major minor name reads_completed reads_merged sectors_read ms_reading
+//	writes_completed writes_merged sectors_written ms_writing
+//	ios_in_progress ms_io weighted_ms_io
 func parseDiskStats() ([]diskStats, error) {
 	data, err := os.ReadFile("/proc/diskstats")
 	if err != nil {
@@ -3658,13 +3669,13 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error reading process IO: %v (need root?)\n", err)
 	} else {
 		descriptions := map[string]string{
-			"rchar":                  "Bytes read (including page cache)",
-			"wchar":                  "Bytes written (including page cache)",
-			"syscr":                  "Read syscalls count",
-			"syscw":                  "Write syscalls count",
-			"read_bytes":             "Bytes actually read from disk",
-			"write_bytes":            "Bytes actually written to disk",
-			"cancelled_write_bytes":  "Bytes cancelled (truncated files)",
+			"rchar":                 "Bytes read (including page cache)",
+			"wchar":                 "Bytes written (including page cache)",
+			"syscr":                 "Read syscalls count",
+			"syscw":                 "Write syscalls count",
+			"read_bytes":            "Bytes actually read from disk",
+			"write_bytes":           "Bytes actually written to disk",
+			"cancelled_write_bytes": "Bytes cancelled (truncated files)",
 		}
 		for key, val := range ioStats {
 			desc := descriptions[key]

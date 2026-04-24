@@ -410,6 +410,7 @@ When you write:
 ```go
 cmd := exec.Command("/bin/ls", "-la")
 cmd.Run()
+
 ```
 
 Go does **not** call `fork()`. Instead, it calls `clone()` with careful flag management.
@@ -467,7 +468,7 @@ import (
 
 func main() {
 	// ForkExec takes the path to the executable, argv (where argv[0]
-		// is conventionally the program name), and a ProcAttr that controls
+	// is conventionally the program name), and a ProcAttr that controls
 	// the child's environment, working directory, and file descriptors.
 	//
 	// The Files field maps child fd numbers to parent fd numbers:
@@ -475,14 +476,14 @@ func main() {
 	//   Files[1] = parent's stdout -> child's fd 1
 	//   Files[2] = parent's stderr -> child's fd 2
 	pid, err := syscall.ForkExec("/bin/echo", []string{"echo", "Hello from child process!"}, &syscall.ProcAttr{
-			Dir:   "/",
-			Env:   os.Environ(),
-			Files: []uintptr{
-				uintptr(syscall.Stdin),
-				uintptr(syscall.Stdout),
-				uintptr(syscall.Stderr),
-			},
-		})
+		Dir: "/",
+		Env: os.Environ(),
+		Files: []uintptr{
+			uintptr(syscall.Stdin),
+			uintptr(syscall.Stdout),
+			uintptr(syscall.Stderr),
+		},
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ForkExec failed: %v\n", err)
 		os.Exit(1)
@@ -519,8 +520,8 @@ loop that reads input, parses it, and fork-execs the requested command:
 // Features:
 //   - Executes external commands by searching PATH.
 //   - Handles the "cd" built-in (which must be handled in-process
-	//     because changing the working directory of a child has no effect
-	//     on the parent).
+//     because changing the working directory of a child has no effect
+//     on the parent).
 //   - Handles the "exit" built-in.
 //   - Displays the current working directory in the prompt.
 //
@@ -748,15 +749,15 @@ goroutines).
 // This program demonstrates how goroutines map to OS threads.
 // It launches several goroutines and has each one report:
 //   - Its goroutine ID (extracted via runtime.Stack, as Go does not
-	//     expose goroutine IDs directly — by design).
+//     expose goroutine IDs directly — by design).
 //   - The OS thread ID it is currently running on (via syscall.Gettid).
 //
 // Key observations:
-//   1. Multiple goroutines may report the same thread ID, proving
-//      that goroutines are multiplexed onto OS threads.
-//   2. The number of unique thread IDs will be at most GOMAXPROCS
-//      (for CPU-bound work without blocking syscalls).
-//   3. Goroutines may migrate between threads between observations.
+//  1. Multiple goroutines may report the same thread ID, proving
+//     that goroutines are multiplexed onto OS threads.
+//  2. The number of unique thread IDs will be at most GOMAXPROCS
+//     (for CPU-bound work without blocking syscalls).
+//  3. Goroutines may migrate between threads between observations.
 package main
 
 import (
@@ -976,11 +977,11 @@ performance.
 // syscall package and the x/sys/unix package. We call several
 // syscalls directly to show the mechanics:
 //
-//   1. SYS_GETPID  - Get our process ID.
-//   2. SYS_GETUID  - Get our user ID.
-//   3. SYS_UNAME   - Get system information (kernel version, etc.).
-//   4. SYS_WRITE   - Write directly to stdout via syscall, bypassing
-//                     Go's buffered I/O entirely.
+//  1. SYS_GETPID  - Get our process ID.
+//  2. SYS_GETUID  - Get our user ID.
+//  3. SYS_UNAME   - Get system information (kernel version, etc.).
+//  4. SYS_WRITE   - Write directly to stdout via syscall, bypassing
+//     Go's buffered I/O entirely.
 //
 // This illustrates that at the lowest level, everything in your
 // program ultimately reduces to numbered syscall invocations.
@@ -1399,25 +1400,26 @@ classic way to create a daemon is the **double-fork** pattern:
 //
 // Demonstrates creating a daemon process in Go. We use a simplified
 // approach: instead of the traditional double-fork (which is tricky in
-	// Go due to the multi-threaded runtime), we use os.StartProcess with
+// Go due to the multi-threaded runtime), we use os.StartProcess with
 // SysProcAttr.Setsid to create a new session.
 //
 // The daemon:
-//   1. Detaches from the controlling terminal via Setsid.
-//   2. Changes its working directory to /.
-//   3. Writes a PID file so we can find it later.
-//   4. Logs to a file (since it has no terminal).
-//   5. Runs a simple loop writing timestamps to the log.
+//  1. Detaches from the controlling terminal via Setsid.
+//  2. Changes its working directory to /.
+//  3. Writes a PID file so we can find it later.
+//  4. Logs to a file (since it has no terminal).
+//  5. Runs a simple loop writing timestamps to the log.
 //
 // This is a teaching example. In production, consider using systemd
 // (which handles daemonization, logging, restart, and cleanup for you).
 //
 // Usage:
-//   go build -o daemon daemon.go
-//   ./daemon                    # Starts the daemon
-//   cat /var/tmp/daemon.pid     # Shows the daemon PID
-//   cat /var/tmp/daemon.log     # Shows the daemon output
-//   kill $(cat /var/tmp/daemon.pid)  # Stops the daemon
+//
+//	go build -o daemon daemon.go
+//	./daemon                    # Starts the daemon
+//	cat /var/tmp/daemon.pid     # Shows the daemon PID
+//	cat /var/tmp/daemon.log     # Shows the daemon output
+//	kill $(cat /var/tmp/daemon.pid)  # Stops the daemon
 package main
 
 import (
@@ -1703,8 +1705,8 @@ func main() {
 
 		// Sort by RSS (memory usage) descending — show the biggest first.
 		sort.Slice(procs, func(i, j int) bool {
-				return procs[i].VmRSS > procs[j].VmRSS
-			})
+			return procs[i].VmRSS > procs[j].VmRSS
+		})
 
 		// Display top 20 processes.
 		displayed := 0
@@ -1728,7 +1730,7 @@ func main() {
 }
 
 // getAllProcesses scans /proc for all numeric directories (each
-	// representing a process) and parses their status files.
+// representing a process) and parses their status files.
 func getAllProcesses() []ProcessInfo {
 	entries, err := os.ReadDir("/proc")
 	if err != nil {

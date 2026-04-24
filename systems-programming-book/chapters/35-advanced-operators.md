@@ -101,7 +101,7 @@ const finalizerName = "postgres.example.com/cleanup"
 //
 // Returns:
 //   - shouldReturn=true: the caller should return immediately (either we added the
-	//     finalizer and requeued, or we completed deletion cleanup).
+//     finalizer and requeued, or we completed deletion cleanup).
 //   - result, err: the ctrl.Result and error to return from Reconcile.
 func (r *PostgresClusterReconciler) handleFinalizer(
 	ctx context.Context,
@@ -127,7 +127,7 @@ func (r *PostgresClusterReconciler) handleFinalizer(
 	// Case 2: Resource IS being deleted — run cleanup and remove finalizer.
 	if !controllerutil.ContainsFinalizer(pg, finalizerName) {
 		// Our finalizer has already been removed (perhaps by a previous reconcile
-			// that succeeded at cleanup but failed at a later step). Nothing to do.
+		// that succeeded at cleanup but failed at a later step). Nothing to do.
 		return true, ctrl.Result{}, nil
 	}
 
@@ -213,17 +213,17 @@ func (r *PostgresClusterReconciler) deleteExternalDNSRecord(
 	// Placeholder: in production, call the DNS provider API.
 	// Example with AWS Route53:
 	//   _, err := route53Client.ChangeResourceRecordSets(ctx, &route53.ChangeResourceRecordSetsInput{
-			//       HostedZoneId: aws.String(hostedZoneID),
-			//       ChangeBatch: &types.ChangeBatch{
-				//           Changes: []types.Change{{
-						//               Action: types.ChangeActionDelete,
-						//               ResourceRecordSet: &types.ResourceRecordSet{
-							//                   Name: aws.String(dnsName),
-							//                   Type: types.RRTypeCname,
-							//               },
-						//           }},
-				//       },
-			//   })
+	//       HostedZoneId: aws.String(hostedZoneID),
+	//       ChangeBatch: &types.ChangeBatch{
+	//           Changes: []types.Change{{
+	//               Action: types.ChangeActionDelete,
+	//               ResourceRecordSet: &types.ResourceRecordSet{
+	//                   Name: aws.String(dnsName),
+	//                   Type: types.RRTypeCname,
+	//               },
+	//           }},
+	//       },
+	//   })
 	log.Info("external DNS record deleted (simulated)", "dnsName", dnsName)
 	return nil
 }
@@ -299,8 +299,8 @@ var webhookLog = logf.Log.WithName("postgrescluster-webhook")
 // TLS termination and request routing.
 func (r *PostgresCluster) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
-	For(r).
-	Complete()
+		For(r).
+		Complete()
 }
 
 // Compile-time interface checks. These ensure that our type implements
@@ -316,7 +316,7 @@ var _ webhook.CustomDefaulter = &PostgresCluster{}
 //
 // Validations performed:
 //   - Replicas must be odd for high availability (so there's always a clear
-	//     majority for leader election in a Patroni/Stolon HA setup).
+//     majority for leader election in a Patroni/Stolon HA setup).
 //   - Storage size must be at least 1Gi.
 //   - PostgreSQL version must be in the supported list.
 //   - Backup retention must not exceed 365 days.
@@ -340,7 +340,7 @@ func (r *PostgresCluster) ValidateCreate(
 //
 // Additional validations for updates:
 //   - StorageClassName cannot be changed after creation (PVC storage class
-	//     is immutable in Kubernetes).
+//     is immutable in Kubernetes).
 func (r *PostgresCluster) ValidateUpdate(
 	ctx context.Context,
 	oldObj, newObj runtime.Object,
@@ -363,8 +363,8 @@ func (r *PostgresCluster) ValidateUpdate(
 
 	// Then, check immutable fields.
 	if oldPG.Spec.Storage.StorageClassName != nil &&
-	newPG.Spec.Storage.StorageClassName != nil &&
-	*oldPG.Spec.Storage.StorageClassName != *newPG.Spec.Storage.StorageClassName {
+		newPG.Spec.Storage.StorageClassName != nil &&
+		*oldPG.Spec.Storage.StorageClassName != *newPG.Spec.Storage.StorageClassName {
 		return warnings, fmt.Errorf(
 			"spec.storage.storageClassName is immutable: cannot change from %q to %q",
 			*oldPG.Spec.Storage.StorageClassName,
@@ -414,7 +414,7 @@ func validatePostgresCluster(pg *PostgresCluster) (admission.Warnings, error) {
 	if pg.Spec.Replicas > 1 && pg.Spec.Replicas%2 == 0 {
 		return warnings, fmt.Errorf(
 			"spec.replicas must be odd for high availability (got %d); "+
-			"use 1, 3, 5, 7, or 9 replicas",
+				"use 1, 3, 5, 7, or 9 replicas",
 			pg.Spec.Replicas,
 		)
 	}
@@ -739,25 +739,25 @@ func NewConditionManager(pg *postgresv1alpha1.PostgresCluster) *ConditionManager
 func (cm *ConditionManager) SetReady(readyReplicas, desiredReplicas int32) {
 	if readyReplicas >= desiredReplicas && desiredReplicas > 0 {
 		meta.SetStatusCondition(&cm.pg.Status.Conditions, metav1.Condition{
-				Type:               postgresv1alpha1.ConditionTypeReady,
-				Status:             metav1.ConditionTrue,
-				ObservedGeneration: cm.pg.Generation,
-				Reason:             "AllReplicasReady",
-				Message: fmt.Sprintf(
-					"All %d desired replicas are ready", desiredReplicas),
-				LastTransitionTime: metav1.Now(),
-			})
+			Type:               postgresv1alpha1.ConditionTypeReady,
+			Status:             metav1.ConditionTrue,
+			ObservedGeneration: cm.pg.Generation,
+			Reason:             "AllReplicasReady",
+			Message: fmt.Sprintf(
+				"All %d desired replicas are ready", desiredReplicas),
+			LastTransitionTime: metav1.Now(),
+		})
 	} else {
 		meta.SetStatusCondition(&cm.pg.Status.Conditions, metav1.Condition{
-				Type:               postgresv1alpha1.ConditionTypeReady,
-				Status:             metav1.ConditionFalse,
-				ObservedGeneration: cm.pg.Generation,
-				Reason:             "ReplicasNotReady",
-				Message: fmt.Sprintf(
-					"%d of %d desired replicas are ready",
-					readyReplicas, desiredReplicas),
-				LastTransitionTime: metav1.Now(),
-			})
+			Type:               postgresv1alpha1.ConditionTypeReady,
+			Status:             metav1.ConditionFalse,
+			ObservedGeneration: cm.pg.Generation,
+			Reason:             "ReplicasNotReady",
+			Message: fmt.Sprintf(
+				"%d of %d desired replicas are ready",
+				readyReplicas, desiredReplicas),
+			LastTransitionTime: metav1.Now(),
+		})
 	}
 }
 
@@ -767,23 +767,23 @@ func (cm *ConditionManager) SetReady(readyReplicas, desiredReplicas int32) {
 func (cm *ConditionManager) SetAvailable(readyReplicas int32) {
 	if readyReplicas > 0 {
 		meta.SetStatusCondition(&cm.pg.Status.Conditions, metav1.Condition{
-				Type:               postgresv1alpha1.ConditionTypeAvailable,
-				Status:             metav1.ConditionTrue,
-				ObservedGeneration: cm.pg.Generation,
-				Reason:             "AtLeastOneReplicaAvailable",
-				Message: fmt.Sprintf(
-					"%d replica(s) available for connections", readyReplicas),
-				LastTransitionTime: metav1.Now(),
-			})
+			Type:               postgresv1alpha1.ConditionTypeAvailable,
+			Status:             metav1.ConditionTrue,
+			ObservedGeneration: cm.pg.Generation,
+			Reason:             "AtLeastOneReplicaAvailable",
+			Message: fmt.Sprintf(
+				"%d replica(s) available for connections", readyReplicas),
+			LastTransitionTime: metav1.Now(),
+		})
 	} else {
 		meta.SetStatusCondition(&cm.pg.Status.Conditions, metav1.Condition{
-				Type:               postgresv1alpha1.ConditionTypeAvailable,
-				Status:             metav1.ConditionFalse,
-				ObservedGeneration: cm.pg.Generation,
-				Reason:             "NoReplicasAvailable",
-				Message:            "No replicas are available for connections",
-				LastTransitionTime: metav1.Now(),
-			})
+			Type:               postgresv1alpha1.ConditionTypeAvailable,
+			Status:             metav1.ConditionFalse,
+			ObservedGeneration: cm.pg.Generation,
+			Reason:             "NoReplicasAvailable",
+			Message:            "No replicas are available for connections",
+			LastTransitionTime: metav1.Now(),
+		})
 	}
 }
 
@@ -796,13 +796,13 @@ func (cm *ConditionManager) SetProgressing(isProgressing bool, reason, message s
 		status = metav1.ConditionTrue
 	}
 	meta.SetStatusCondition(&cm.pg.Status.Conditions, metav1.Condition{
-			Type:               postgresv1alpha1.ConditionTypeProgressing,
-			Status:             status,
-			ObservedGeneration: cm.pg.Generation,
-			Reason:             reason,
-			Message:            message,
-			LastTransitionTime: metav1.Now(),
-		})
+		Type:               postgresv1alpha1.ConditionTypeProgressing,
+		Status:             status,
+		ObservedGeneration: cm.pg.Generation,
+		Reason:             reason,
+		Message:            message,
+		LastTransitionTime: metav1.Now(),
+	})
 }
 
 // SetDegraded sets a "Degraded" condition when the cluster is operational
@@ -813,13 +813,13 @@ func (cm *ConditionManager) SetDegraded(isDegraded bool, reason, message string)
 		status = metav1.ConditionTrue
 	}
 	meta.SetStatusCondition(&cm.pg.Status.Conditions, metav1.Condition{
-			Type:               "Degraded",
-			Status:             status,
-			ObservedGeneration: cm.pg.Generation,
-			Reason:             reason,
-			Message:            message,
-			LastTransitionTime: metav1.Now(),
-		})
+		Type:               "Degraded",
+		Status:             status,
+		ObservedGeneration: cm.pg.Generation,
+		Reason:             reason,
+		Message:            message,
+		LastTransitionTime: metav1.Now(),
+	})
 }
 
 // SetError sets a "Ready" condition to False with error details. This is
@@ -827,13 +827,13 @@ func (cm *ConditionManager) SetDegraded(isDegraded bool, reason, message string)
 // from being fully healthy.
 func (cm *ConditionManager) SetError(err error) {
 	meta.SetStatusCondition(&cm.pg.Status.Conditions, metav1.Condition{
-			Type:               postgresv1alpha1.ConditionTypeReady,
-			Status:             metav1.ConditionFalse,
-			ObservedGeneration: cm.pg.Generation,
-			Reason:             "ReconcileError",
-			Message:            fmt.Sprintf("Reconciliation error: %v", err),
-			LastTransitionTime: metav1.Now(),
-		})
+		Type:               postgresv1alpha1.ConditionTypeReady,
+		Status:             metav1.ConditionFalse,
+		ObservedGeneration: cm.pg.Generation,
+		Reason:             "ReconcileError",
+		Message:            fmt.Sprintf("Reconciliation error: %v", err),
+		LastTransitionTime: metav1.Now(),
+	})
 }
 
 // IsReady returns true if the "Ready" condition is True. This is a
@@ -878,6 +878,7 @@ controllerutil.SetControllerReference(owner, child, scheme)
 // Multiple non-controller owners are allowed. The resource is only
 // garbage collected when ALL owners (controller + non-controller) are deleted.
 controllerutil.SetOwnerReference(owner, child, scheme)
+
 ```
 
 ### 35.4.2 Cross-Namespace Ownership
@@ -893,9 +894,10 @@ Workarounds for cross-namespace relationships:
 // must implement cleanup manually (e.g., via finalizers).
 //
 // The child resource in another namespace gets a label pointing to the owner:
-//   labels:
-//     postgres.example.com/owner-name: my-database
-//     postgres.example.com/owner-namespace: production
+//
+//	labels:
+//	  postgres.example.com/owner-name: my-database
+//	  postgres.example.com/owner-namespace: production
 //
 // During finalizer cleanup, the operator lists resources with these labels
 // and deletes them.
@@ -934,8 +936,8 @@ func demonstrateDeletionPolicies(ctx context.Context, c client.Client) {
 	// The garbage collector asynchronously deletes children.
 	bgPolicy := metav1.DeletePropagationBackground
 	_ = c.Delete(ctx, pg, &client.DeleteOptions{
-			PropagationPolicy: &bgPolicy,
-		})
+		PropagationPolicy: &bgPolicy,
+	})
 
 	// Foreground deletion: children are deleted first. The owner enters
 	// a "deleting" state and is only removed after all children are gone.
@@ -943,16 +945,16 @@ func demonstrateDeletionPolicies(ctx context.Context, c client.Client) {
 	// before the parent disappears.
 	fgPolicy := metav1.DeletePropagationForeground
 	_ = c.Delete(ctx, pg, &client.DeleteOptions{
-			PropagationPolicy: &fgPolicy,
-		})
+		PropagationPolicy: &fgPolicy,
+	})
 
 	// Orphan deletion: the owner is deleted but children are left running.
 	// The owner references are removed from the children, making them
 	// standalone resources. Useful for "detaching" resources.
 	orphanPolicy := metav1.DeletePropagationOrphan
 	_ = c.Delete(ctx, pg, &client.DeleteOptions{
-			PropagationPolicy: &orphanPolicy,
-		})
+		PropagationPolicy: &orphanPolicy,
+	})
 }
 ```
 
@@ -1030,10 +1032,10 @@ const (
 // Examples:
 //
 //	recordEvent(recorder, pg, corev1.EventTypeNormal, EventReasonCreated,
-	//	    "Created StatefulSet %s with %d replicas", stsName, replicas)
+//	    "Created StatefulSet %s with %d replicas", stsName, replicas)
 //
 //	recordEvent(recorder, pg, corev1.EventTypeWarning, EventReasonReconcileError,
-	//	    "Failed to create Service: %v", err)
+//	    "Failed to create Service: %v", err)
 func recordEvent(
 	recorder record.EventRecorder,
 	pg *postgresv1alpha1.PostgresCluster,
@@ -1104,11 +1106,11 @@ In Chapter 34 we used `Owns()` to watch resources created by our operator:
 // PostgresCluster and enqueues a reconciliation.
 func (r *PostgresClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-	For(&postgresv1alpha1.PostgresCluster{}).
-	Owns(&appsv1.StatefulSet{}).
-	Owns(&corev1.Service{}).
-	Owns(&corev1.ConfigMap{}).
-	Complete(r)
+		For(&postgresv1alpha1.PostgresCluster{}).
+		Owns(&appsv1.StatefulSet{}).
+		Owns(&corev1.Service{}).
+		Owns(&corev1.ConfigMap{}).
+		Complete(r)
 }
 ```
 
@@ -1131,29 +1133,28 @@ func (r *PostgresClusterReconciler) SetupWithManagerAdvanced(
 	mgr ctrl.Manager,
 ) error {
 	return ctrl.NewControllerManagedBy(mgr).
-	// Primary watch: PostgresCluster resources.
-	For(&postgresv1alpha1.PostgresCluster{}).
+		// Primary watch: PostgresCluster resources.
+		For(&postgresv1alpha1.PostgresCluster{}).
 
-	// Owned resources: changes trigger reconcile of the owner.
-	Owns(&appsv1.StatefulSet{}).
-	Owns(&corev1.Service{}).
-	Owns(&corev1.ConfigMap{}).
+		// Owned resources: changes trigger reconcile of the owner.
+		Owns(&appsv1.StatefulSet{}).
+		Owns(&corev1.Service{}).
+		Owns(&corev1.ConfigMap{}).
 
-	// Watch Secrets with a specific label. When a Secret with label
-	// "postgres.example.com/watched=true" changes, find all
-	// PostgresClusters in the same namespace and reconcile them.
-	Watches(
-		&corev1.Secret{},
-		handler.EnqueueRequestsFromMapFunc(
-			r.findPostgresClustersForSecret,
-		),
-		builder.WithPredicates(predicate.NewPredicateFuncs(func(obj client.Object) bool {
-					// Only watch Secrets with our label.
-					return obj.GetLabels()["postgres.example.com/watched"] == "true"
-				})),
-	).
-
-	Complete(r)
+		// Watch Secrets with a specific label. When a Secret with label
+		// "postgres.example.com/watched=true" changes, find all
+		// PostgresClusters in the same namespace and reconcile them.
+		Watches(
+			&corev1.Secret{},
+			handler.EnqueueRequestsFromMapFunc(
+				r.findPostgresClustersForSecret,
+			),
+			builder.WithPredicates(predicate.NewPredicateFuncs(func(obj client.Object) bool {
+				// Only watch Secrets with our label.
+				return obj.GetLabels()["postgres.example.com/watched"] == "true"
+			})),
+		).
+		Complete(r)
 }
 
 // findPostgresClustersForSecret maps a Secret change to the PostgresClusters
@@ -1181,11 +1182,11 @@ func (r *PostgresClusterReconciler) findPostgresClustersForSecret(
 	requests := make([]ctrl.Request, 0, len(pgList.Items))
 	for _, pg := range pgList.Items {
 		requests = append(requests, ctrl.Request{
-				NamespacedName: types.NamespacedName{
-					Name:      pg.Name,
-					Namespace: pg.Namespace,
-				},
-			})
+			NamespacedName: types.NamespacedName{
+				Name:      pg.Name,
+				Namespace: pg.Namespace,
+			},
+		})
 	}
 
 	log.Info("Secret changed — enqueueing PostgresClusters",
@@ -1201,7 +1202,7 @@ func (r *PostgresClusterReconciler) findPostgresClustersForSecret(
 
 ```go
 // watchPodsForHealth demonstrates watching individual Pods (not just the
-	// StatefulSet) to detect health issues early. When a Pod transitions to
+// StatefulSet) to detect health issues early. When a Pod transitions to
 // a failed state, we can trigger immediate reconciliation rather than
 // waiting for the StatefulSet controller to report the change.
 //
@@ -1213,22 +1214,22 @@ func (r *PostgresClusterReconciler) watchPodsForHealth(
 	mgr ctrl.Manager,
 ) error {
 	return ctrl.NewControllerManagedBy(mgr).
-	For(&postgresv1alpha1.PostgresCluster{}).
-	Owns(&appsv1.StatefulSet{}).
-	Watches(
-		&corev1.Pod{},
-		handler.EnqueueRequestForOwner(
-			mgr.GetScheme(),
-			mgr.GetRESTMapper(),
-			&appsv1.StatefulSet{},
-		),
-		builder.WithPredicates(predicate.NewPredicateFuncs(func(obj client.Object) bool {
-					// Only watch Pods with our label.
-					labels := obj.GetLabels()
-					return labels["app.kubernetes.io/managed-by"] == "postgres-operator"
-				})),
-	).
-	Complete(r)
+		For(&postgresv1alpha1.PostgresCluster{}).
+		Owns(&appsv1.StatefulSet{}).
+		Watches(
+			&corev1.Pod{},
+			handler.EnqueueRequestForOwner(
+				mgr.GetScheme(),
+				mgr.GetRESTMapper(),
+				&appsv1.StatefulSet{},
+			),
+			builder.WithPredicates(predicate.NewPredicateFuncs(func(obj client.Object) bool {
+				// Only watch Pods with our label.
+				labels := obj.GetLabels()
+				return labels["app.kubernetes.io/managed-by"] == "postgres-operator"
+			})),
+		).
+		Complete(r)
 }
 ```
 
@@ -1266,43 +1267,43 @@ controller-runtime provides built-in leader election using Kubernetes Lease obje
 // The holder of the Lease is the leader.
 func configureLeaderElection() (ctrl.Manager, error) {
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-			Scheme: scheme,
+		Scheme: scheme,
 
-			// LeaderElection enables leader election. When true, only the leader
-			// instance starts controllers. Non-leader instances idle until they
-			// acquire the Lease.
-			LeaderElection: true,
+		// LeaderElection enables leader election. When true, only the leader
+		// instance starts controllers. Non-leader instances idle until they
+		// acquire the Lease.
+		LeaderElection: true,
 
-			// LeaderElectionID is the name of the Lease resource used for
-			// leader election. It must be unique per operator (if multiple
-				// operators share a namespace).
-			LeaderElectionID: "postgres-operator.example.com",
+		// LeaderElectionID is the name of the Lease resource used for
+		// leader election. It must be unique per operator (if multiple
+		// operators share a namespace).
+		LeaderElectionID: "postgres-operator.example.com",
 
-			// LeaderElectionNamespace is the namespace for the Lease.
-			// Defaults to the operator's namespace (read from the downward API
-				// or the WATCH_NAMESPACE environment variable).
-			LeaderElectionNamespace: "postgres-operator-system",
+		// LeaderElectionNamespace is the namespace for the Lease.
+		// Defaults to the operator's namespace (read from the downward API
+		// or the WATCH_NAMESPACE environment variable).
+		LeaderElectionNamespace: "postgres-operator-system",
 
-			// LeaderElectionReleaseOnCancel controls whether the leader releases
-			// the Lease when it shuts down gracefully. When true, leadership
-			// transitions are faster (no need to wait for the Lease to expire).
-			// When false (default), the Lease must expire before a new leader
-			// is elected (takes LeaseDuration).
-			LeaderElectionReleaseOnCancel: true,
+		// LeaderElectionReleaseOnCancel controls whether the leader releases
+		// the Lease when it shuts down gracefully. When true, leadership
+		// transitions are faster (no need to wait for the Lease to expire).
+		// When false (default), the Lease must expire before a new leader
+		// is elected (takes LeaseDuration).
+		LeaderElectionReleaseOnCancel: true,
 
-			// LeaseDuration is how long a non-leader waits before trying to
-			// acquire the Lease after the leader's last heartbeat. Default: 15s.
-			// Lower values = faster failover but more API server load.
-			LeaseDuration: durationPtr(15 * time.Second),
+		// LeaseDuration is how long a non-leader waits before trying to
+		// acquire the Lease after the leader's last heartbeat. Default: 15s.
+		// Lower values = faster failover but more API server load.
+		LeaseDuration: durationPtr(15 * time.Second),
 
-			// RenewDeadline is how long the leader has to renew its Lease
-			// before it expires. Must be < LeaseDuration. Default: 10s.
-			RenewDeadline: durationPtr(10 * time.Second),
+		// RenewDeadline is how long the leader has to renew its Lease
+		// before it expires. Must be < LeaseDuration. Default: 10s.
+		RenewDeadline: durationPtr(10 * time.Second),
 
-			// RetryPeriod is how often the operator retries acquiring or
-			// renewing the Lease. Must be < RenewDeadline. Default: 2s.
-			RetryPeriod: durationPtr(2 * time.Second),
-		})
+		// RetryPeriod is how often the operator retries acquiring or
+		// renewing the Lease. Must be < RenewDeadline. Default: 2s.
+		RetryPeriod: durationPtr(2 * time.Second),
+	})
 	return mgr, err
 }
 
@@ -1405,10 +1406,10 @@ var (
 	//   - Alert if the count drops unexpectedly (mass deletion)
 	//   - Track growth over time
 	ClustersTotal = prometheus.NewGauge(prometheus.GaugeOpts{
-			Name:      "postgres_operator_clusters_total",
-			Help:      "Total number of PostgresCluster resources managed by the operator",
-			Namespace: "postgres_operator",
-		})
+		Name:      "postgres_operator_clusters_total",
+		Help:      "Total number of PostgresCluster resources managed by the operator",
+		Namespace: "postgres_operator",
+	})
 
 	// ClusterReadyReplicas is a gauge vector that tracks the number of ready
 	// replicas for each PostgresCluster, labeled by cluster name and namespace.
@@ -1502,15 +1503,15 @@ func (r *PostgresClusterReconciler) updateMetrics(
 
 	// Update replica gauges.
 	metrics.ClusterReadyReplicas.WithLabelValues(name, namespace).
-	Set(float64(pg.Status.ReadyReplicas))
+		Set(float64(pg.Status.ReadyReplicas))
 	metrics.ClusterDesiredReplicas.WithLabelValues(name, namespace).
-	Set(float64(pg.Spec.Replicas))
+		Set(float64(pg.Spec.Replicas))
 
 	// Update version info gauge.
 	// Reset the old version (if it changed) and set the new one.
 	metrics.ClusterVersion.DeletePartialMatch(prometheus.Labels{
-			"name": name, "namespace": namespace,
-		})
+		"name": name, "namespace": namespace,
+	})
 	metrics.ClusterVersion.WithLabelValues(name, namespace, pg.Spec.Version).Set(1)
 }
 
@@ -1616,7 +1617,7 @@ type reconcileTestCase struct {
 func TestReconcile_TableDriven(t *testing.T) {
 	tests := []reconcileTestCase{
 		{
-			name: "resource not found — returns empty result (no error)",
+			name:            "resource not found — returns empty result (no error)",
 			existingObjects: []runtime.Object{},
 			request: ctrl.Request{
 				NamespacedName: types.NamespacedName{
@@ -1641,8 +1642,8 @@ func TestReconcile_TableDriven(t *testing.T) {
 			validate: func(t *testing.T, c client.Client) {
 				pg := &postgresv1alpha1.PostgresCluster{}
 				err := c.Get(context.Background(), types.NamespacedName{
-						Name: "test-pg", Namespace: "default",
-					}, pg)
+					Name: "test-pg", Namespace: "default",
+				}, pg)
 				require.NoError(t, err)
 				assert.Contains(t, pg.Finalizers, "postgres.example.com/finalizer",
 					"finalizer should be added on first reconcile")
@@ -1664,24 +1665,24 @@ func TestReconcile_TableDriven(t *testing.T) {
 				// Verify StatefulSet exists.
 				sts := &appsv1.StatefulSet{}
 				err := c.Get(context.Background(), types.NamespacedName{
-						Name: "test-pg", Namespace: "default",
-					}, sts)
+					Name: "test-pg", Namespace: "default",
+				}, sts)
 				require.NoError(t, err)
 				assert.Equal(t, int32(3), *sts.Spec.Replicas)
 
 				// Verify headless Service exists.
 				svc := &corev1.Service{}
 				err = c.Get(context.Background(), types.NamespacedName{
-						Name: "test-pg-headless", Namespace: "default",
-					}, svc)
+					Name: "test-pg-headless", Namespace: "default",
+				}, svc)
 				require.NoError(t, err)
 				assert.Equal(t, corev1.ClusterIPNone, svc.Spec.ClusterIP)
 
 				// Verify ConfigMap exists.
 				cm := &corev1.ConfigMap{}
 				err = c.Get(context.Background(), types.NamespacedName{
-						Name: "test-pg-config", Namespace: "default",
-					}, cm)
+					Name: "test-pg-config", Namespace: "default",
+				}, cm)
 				require.NoError(t, err)
 			},
 		},
@@ -1689,49 +1690,49 @@ func TestReconcile_TableDriven(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-				// Create a fresh fake client for each test case.
-				scheme := runtime.NewScheme()
-				_ = postgresv1alpha1.AddToScheme(scheme)
-				_ = appsv1.AddToScheme(scheme)
-				_ = corev1.AddToScheme(scheme)
+			// Create a fresh fake client for each test case.
+			scheme := runtime.NewScheme()
+			_ = postgresv1alpha1.AddToScheme(scheme)
+			_ = appsv1.AddToScheme(scheme)
+			_ = corev1.AddToScheme(scheme)
 
-				fakeClient := fake.NewClientBuilder().
+			fakeClient := fake.NewClientBuilder().
 				WithScheme(scheme).
 				WithRuntimeObjects(tc.existingObjects...).
 				WithStatusSubresource(&postgresv1alpha1.PostgresCluster{}).
 				Build()
 
-				reconciler := &controller.PostgresClusterReconciler{
-					Client:   fakeClient,
-					Scheme:   scheme,
-					Recorder: record.NewFakeRecorder(100),
-				}
+			reconciler := &controller.PostgresClusterReconciler{
+				Client:   fakeClient,
+				Scheme:   scheme,
+				Recorder: record.NewFakeRecorder(100),
+			}
 
-				// Run one reconciliation.
-				result, err := reconciler.Reconcile(context.Background(), tc.request)
+			// Run one reconciliation.
+			result, err := reconciler.Reconcile(context.Background(), tc.request)
 
-				// Assert error expectation.
-				if tc.expectError {
-					assert.Error(t, err, "expected reconcile to return an error")
-				} else {
-					assert.NoError(t, err, "expected reconcile to succeed")
-				}
+			// Assert error expectation.
+			if tc.expectError {
+				assert.Error(t, err, "expected reconcile to return an error")
+			} else {
+				assert.NoError(t, err, "expected reconcile to succeed")
+			}
 
-				// Assert requeue expectation.
-				if tc.expectRequeue {
-					assert.True(t, result.Requeue,
-						"expected result.Requeue to be true")
-				}
-				if tc.expectRequeueAfter {
-					assert.True(t, result.RequeueAfter > 0,
-						"expected result.RequeueAfter > 0")
-				}
+			// Assert requeue expectation.
+			if tc.expectRequeue {
+				assert.True(t, result.Requeue,
+					"expected result.Requeue to be true")
+			}
+			if tc.expectRequeueAfter {
+				assert.True(t, result.RequeueAfter > 0,
+					"expected result.RequeueAfter > 0")
+			}
 
-				// Run custom validation.
-				if tc.validate != nil {
-					tc.validate(t, fakeClient)
-				}
-			})
+			// Run custom validation.
+			if tc.validate != nil {
+				tc.validate(t, fakeClient)
+			}
+		})
 	}
 }
 
@@ -1755,7 +1756,7 @@ func newPostgresCluster(name, namespace string, replicas int32, version string) 
 
 // newPostgresClusterWithFinalizer creates a PostgresCluster that already
 // has the finalizer added (simulating a cluster that has already had its
-	// first reconcile).
+// first reconcile).
 func newPostgresClusterWithFinalizer(name, namespace string, replicas int32, version string) *postgresv1alpha1.PostgresCluster {
 	pg := newPostgresCluster(name, namespace, replicas, version)
 	pg.Finalizers = []string{"postgres.example.com/finalizer"}

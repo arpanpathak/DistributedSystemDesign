@@ -1495,7 +1495,7 @@ func NewRBACManager() (*RBACManager, error) {
 //   - rules: The set of PolicyRules that define what this Role allows.
 //
 // Returns the created Role object or an error if creation fails (e.g.,
-	// the Role already exists, or the caller lacks permission to create Roles).
+// the Role already exists, or the caller lacks permission to create Roles).
 func (m *RBACManager) CreateNamespacedRole(
 	ctx context.Context,
 	namespace, name string,
@@ -1624,13 +1624,13 @@ func (m *RBACManager) CreateRoleBinding(
 //   - appName: The name of the application (used to derive resource names).
 //
 // This function creates:
-//   1. A Role named "<appName>-role" with permissions to manage Pods,
-//      ConfigMaps, and Services.
-//   2. A RoleBinding named "<appName>-binding" connecting the
-//      ServiceAccount "<appName>-sa" to the Role.
+//  1. A Role named "<appName>-role" with permissions to manage Pods,
+//     ConfigMaps, and Services.
+//  2. A RoleBinding named "<appName>-binding" connecting the
+//     ServiceAccount "<appName>-sa" to the Role.
 //
 // The ServiceAccount itself should be created separately (usually by
-	// the application's Deployment manifest).
+// the application's Deployment manifest).
 func (m *RBACManager) SetupApplicationRBAC(
 	ctx context.Context,
 	namespace, appName string,
@@ -1738,7 +1738,7 @@ type PermissionCheck struct {
 	Resource string
 
 	// APIGroup is the API group of the resource ("" for core, "apps",
-		// "rbac.authorization.k8s.io", etc.).
+	// "rbac.authorization.k8s.io", etc.).
 	APIGroup string
 
 	// ResourceName is an optional specific resource name. If empty,
@@ -1913,7 +1913,7 @@ func (a *RBACAuditor) AuditServiceAccount(
 // PrintAuditReport prints a formatted audit report to the log, showing
 // which permissions are allowed and which are denied. Allowed permissions
 // are marked with ✓ and denied with ✗. Dangerous permissions (secrets,
-	// exec, RBAC) are flagged with warnings.
+// exec, RBAC) are flagged with warnings.
 //
 // Parameters:
 //   - saName: The name of the ServiceAccount (for display purposes).
@@ -2245,11 +2245,11 @@ func main() {
 	}{
 		{"get", "configmaps", "", true},
 		{"list", "configmaps", "", true},
-		{"create", "configmaps", "", false},   // Should NOT be allowed
-		{"get", "secrets", "", true},           // Allowed (specific names)
-		{"list", "secrets", "", false},         // Should NOT be allowed
+		{"create", "configmaps", "", false}, // Should NOT be allowed
+		{"get", "secrets", "", true},        // Allowed (specific names)
+		{"list", "secrets", "", false},      // Should NOT be allowed
 		{"create", "events", "", true},
-		{"get", "pods", "", false},             // Not in our role
+		{"get", "pods", "", false},               // Not in our role
 		{"create", "deployments", "apps", false}, // Not in our role
 	}
 

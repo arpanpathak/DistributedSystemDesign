@@ -377,10 +377,10 @@ func createNamespacedProcess() error {
 	// The Cloneflags field maps directly to the flags argument of
 	// the clone(2) syscall.
 	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Cloneflags: syscall.CLONE_NEWPID |  // New PID namespace
-		syscall.CLONE_NEWUTS |          // New UTS namespace
-		syscall.CLONE_NEWNS |           // New mount namespace
-		syscall.CLONE_NEWIPC,           // New IPC namespace
+		Cloneflags: syscall.CLONE_NEWPID | // New PID namespace
+			syscall.CLONE_NEWUTS | // New UTS namespace
+			syscall.CLONE_NEWNS | // New mount namespace
+			syscall.CLONE_NEWIPC, // New IPC namespace
 	}
 
 	// Connect the child's stdio to our own so we can interact
@@ -463,10 +463,10 @@ func unshareNamespace(flags uintptr) error {
 	// syscall.RawSyscall provides direct access to Linux syscalls.
 	// SYS_UNSHARE is the syscall number for unshare(2).
 	_, _, errno := syscall.RawSyscall(
-		syscall.SYS_UNSHARE,  // syscall number
-		flags,                 // namespace flags
-		0,                     // unused
-		0,                     // unused
+		syscall.SYS_UNSHARE, // syscall number
+		flags,               // namespace flags
+		0,                   // unused
+		0,                   // unused
 	)
 	if errno != 0 {
 		return fmt.Errorf("unshare failed: %v", errno)
@@ -601,9 +601,9 @@ func enterNamespace(pid int, nsName string) error {
 	// The second argument is the expected namespace type — the kernel
 	// will verify the fd actually refers to this type of namespace.
 	_, _, errno := syscall.RawSyscall(
-		308,                   // SYS_SETNS on x86_64
-		uintptr(fd),          // namespace file descriptor
-		uintptr(ns.flag),     // expected namespace type (0 = any)
+		308,              // SYS_SETNS on x86_64
+		uintptr(fd),      // namespace file descriptor
+		uintptr(ns.flag), // expected namespace type (0 = any)
 		0,
 	)
 	if errno != 0 {
@@ -689,7 +689,7 @@ var allNamespaceTypes = []string{
 //
 // Returns a NamespaceInfo struct with the extracted inode, or an error
 // if the namespace file cannot be read (e.g., insufficient permissions
-	// or the namespace type doesn't exist on this kernel).
+// or the namespace type doesn't exist on this kernel).
 func getNamespaceInfo(pid int, nsType string) (NamespaceInfo, error) {
 	nsPath := filepath.Join("/proc", fmt.Sprintf("%d", pid), "ns", nsType)
 
@@ -945,9 +945,9 @@ func main() {
 
 	// Set clone flags to create new namespaces for the child.
 	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Cloneflags: syscall.CLONE_NEWPID |   // Child becomes PID 1
-		syscall.CLONE_NEWUTS |            // Isolated hostname
-		syscall.CLONE_NEWNS,              // Isolated mounts (for /proc)
+		Cloneflags: syscall.CLONE_NEWPID | // Child becomes PID 1
+			syscall.CLONE_NEWUTS | // Isolated hostname
+			syscall.CLONE_NEWNS, // Isolated mounts (for /proc)
 	}
 
 	if err := cmd.Run(); err != nil {
@@ -1399,7 +1399,7 @@ import (
 //
 // Parameters:
 //   - newRoot: path to the container's root filesystem (e.g., an
-	//     extracted Docker image layer or a minimal rootfs like Alpine)
+//     extracted Docker image layer or a minimal rootfs like Alpine)
 func setupRootfs(newRoot string) error {
 	// Step 1: Make the entire mount tree private. This prevents any
 	// mount/unmount operations we perform from propagating back to
@@ -1501,10 +1501,10 @@ func runContainer() {
 	// Execute a shell inside the isolated filesystem.
 	fmt.Println("[+] Entering isolated filesystem...")
 	syscall.Exec("/bin/sh", []string{"sh"}, []string{
-			"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-			"HOME=/root",
-			"TERM=xterm",
-		})
+		"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+		"HOME=/root",
+		"TERM=xterm",
+	})
 }
 
 func main() {
@@ -1523,8 +1523,8 @@ func main() {
 
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Cloneflags: syscall.CLONE_NEWPID |
-		syscall.CLONE_NEWNS |
-		syscall.CLONE_NEWUTS,
+			syscall.CLONE_NEWNS |
+			syscall.CLONE_NEWUTS,
 	}
 
 	if err := cmd.Run(); err != nil {
@@ -1641,9 +1641,9 @@ func createUserNamespace() error {
 		// CLONE_NEWUSER is special: it can be used by unprivileged users!
 		// This is what makes rootless containers possible.
 		Cloneflags: syscall.CLONE_NEWUSER |
-		syscall.CLONE_NEWPID |
-		syscall.CLONE_NEWUTS |
-		syscall.CLONE_NEWNS,
+			syscall.CLONE_NEWPID |
+			syscall.CLONE_NEWUTS |
+			syscall.CLONE_NEWNS,
 
 		// UidMappings defines the UID translation table.
 		// ContainerID 0 (root inside) maps to HostID (our UID) for Size 1.
@@ -1653,18 +1653,18 @@ func createUserNamespace() error {
 		// it's root but has no real root privileges on the host.
 		UidMappings: []syscall.SysProcIDMap{
 			{
-				ContainerID: 0,          // UID 0 inside namespace (root)
-				HostID:      uid,        // Maps to our real UID outside
-				Size:        1,          // Only one UID mapped
+				ContainerID: 0,   // UID 0 inside namespace (root)
+				HostID:      uid, // Maps to our real UID outside
+				Size:        1,   // Only one UID mapped
 			},
 		},
 
 		// GidMappings follows the same pattern for group IDs.
 		GidMappings: []syscall.SysProcIDMap{
 			{
-				ContainerID: 0,          // GID 0 inside namespace (root)
-				HostID:      gid,        // Maps to our real GID outside
-				Size:        1,          // Only one GID mapped
+				ContainerID: 0,   // GID 0 inside namespace (root)
+				HostID:      gid, // Maps to our real GID outside
+				Size:        1,   // Only one GID mapped
 			},
 		},
 	}
@@ -1979,7 +1979,7 @@ const cgroupV1BasePath = "/sys/fs/cgroup"
 //   - value: the value to write (e.g., "536870912" for 512MB)
 //
 // Returns an error if the write fails (e.g., invalid value, permission denied,
-	// or the cgroup controller rejected the value).
+// or the cgroup controller rejected the value).
 func writeFile(path string, value string) error {
 	if err := os.WriteFile(path, []byte(value), 0644); err != nil {
 		return fmt.Errorf("write %s=%s: %w", path, value, err)
@@ -2140,10 +2140,10 @@ func main() {
 	//   - Maximum 50 processes
 	cfg := CgroupV1Config{
 		Name:             cgroupName,
-		MemoryLimitBytes: 256 * 1024 * 1024,  // 256 MB
-		CPUQuotaUS:       50000,               // 50ms per 100ms = 50% CPU
-		CPUPeriodUS:      100000,              // 100ms period
-		PidsMax:          50,                  // Max 50 processes
+		MemoryLimitBytes: 256 * 1024 * 1024, // 256 MB
+		CPUQuotaUS:       50000,             // 50ms per 100ms = 50% CPU
+		CPUPeriodUS:      100000,            // 100ms period
+		PidsMax:          50,                // Max 50 processes
 	}
 
 	if err := CreateCgroupV1(cfg); err != nil {
@@ -2513,7 +2513,7 @@ func writeCgroupFile(cgroupPath, filename, value string) error {
 //
 // This writes to cgroup.subtree_control, e.g., "+cpu +memory +pids".
 // The controllers must already be listed in cgroup.controllers (available
-	// from the parent).
+// from the parent).
 func enableControllers(cgroupPath string, controllers []string) error {
 	// Build the "+controller" string for each controller.
 	var enables []string
@@ -2632,7 +2632,7 @@ func CreateCgroupV2(cfg CgroupV2Config) error {
 //
 // The process is moved atomically — it leaves its current cgroup and
 // enters the new one. All threads of the process move together (unlike
-	// cgroups v1 which allowed per-thread placement).
+// cgroups v1 which allowed per-thread placement).
 func AddProcessToCgroupV2(name string, pid int) error {
 	procsFile := filepath.Join(cgroupV2Root, name, "cgroup.procs")
 	return writeCgroupFile(filepath.Dir(procsFile), "cgroup.procs",
@@ -2668,13 +2668,13 @@ func main() {
 	// Create a cgroup with comprehensive resource limits.
 	cfg := CgroupV2Config{
 		Name:          cgroupName,
-		CPUMax:        "50000 100000",         // 50% of one CPU
-		CPUWeight:     100,                    // Default weight
-		MemoryMax:     256 * 1024 * 1024,      // 256 MB hard limit
-		MemoryHigh:    200 * 1024 * 1024,      // 200 MB throttle point
-		MemoryLow:     64 * 1024 * 1024,       // 64 MB protection
-		MemorySwapMax: 0,                      // No swap
-		PidsMax:       50,                     // Max 50 processes
+		CPUMax:        "50000 100000",    // 50% of one CPU
+		CPUWeight:     100,               // Default weight
+		MemoryMax:     256 * 1024 * 1024, // 256 MB hard limit
+		MemoryHigh:    200 * 1024 * 1024, // 200 MB throttle point
+		MemoryLow:     64 * 1024 * 1024,  // 64 MB protection
+		MemorySwapMax: 0,                 // No swap
+		PidsMax:       50,                // Max 50 processes
 	}
 
 	if err := CreateCgroupV2(cfg); err != nil {
@@ -3219,9 +3219,9 @@ func main() {
 		Hostname:    "mini-container",
 		RootFS:      "/var/lib/containers/alpine-rootfs",
 		Command:     []string{"/bin/sh"},
-		MemoryLimit: 256 * 1024 * 1024,      // 256 MB
-		CPUQuota:    "50000 100000",           // 50% CPU
-		PidsLimit:   64,                       // Max 64 processes
+		MemoryLimit: 256 * 1024 * 1024, // 256 MB
+		CPUQuota:    "50000 100000",    // 50% CPU
+		PidsLimit:   64,                // Max 64 processes
 	}
 
 	fmt.Println("╔═══════════════════════════════════════════════════════╗")
@@ -3256,12 +3256,12 @@ func main() {
 
 	// Set ALL namespace flags — full isolation.
 	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Cloneflags: syscall.CLONE_NEWPID |    // Isolated PIDs
-		syscall.CLONE_NEWNS |             // Isolated mounts
-		syscall.CLONE_NEWUTS |            // Isolated hostname
-		syscall.CLONE_NEWIPC |            // Isolated IPC
-		syscall.CLONE_NEWNET |            // Isolated network
-		0x02000000,                       // CLONE_NEWCGROUP
+		Cloneflags: syscall.CLONE_NEWPID | // Isolated PIDs
+			syscall.CLONE_NEWNS | // Isolated mounts
+			syscall.CLONE_NEWUTS | // Isolated hostname
+			syscall.CLONE_NEWIPC | // Isolated IPC
+			syscall.CLONE_NEWNET | // Isolated network
+			0x02000000, // CLONE_NEWCGROUP
 	}
 
 	if err := cmd.Start(); err != nil {

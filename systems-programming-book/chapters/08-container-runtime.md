@@ -205,39 +205,39 @@ parent (run) and child (init) process roles:
 package main
 
 import (
-"fmt"
-"os"
+	"fmt"
+	"os"
 
-"github.com/example/gobox/cmd"
+	"github.com/example/gobox/cmd"
 )
 
 func main() {
-if len(os.Args) < 2 {
-printUsage()
-os.Exit(1)
-}
+	if len(os.Args) < 2 {
+		printUsage()
+		os.Exit(1)
+	}
 
-switch os.Args[1] {
-case "run":
-if err := cmd.Run(os.Args[2:]); err != nil {
-fmt.Fprintf(os.Stderr, "gobox: %v\n", err)
-os.Exit(1)
-}
-case "init":
-// Called internally by the child process—never by the user
-if err := cmd.Init(os.Args[2:]); err != nil {
-fmt.Fprintf(os.Stderr, "gobox-init: %v\n", err)
-os.Exit(1)
-}
-default:
-fmt.Fprintf(os.Stderr, "gobox: unknown command %q\n", os.Args[1])
-printUsage()
-os.Exit(1)
-}
+	switch os.Args[1] {
+	case "run":
+		if err := cmd.Run(os.Args[2:]); err != nil {
+			fmt.Fprintf(os.Stderr, "gobox: %v\n", err)
+			os.Exit(1)
+		}
+	case "init":
+		// Called internally by the child process—never by the user
+		if err := cmd.Init(os.Args[2:]); err != nil {
+			fmt.Fprintf(os.Stderr, "gobox-init: %v\n", err)
+			os.Exit(1)
+		}
+	default:
+		fmt.Fprintf(os.Stderr, "gobox: unknown command %q\n", os.Args[1])
+		printUsage()
+		os.Exit(1)
+	}
 }
 
 func printUsage() {
-fmt.Fprintf(os.Stderr, `Usage: gobox <command> [options]
+	fmt.Fprintf(os.Stderr, `Usage: gobox <command> [options]
 
 Commands:
   run    Create and start a new container
@@ -268,85 +268,85 @@ the container specification as Go structs.
 package container
 
 import (
-"encoding/json"
-"fmt"
-"os"
-"time"
+	"encoding/json"
+	"fmt"
+	"os"
+	"time"
 )
 
 // Config holds the complete specification for a container.
 type Config struct {
-// ID is a unique identifier for this container.
-ID string `json:"id"`
+	// ID is a unique identifier for this container.
+	ID string `json:"id"`
 
-// RootFS is the path to the root filesystem image.
-RootFS string `json:"rootfs"`
+	// RootFS is the path to the root filesystem image.
+	RootFS string `json:"rootfs"`
 
-// Command is the process to execute inside the container.
-Command []string `json:"command"`
+	// Command is the process to execute inside the container.
+	Command []string `json:"command"`
 
-// Hostname to set inside the container.
-Hostname string `json:"hostname"`
+	// Hostname to set inside the container.
+	Hostname string `json:"hostname"`
 
-// Environment variables for the container process.
-Env []string `json:"env"`
+	// Environment variables for the container process.
+	Env []string `json:"env"`
 
-// Resources defines CPU, memory, and PID limits.
-Resources ResourceConfig `json:"resources"`
+	// Resources defines CPU, memory, and PID limits.
+	Resources ResourceConfig `json:"resources"`
 
-// Network holds network configuration.
-Network NetworkConfig `json:"network"`
+	// Network holds network configuration.
+	Network NetworkConfig `json:"network"`
 
-// Security holds security settings.
-Security SecurityConfig `json:"security"`
+	// Security holds security settings.
+	Security SecurityConfig `json:"security"`
 
-// WorkDir is the working directory inside the container.
-WorkDir string `json:"workdir"`
+	// WorkDir is the working directory inside the container.
+	WorkDir string `json:"workdir"`
 
-// Created records when this config was generated.
-Created time.Time `json:"created"`
+	// Created records when this config was generated.
+	Created time.Time `json:"created"`
 }
 
 // ResourceConfig defines resource limits enforced via cgroups v2.
 type ResourceConfig struct {
-// CPUQuota is the fraction of a CPU core (e.g., 0.5 = 50%).
-CPUQuota float64 `json:"cpu_quota"`
+	// CPUQuota is the fraction of a CPU core (e.g., 0.5 = 50%).
+	CPUQuota float64 `json:"cpu_quota"`
 
-// MemoryLimitBytes is the hard memory limit in bytes.
-MemoryLimitBytes int64 `json:"memory_limit_bytes"`
+	// MemoryLimitBytes is the hard memory limit in bytes.
+	MemoryLimitBytes int64 `json:"memory_limit_bytes"`
 
-// PidsLimit is the maximum number of processes.
-PidsLimit int64 `json:"pids_limit"`
+	// PidsLimit is the maximum number of processes.
+	PidsLimit int64 `json:"pids_limit"`
 }
 
 // NetworkConfig defines the container network setup.
 type NetworkConfig struct {
-// BridgeName is the host bridge interface name.
-BridgeName string `json:"bridge_name"`
+	// BridgeName is the host bridge interface name.
+	BridgeName string `json:"bridge_name"`
 
-// ContainerIP is the IP address for the container (CIDR notation).
-ContainerIP string `json:"container_ip"`
+	// ContainerIP is the IP address for the container (CIDR notation).
+	ContainerIP string `json:"container_ip"`
 
-// GatewayIP is the bridge/gateway IP address.
-GatewayIP string `json:"gateway_ip"`
+	// GatewayIP is the bridge/gateway IP address.
+	GatewayIP string `json:"gateway_ip"`
 
-// EnableNAT controls whether to set up NAT for outbound traffic.
-EnableNAT bool `json:"enable_nat"`
+	// EnableNAT controls whether to set up NAT for outbound traffic.
+	EnableNAT bool `json:"enable_nat"`
 }
 
 // SecurityConfig defines security hardening options.
 type SecurityConfig struct {
-// DropCapabilities lists capabilities to drop.
-DropCapabilities []string `json:"drop_capabilities"`
+	// DropCapabilities lists capabilities to drop.
+	DropCapabilities []string `json:"drop_capabilities"`
 
-// ReadonlyRootfs makes the root filesystem read-only.
-ReadonlyRootfs bool `json:"readonly_rootfs"`
+	// ReadonlyRootfs makes the root filesystem read-only.
+	ReadonlyRootfs bool `json:"readonly_rootfs"`
 
-// NoNewPrivileges prevents gaining new privileges via setuid.
-NoNewPrivileges bool `json:"no_new_privileges"`
+	// NoNewPrivileges prevents gaining new privileges via setuid.
+	NoNewPrivileges bool `json:"no_new_privileges"`
 
-// SeccompProfile is the path to a seccomp BPF profile.
-SeccompProfile string `json:"seccomp_profile"`
+	// SeccompProfile is the path to a seccomp BPF profile.
+	SeccompProfile string `json:"seccomp_profile"`
 }
 ```
 
@@ -355,45 +355,45 @@ SeccompProfile string `json:"seccomp_profile"`
 ```go
 // DefaultConfig returns a sensible default configuration.
 func DefaultConfig(rootfs string, command []string) *Config {
-return &Config{
-ID:       generateID(),
-RootFS:   rootfs,
-Command:  command,
-Hostname: "gobox",
-Env: []string{
-"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-"TERM=xterm-256color",
-"HOME=/root",
-},
-Resources: ResourceConfig{
-CPUQuota:         1.0,    // 100% of one core
-MemoryLimitBytes: 256 << 20, // 256 MiB
-PidsLimit:        64,     // Max 64 processes
-},
-Network: NetworkConfig{
-BridgeName:  "gobox0",
-ContainerIP: "10.10.10.2/24",
-GatewayIP:   "10.10.10.1/24",
-EnableNAT:   true,
-},
-Security: SecurityConfig{
-DropCapabilities: []string{
-"CAP_SYS_ADMIN",
-"CAP_NET_RAW",
-"CAP_SYS_PTRACE",
-"CAP_MKNOD",
-},
-ReadonlyRootfs:  false,
-NoNewPrivileges: true,
-},
-WorkDir: "/",
-Created: time.Now(),
-}
+	return &Config{
+		ID:       generateID(),
+		RootFS:   rootfs,
+		Command:  command,
+		Hostname: "gobox",
+		Env: []string{
+			"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+			"TERM=xterm-256color",
+			"HOME=/root",
+		},
+		Resources: ResourceConfig{
+			CPUQuota:         1.0,       // 100% of one core
+			MemoryLimitBytes: 256 << 20, // 256 MiB
+			PidsLimit:        64,        // Max 64 processes
+		},
+		Network: NetworkConfig{
+			BridgeName:  "gobox0",
+			ContainerIP: "10.10.10.2/24",
+			GatewayIP:   "10.10.10.1/24",
+			EnableNAT:   true,
+		},
+		Security: SecurityConfig{
+			DropCapabilities: []string{
+				"CAP_SYS_ADMIN",
+				"CAP_NET_RAW",
+				"CAP_SYS_PTRACE",
+				"CAP_MKNOD",
+			},
+			ReadonlyRootfs:  false,
+			NoNewPrivileges: true,
+		},
+		WorkDir: "/",
+		Created: time.Now(),
+	}
 }
 
 // generateID produces a short unique container ID.
 func generateID() string {
-return fmt.Sprintf("gobox-%d", time.Now().UnixNano()%1000000)
+	return fmt.Sprintf("gobox-%d", time.Now().UnixNano()%1000000)
 }
 ```
 
@@ -405,27 +405,27 @@ process via a file descriptor or pipe.
 ```go
 // Serialize writes the config as JSON to the given path.
 func (c *Config) Serialize(path string) error {
-data, err := json.MarshalIndent(c, "", "  ")
-if err != nil {
-return fmt.Errorf("marshaling config: %w", err)
-}
-if err := os.WriteFile(path, data, 0644); err != nil {
-return fmt.Errorf("writing config to %s: %w", path, err)
-}
-return nil
+	data, err := json.MarshalIndent(c, "", "  ")
+	if err != nil {
+		return fmt.Errorf("marshaling config: %w", err)
+	}
+	if err := os.WriteFile(path, data, 0644); err != nil {
+		return fmt.Errorf("writing config to %s: %w", path, err)
+	}
+	return nil
 }
 
 // LoadConfig reads a Config from a JSON file.
 func LoadConfig(path string) (*Config, error) {
-data, err := os.ReadFile(path)
-if err != nil {
-return nil, fmt.Errorf("reading config from %s: %w", path, err)
-}
-var cfg Config
-if err := json.Unmarshal(data, &cfg); err != nil {
-return nil, fmt.Errorf("parsing config: %w", err)
-}
-return &cfg, nil
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("reading config from %s: %w", path, err)
+	}
+	var cfg Config
+	if err := json.Unmarshal(data, &cfg); err != nil {
+		return nil, fmt.Errorf("parsing config: %w", err)
+	}
+	return &cfg, nil
 }
 ```
 
@@ -436,83 +436,83 @@ return &cfg, nil
 package cmd
 
 import (
-"flag"
-"fmt"
-"log"
-"os"
+	"flag"
+	"fmt"
+	"log"
+	"os"
 
-"github.com/example/gobox/container"
+	"github.com/example/gobox/container"
 )
 
 // Run is the entry point for "gobox run".
 func Run(args []string) error {
-fs := flag.NewFlagSet("run", flag.ExitOnError)
+	fs := flag.NewFlagSet("run", flag.ExitOnError)
 
-rootfs := fs.String("rootfs", "", "Path to root filesystem")
-cpu := fs.Float64("cpu", 1.0, "CPU quota (fraction of one core)")
-mem := fs.String("mem", "256m", "Memory limit (e.g., 128m, 1g)")
-pids := fs.Int64("pids", 64, "Maximum number of PIDs")
-hostname := fs.String("hostname", "gobox", "Container hostname")
+	rootfs := fs.String("rootfs", "", "Path to root filesystem")
+	cpu := fs.Float64("cpu", 1.0, "CPU quota (fraction of one core)")
+	mem := fs.String("mem", "256m", "Memory limit (e.g., 128m, 1g)")
+	pids := fs.Int64("pids", 64, "Maximum number of PIDs")
+	hostname := fs.String("hostname", "gobox", "Container hostname")
 
-if err := fs.Parse(args); err != nil {
-return fmt.Errorf("parsing flags: %w", err)
-}
+	if err := fs.Parse(args); err != nil {
+		return fmt.Errorf("parsing flags: %w", err)
+	}
 
-if *rootfs == "" {
-return fmt.Errorf("--rootfs is required")
-}
+	if *rootfs == "" {
+		return fmt.Errorf("--rootfs is required")
+	}
 
-remaining := fs.Args()
-if len(remaining) == 0 {
-return fmt.Errorf("no command specified")
-}
+	remaining := fs.Args()
+	if len(remaining) == 0 {
+		return fmt.Errorf("no command specified")
+	}
 
-memBytes, err := parseMemoryLimit(*mem)
-if err != nil {
-return fmt.Errorf("invalid memory limit %q: %w", *mem, err)
-}
+	memBytes, err := parseMemoryLimit(*mem)
+	if err != nil {
+		return fmt.Errorf("invalid memory limit %q: %w", *mem, err)
+	}
 
-cfg := container.DefaultConfig(*rootfs, remaining)
-cfg.Hostname = *hostname
-cfg.Resources.CPUQuota = *cpu
-cfg.Resources.MemoryLimitBytes = memBytes
-cfg.Resources.PidsLimit = *pids
+	cfg := container.DefaultConfig(*rootfs, remaining)
+	cfg.Hostname = *hostname
+	cfg.Resources.CPUQuota = *cpu
+	cfg.Resources.MemoryLimitBytes = memBytes
+	cfg.Resources.PidsLimit = *pids
 
-log.Printf("Starting container %s", cfg.ID)
-log.Printf("  Rootfs:   %s", cfg.RootFS)
-log.Printf("  Command:  %v", cfg.Command)
-log.Printf("  CPU:      %.1f cores", cfg.Resources.CPUQuota)
-log.Printf("  Memory:   %d MiB", cfg.Resources.MemoryLimitBytes>>20)
-log.Printf("  PIDs:     %d", cfg.Resources.PidsLimit)
+	log.Printf("Starting container %s", cfg.ID)
+	log.Printf("  Rootfs:   %s", cfg.RootFS)
+	log.Printf("  Command:  %v", cfg.Command)
+	log.Printf("  CPU:      %.1f cores", cfg.Resources.CPUQuota)
+	log.Printf("  Memory:   %d MiB", cfg.Resources.MemoryLimitBytes>>20)
+	log.Printf("  PIDs:     %d", cfg.Resources.PidsLimit)
 
-// Create and start the container (Section 8.8)
-ctr := container.New(cfg)
-return ctr.Run()
+	// Create and start the container (Section 8.8)
+	ctr := container.New(cfg)
+	return ctr.Run()
 }
 
 // parseMemoryLimit converts human-readable memory strings to bytes.
 func parseMemoryLimit(s string) (int64, error) {
-if len(s) < 2 {
-return 0, fmt.Errorf("too short")
-}
-suffix := s[len(s)-1]
-value := s[:len(s)-1]
+	if len(s) < 2 {
+		return 0, fmt.Errorf("too short")
+	}
+	suffix := s[len(s)-1]
+	value := s[:len(s)-1]
 
-var n int64
-if _, err := fmt.Sscanf(value, "%d", &n); err != nil {
-return 0, err
-}
+	var n int64
+	if _, err := fmt.Sscanf(value, "%d", &n); err != nil {
+		return 0, err
+	}
 
-switch suffix {
-case 'k', 'K':
-return n * 1024, nil
-case 'm', 'M':
-return n * 1024 * 1024, nil
-case 'g', 'G':
-return n * 1024 * 1024 * 1024, nil
-default:
-return 0, fmt.Errorf("unknown suffix %q", string(suffix))
-}
+	switch suffix {
+	case 'k', 'K':
+		return n * 1024, nil
+	case 'm', 'M':
+		return n * 1024 * 1024, nil
+	case 'g', 'G':
+		return n * 1024 * 1024 * 1024, nil
+	default:
+		return 0, fmt.Errorf("unknown suffix %q", string(suffix))
+	}
 }
 ```
 
@@ -579,95 +579,95 @@ modified.
 package filesystem
 
 import (
-"fmt"
-"log"
-"os"
-"path/filepath"
-"syscall"
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"syscall"
 )
 
 // OverlayFS manages an overlay filesystem for a container.
 type OverlayFS struct {
-// ContainerID uniquely identifies the container.
-ContainerID string
+	// ContainerID uniquely identifies the container.
+	ContainerID string
 
-// LowerDir is the read-only base image (e.g., Alpine rootfs).
-LowerDir string
+	// LowerDir is the read-only base image (e.g., Alpine rootfs).
+	LowerDir string
 
-// BaseDir is the parent directory for upper, work, and merged dirs.
-BaseDir string
+	// BaseDir is the parent directory for upper, work, and merged dirs.
+	BaseDir string
 
-// Derived paths
-upperDir  string
-workDir   string
-mergedDir string
+	// Derived paths
+	upperDir  string
+	workDir   string
+	mergedDir string
 }
 
 // NewOverlayFS creates a new OverlayFS instance.
 func NewOverlayFS(containerID, lowerDir, baseDir string) *OverlayFS {
-return &OverlayFS{
-ContainerID: containerID,
-LowerDir:    lowerDir,
-BaseDir:     baseDir,
-upperDir:    filepath.Join(baseDir, containerID, "upper"),
-workDir:     filepath.Join(baseDir, containerID, "work"),
-mergedDir:   filepath.Join(baseDir, containerID, "merged"),
-}
+	return &OverlayFS{
+		ContainerID: containerID,
+		LowerDir:    lowerDir,
+		BaseDir:     baseDir,
+		upperDir:    filepath.Join(baseDir, containerID, "upper"),
+		workDir:     filepath.Join(baseDir, containerID, "work"),
+		mergedDir:   filepath.Join(baseDir, containerID, "merged"),
+	}
 }
 
 // MergedDir returns the path to the merged mount point.
 func (o *OverlayFS) MergedDir() string {
-return o.mergedDir
+	return o.mergedDir
 }
 
 // Mount creates the directory structure and mounts the overlay.
 func (o *OverlayFS) Mount() error {
-// Create all required directories
-dirs := []string{o.upperDir, o.workDir, o.mergedDir}
-for _, dir := range dirs {
-if err := os.MkdirAll(dir, 0755); err != nil {
-return fmt.Errorf("creating directory %s: %w", dir, err)
-}
-}
+	// Create all required directories
+	dirs := []string{o.upperDir, o.workDir, o.mergedDir}
+	for _, dir := range dirs {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return fmt.Errorf("creating directory %s: %w", dir, err)
+		}
+	}
 
-// Construct the mount options string
-opts := fmt.Sprintf(
-"lowerdir=%s,upperdir=%s,workdir=%s",
-o.LowerDir,
-o.upperDir,
-o.workDir,
-)
+	// Construct the mount options string
+	opts := fmt.Sprintf(
+		"lowerdir=%s,upperdir=%s,workdir=%s",
+		o.LowerDir,
+		o.upperDir,
+		o.workDir,
+	)
 
-log.Printf("Mounting OverlayFS: merged=%s", o.mergedDir)
-log.Printf("  lowerdir=%s", o.LowerDir)
-log.Printf("  upperdir=%s", o.upperDir)
+	log.Printf("Mounting OverlayFS: merged=%s", o.mergedDir)
+	log.Printf("  lowerdir=%s", o.LowerDir)
+	log.Printf("  upperdir=%s", o.upperDir)
 
-// Mount the overlay filesystem
-err := syscall.Mount("overlay", o.mergedDir, "overlay", 0, opts)
-if err != nil {
-return fmt.Errorf("mounting overlay at %s: %w", o.mergedDir, err)
-}
+	// Mount the overlay filesystem
+	err := syscall.Mount("overlay", o.mergedDir, "overlay", 0, opts)
+	if err != nil {
+		return fmt.Errorf("mounting overlay at %s: %w", o.mergedDir, err)
+	}
 
-log.Printf("OverlayFS mounted successfully")
-return nil
+	log.Printf("OverlayFS mounted successfully")
+	return nil
 }
 
 // Unmount tears down the overlay and cleans up directories.
 func (o *OverlayFS) Unmount() error {
-log.Printf("Unmounting OverlayFS at %s", o.mergedDir)
+	log.Printf("Unmounting OverlayFS at %s", o.mergedDir)
 
-if err := syscall.Unmount(o.mergedDir, 0); err != nil {
-return fmt.Errorf("unmounting overlay at %s: %w", o.mergedDir, err)
-}
+	if err := syscall.Unmount(o.mergedDir, 0); err != nil {
+		return fmt.Errorf("unmounting overlay at %s: %w", o.mergedDir, err)
+	}
 
-// Clean up the container-specific directory
-containerDir := filepath.Join(o.BaseDir, o.ContainerID)
-if err := os.RemoveAll(containerDir); err != nil {
-return fmt.Errorf("removing container dir %s: %w", containerDir, err)
-}
+	// Clean up the container-specific directory
+	containerDir := filepath.Join(o.BaseDir, o.ContainerID)
+	if err := os.RemoveAll(containerDir); err != nil {
+		return fmt.Errorf("removing container dir %s: %w", containerDir, err)
+	}
 
-log.Printf("OverlayFS cleanup complete")
-return nil
+	log.Printf("OverlayFS cleanup complete")
+	return nil
 }
 ```
 
@@ -705,59 +705,59 @@ root is much more secure.
 package filesystem
 
 import (
-"fmt"
-"log"
-"os"
-"path/filepath"
-"syscall"
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"syscall"
 )
 
 // PivotRoot changes the root filesystem of the current process to newRoot.
 // This must be called from inside the new mount namespace.
 func PivotRoot(newRoot string) error {
-log.Printf("Performing pivot_root to %s", newRoot)
+	log.Printf("Performing pivot_root to %s", newRoot)
 
-// pivot_root requires that newRoot is a mount point.
-// Bind-mount it onto itself to satisfy this requirement.
-if err := syscall.Mount(newRoot, newRoot, "", syscall.MS_BIND|syscall.MS_REC, ""); err != nil {
-return fmt.Errorf("bind mount newRoot: %w", err)
-}
+	// pivot_root requires that newRoot is a mount point.
+	// Bind-mount it onto itself to satisfy this requirement.
+	if err := syscall.Mount(newRoot, newRoot, "", syscall.MS_BIND|syscall.MS_REC, ""); err != nil {
+		return fmt.Errorf("bind mount newRoot: %w", err)
+	}
 
-// Create directory for the old root
-pivotDir := filepath.Join(newRoot, ".pivot_root")
-if err := os.MkdirAll(pivotDir, 0700); err != nil {
-return fmt.Errorf("creating pivot dir: %w", err)
-}
+	// Create directory for the old root
+	pivotDir := filepath.Join(newRoot, ".pivot_root")
+	if err := os.MkdirAll(pivotDir, 0700); err != nil {
+		return fmt.Errorf("creating pivot dir: %w", err)
+	}
 
-// Perform the pivot
-// After this call:
-//   - newRoot becomes the new /
-//   - the old / is moved to .pivot_root
-if err := syscall.PivotRoot(newRoot, pivotDir); err != nil {
-return fmt.Errorf("pivot_root(%s, %s): %w", newRoot, pivotDir, err)
-}
+	// Perform the pivot
+	// After this call:
+	//   - newRoot becomes the new /
+	//   - the old / is moved to .pivot_root
+	if err := syscall.PivotRoot(newRoot, pivotDir); err != nil {
+		return fmt.Errorf("pivot_root(%s, %s): %w", newRoot, pivotDir, err)
+	}
 
-// Change to the new root directory
-if err := os.Chdir("/"); err != nil {
-return fmt.Errorf("chdir to new root: %w", err)
-}
+	// Change to the new root directory
+	if err := os.Chdir("/"); err != nil {
+		return fmt.Errorf("chdir to new root: %w", err)
+	}
 
-// Unmount the old root filesystem
-// MNT_DETACH performs a lazy unmount—the filesystem is unmounted
-// immediately from the namespace but actual cleanup happens when
-// all references are dropped.
-pivotDir = "/.pivot_root"
-if err := syscall.Unmount(pivotDir, syscall.MNT_DETACH); err != nil {
-return fmt.Errorf("unmounting old root: %w", err)
-}
+	// Unmount the old root filesystem
+	// MNT_DETACH performs a lazy unmount—the filesystem is unmounted
+	// immediately from the namespace but actual cleanup happens when
+	// all references are dropped.
+	pivotDir = "/.pivot_root"
+	if err := syscall.Unmount(pivotDir, syscall.MNT_DETACH); err != nil {
+		return fmt.Errorf("unmounting old root: %w", err)
+	}
 
-// Remove the pivot directory
-if err := os.Remove(pivotDir); err != nil {
-return fmt.Errorf("removing pivot dir: %w", err)
-}
+	// Remove the pivot directory
+	if err := os.Remove(pivotDir); err != nil {
+		return fmt.Errorf("removing pivot dir: %w", err)
+	}
 
-log.Printf("pivot_root complete — new root is /")
-return nil
+	log.Printf("pivot_root complete — new root is /")
+	return nil
 }
 ```
 
@@ -771,124 +771,124 @@ properly:
 package filesystem
 
 import (
-"fmt"
-"log"
-"os"
-"syscall"
+	"fmt"
+	"log"
+	"os"
+	"syscall"
 )
 
 // MountSpec describes a filesystem mount to set up inside the container.
 type MountSpec struct {
-Source string
-Target string
-FSType string
-Flags  uintptr
-Data   string
+	Source string
+	Target string
+	FSType string
+	Flags  uintptr
+	Data   string
 }
 
 // SetupContainerMounts creates essential mounts inside the container.
 // Must be called after pivot_root.
 func SetupContainerMounts() error {
-mounts := []MountSpec{
-{
-// /proc — process information pseudo-filesystem
-Source: "proc",
-Target: "/proc",
-FSType: "proc",
-Flags:  syscall.MS_NOSUID | syscall.MS_NODEV | syscall.MS_NOEXEC,
-},
-{
-// /sys — kernel and device information
-Source: "sysfs",
-Target: "/sys",
-FSType: "sysfs",
-Flags:  syscall.MS_NOSUID | syscall.MS_NODEV | syscall.MS_NOEXEC | syscall.MS_RDONLY,
-},
-{
-// /dev — device nodes (minimal tmpfs)
-Source: "tmpfs",
-Target: "/dev",
-FSType: "tmpfs",
-Flags:  syscall.MS_NOSUID | syscall.MS_STRICTATIME,
-Data:   "mode=755,size=65536k",
-},
-{
-// /dev/pts — pseudo-terminal devices
-Source: "devpts",
-Target: "/dev/pts",
-FSType: "devpts",
-Flags:  syscall.MS_NOSUID | syscall.MS_NOEXEC,
-Data:   "newinstance,ptmxmode=0666,mode=0620",
-},
-{
-// /dev/shm — shared memory
-Source: "shm",
-Target: "/dev/shm",
-FSType: "tmpfs",
-Flags:  syscall.MS_NOSUID | syscall.MS_NODEV | syscall.MS_NOEXEC,
-Data:   "mode=1777,size=65536k",
-},
-}
+	mounts := []MountSpec{
+		{
+			// /proc — process information pseudo-filesystem
+			Source: "proc",
+			Target: "/proc",
+			FSType: "proc",
+			Flags:  syscall.MS_NOSUID | syscall.MS_NODEV | syscall.MS_NOEXEC,
+		},
+		{
+			// /sys — kernel and device information
+			Source: "sysfs",
+			Target: "/sys",
+			FSType: "sysfs",
+			Flags:  syscall.MS_NOSUID | syscall.MS_NODEV | syscall.MS_NOEXEC | syscall.MS_RDONLY,
+		},
+		{
+			// /dev — device nodes (minimal tmpfs)
+			Source: "tmpfs",
+			Target: "/dev",
+			FSType: "tmpfs",
+			Flags:  syscall.MS_NOSUID | syscall.MS_STRICTATIME,
+			Data:   "mode=755,size=65536k",
+		},
+		{
+			// /dev/pts — pseudo-terminal devices
+			Source: "devpts",
+			Target: "/dev/pts",
+			FSType: "devpts",
+			Flags:  syscall.MS_NOSUID | syscall.MS_NOEXEC,
+			Data:   "newinstance,ptmxmode=0666,mode=0620",
+		},
+		{
+			// /dev/shm — shared memory
+			Source: "shm",
+			Target: "/dev/shm",
+			FSType: "tmpfs",
+			Flags:  syscall.MS_NOSUID | syscall.MS_NODEV | syscall.MS_NOEXEC,
+			Data:   "mode=1777,size=65536k",
+		},
+	}
 
-for _, m := range mounts {
-log.Printf("Mounting %s at %s (type=%s)", m.Source, m.Target, m.FSType)
+	for _, m := range mounts {
+		log.Printf("Mounting %s at %s (type=%s)", m.Source, m.Target, m.FSType)
 
-// Ensure the mount target directory exists
-if err := os.MkdirAll(m.Target, 0755); err != nil {
-return fmt.Errorf("creating mount target %s: %w", m.Target, err)
-}
+		// Ensure the mount target directory exists
+		if err := os.MkdirAll(m.Target, 0755); err != nil {
+			return fmt.Errorf("creating mount target %s: %w", m.Target, err)
+		}
 
-err := syscall.Mount(m.Source, m.Target, m.FSType, m.Flags, m.Data)
-if err != nil {
-return fmt.Errorf("mounting %s at %s: %w", m.Source, m.Target, err)
-}
-}
+		err := syscall.Mount(m.Source, m.Target, m.FSType, m.Flags, m.Data)
+		if err != nil {
+			return fmt.Errorf("mounting %s at %s: %w", m.Source, m.Target, err)
+		}
+	}
 
-// Create essential device nodes
-if err := createDeviceNodes(); err != nil {
-return fmt.Errorf("creating device nodes: %w", err)
-}
+	// Create essential device nodes
+	if err := createDeviceNodes(); err != nil {
+		return fmt.Errorf("creating device nodes: %w", err)
+	}
 
-return nil
+	return nil
 }
 
 // createDeviceNodes creates minimal /dev entries needed by most programs.
 func createDeviceNodes() error {
-// Symbolic links for standard I/O
-links := map[string]string{
-"/dev/stdin":  "/proc/self/fd/0",
-"/dev/stdout": "/proc/self/fd/1",
-"/dev/stderr": "/proc/self/fd/2",
-}
+	// Symbolic links for standard I/O
+	links := map[string]string{
+		"/dev/stdin":  "/proc/self/fd/0",
+		"/dev/stdout": "/proc/self/fd/1",
+		"/dev/stderr": "/proc/self/fd/2",
+	}
 
-for dst, src := range links {
-if err := os.Symlink(src, dst); err != nil {
-return fmt.Errorf("creating symlink %s -> %s: %w", dst, src, err)
-}
-}
+	for dst, src := range links {
+		if err := os.Symlink(src, dst); err != nil {
+			return fmt.Errorf("creating symlink %s -> %s: %w", dst, src, err)
+		}
+	}
 
-// Create /dev/null, /dev/zero, /dev/random, /dev/urandom
-devices := []struct {
-path  string
-major uint32
-minor uint32
-}{
-{"/dev/null", 1, 3},
-{"/dev/zero", 1, 5},
-{"/dev/random", 1, 8},
-{"/dev/urandom", 1, 9},
-{"/dev/tty", 5, 0},
-}
+	// Create /dev/null, /dev/zero, /dev/random, /dev/urandom
+	devices := []struct {
+		path  string
+		major uint32
+		minor uint32
+	}{
+		{"/dev/null", 1, 3},
+		{"/dev/zero", 1, 5},
+		{"/dev/random", 1, 8},
+		{"/dev/urandom", 1, 9},
+		{"/dev/tty", 5, 0},
+	}
 
-for _, dev := range devices {
-devNum := int(dev.major*256 + dev.minor)
-if err := syscall.Mknod(dev.path, syscall.S_IFCHR|0666, devNum); err != nil {
-return fmt.Errorf("mknod %s: %w", dev.path, err)
-}
-}
+	for _, dev := range devices {
+		devNum := int(dev.major*256 + dev.minor)
+		if err := syscall.Mknod(dev.path, syscall.S_IFCHR|0666, devNum); err != nil {
+			return fmt.Errorf("mknod %s: %w", dev.path, err)
+		}
+	}
 
-log.Printf("Device nodes created")
-return nil
+	log.Printf("Device nodes created")
+	return nil
 }
 ```
 
@@ -955,106 +955,106 @@ namespaces via `SysProcAttr.Cloneflags`.
 package container
 
 import (
-"encoding/json"
-"fmt"
-"log"
-"os"
-"os/exec"
-"path/filepath"
-"syscall"
+	"encoding/json"
+	"fmt"
+	"log"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"syscall"
 
-"github.com/example/gobox/cgroup"
-"github.com/example/gobox/filesystem"
-"github.com/example/gobox/network"
+	"github.com/example/gobox/cgroup"
+	"github.com/example/gobox/filesystem"
+	"github.com/example/gobox/network"
 )
 
 // Container manages the lifecycle of a single container.
 type Container struct {
-Config  *Config
-overlay *filesystem.OverlayFS
-cgroup  *cgroup.Manager
-net     *network.Veth
+	Config  *Config
+	overlay *filesystem.OverlayFS
+	cgroup  *cgroup.Manager
+	net     *network.Veth
 }
 
 // New creates a new Container from the given config.
 func New(cfg *Config) *Container {
-return &Container{
-Config: cfg,
-}
+	return &Container{
+		Config: cfg,
+	}
 }
 
 // Run creates and starts the container. This is the parent process entry point.
 func (c *Container) Run() error {
-log.Printf("=== Starting container %s ===", c.Config.ID)
+	log.Printf("=== Starting container %s ===", c.Config.ID)
 
-// Step 1: Set up the overlay filesystem
-if err := c.setupFilesystem(); err != nil {
-return fmt.Errorf("filesystem setup: %w", err)
-}
-defer c.cleanup()
+	// Step 1: Set up the overlay filesystem
+	if err := c.setupFilesystem(); err != nil {
+		return fmt.Errorf("filesystem setup: %w", err)
+	}
+	defer c.cleanup()
 
-// Step 2: Set up cgroups
-if err := c.setupCgroups(); err != nil {
-return fmt.Errorf("cgroup setup: %w", err)
-}
+	// Step 2: Set up cgroups
+	if err := c.setupCgroups(); err != nil {
+		return fmt.Errorf("cgroup setup: %w", err)
+	}
 
-// Step 3: Write config for the child process
-configPath := filepath.Join(c.overlay.MergedDir(), ".gobox-config.json")
-if err := c.Config.Serialize(configPath); err != nil {
-return fmt.Errorf("serializing config: %w", err)
-}
+	// Step 3: Write config for the child process
+	configPath := filepath.Join(c.overlay.MergedDir(), ".gobox-config.json")
+	if err := c.Config.Serialize(configPath); err != nil {
+		return fmt.Errorf("serializing config: %w", err)
+	}
 
-// Step 4: Create the child process with new namespaces
-child, err := c.createChild(configPath)
-if err != nil {
-return fmt.Errorf("creating child process: %w", err)
-}
+	// Step 4: Create the child process with new namespaces
+	child, err := c.createChild(configPath)
+	if err != nil {
+		return fmt.Errorf("creating child process: %w", err)
+	}
 
-// Step 5: Set up networking (requires child's PID for netns)
-if err := c.setupNetworking(child.Process.Pid); err != nil {
-log.Printf("WARNING: network setup failed: %v", err)
-// Continue without networking—container still works for local tasks
-}
+	// Step 5: Set up networking (requires child's PID for netns)
+	if err := c.setupNetworking(child.Process.Pid); err != nil {
+		log.Printf("WARNING: network setup failed: %v", err)
+		// Continue without networking—container still works for local tasks
+	}
 
-// Step 6: Wait for the child process to exit
-log.Printf("Waiting for container process (PID %d)", child.Process.Pid)
-if err := child.Wait(); err != nil {
-return fmt.Errorf("container exited with error: %w", err)
-}
+	// Step 6: Wait for the child process to exit
+	log.Printf("Waiting for container process (PID %d)", child.Process.Pid)
+	if err := child.Wait(); err != nil {
+		return fmt.Errorf("container exited with error: %w", err)
+	}
 
-log.Printf("=== Container %s exited ===", c.Config.ID)
-return nil
+	log.Printf("=== Container %s exited ===", c.Config.ID)
+	return nil
 }
 
 // createChild spawns the container init process with new namespaces.
 func (c *Container) createChild(configPath string) (*exec.Cmd, error) {
-// Re-execute ourselves as "gobox init" with the config path
-child := exec.Command("/proc/self/exe", "init", configPath)
+	// Re-execute ourselves as "gobox init" with the config path
+	child := exec.Command("/proc/self/exe", "init", configPath)
 
-// Set up new namespaces for the child
-child.SysProcAttr = &syscall.SysProcAttr{
-Cloneflags: syscall.CLONE_NEWPID |    // New PID namespace
-syscall.CLONE_NEWNS |             // New mount namespace
-syscall.CLONE_NEWUTS |            // New UTS namespace
-syscall.CLONE_NEWIPC |            // New IPC namespace
-syscall.CLONE_NEWNET,             // New network namespace
-// Unshare the filesystem attributes so mount changes
-// don't propagate to the host
-Unshareflags: syscall.CLONE_NEWNS,
-}
+	// Set up new namespaces for the child
+	child.SysProcAttr = &syscall.SysProcAttr{
+		Cloneflags: syscall.CLONE_NEWPID | // New PID namespace
+			syscall.CLONE_NEWNS | // New mount namespace
+			syscall.CLONE_NEWUTS | // New UTS namespace
+			syscall.CLONE_NEWIPC | // New IPC namespace
+			syscall.CLONE_NEWNET, // New network namespace
+		// Unshare the filesystem attributes so mount changes
+		// don't propagate to the host
+		Unshareflags: syscall.CLONE_NEWNS,
+	}
 
-// Connect stdio
-child.Stdin = os.Stdin
-child.Stdout = os.Stdout
-child.Stderr = os.Stderr
+	// Connect stdio
+	child.Stdin = os.Stdin
+	child.Stdout = os.Stdout
+	child.Stderr = os.Stderr
 
-log.Printf("Starting child process with new namespaces")
-if err := child.Start(); err != nil {
-return nil, fmt.Errorf("starting child: %w", err)
-}
+	log.Printf("Starting child process with new namespaces")
+	if err := child.Start(); err != nil {
+		return nil, fmt.Errorf("starting child: %w", err)
+	}
 
-log.Printf("Child process started: PID %d", child.Process.Pid)
-return child, nil
+	log.Printf("Child process started: PID %d", child.Process.Pid)
+	return child, nil
 }
 ```
 
@@ -1069,108 +1069,108 @@ command.
 package cmd
 
 import (
-"fmt"
-"log"
-"os"
-"syscall"
+	"fmt"
+	"log"
+	"os"
+	"syscall"
 
-"github.com/example/gobox/container"
-"github.com/example/gobox/filesystem"
+	"github.com/example/gobox/container"
+	"github.com/example/gobox/filesystem"
 )
 
 // Init is the entry point for the container init process.
 // It is called as "gobox init <config-path>".
 func Init(args []string) error {
-if len(args) < 1 {
-return fmt.Errorf("init requires config path argument")
-}
+	if len(args) < 1 {
+		return fmt.Errorf("init requires config path argument")
+	}
 
-configPath := args[0]
+	configPath := args[0]
 
-// Load the config written by the parent
-cfg, err := container.LoadConfig(configPath)
-if err != nil {
-return fmt.Errorf("loading config: %w", err)
-}
+	// Load the config written by the parent
+	cfg, err := container.LoadConfig(configPath)
+	if err != nil {
+		return fmt.Errorf("loading config: %w", err)
+	}
 
-log.Printf("[init] Container %s starting", cfg.ID)
+	log.Printf("[init] Container %s starting", cfg.ID)
 
-// Step 1: Set the hostname in the new UTS namespace
-if err := syscall.Sethostname([]byte(cfg.Hostname)); err != nil {
-return fmt.Errorf("setting hostname: %w", err)
-}
-log.Printf("[init] Hostname set to %s", cfg.Hostname)
+	// Step 1: Set the hostname in the new UTS namespace
+	if err := syscall.Sethostname([]byte(cfg.Hostname)); err != nil {
+		return fmt.Errorf("setting hostname: %w", err)
+	}
+	log.Printf("[init] Hostname set to %s", cfg.Hostname)
 
-// Step 2: Perform pivot_root to the overlay merged directory
-if err := filesystem.PivotRoot(cfg.RootFS); err != nil {
-return fmt.Errorf("pivot_root: %w", err)
-}
-log.Printf("[init] pivot_root complete")
+	// Step 2: Perform pivot_root to the overlay merged directory
+	if err := filesystem.PivotRoot(cfg.RootFS); err != nil {
+		return fmt.Errorf("pivot_root: %w", err)
+	}
+	log.Printf("[init] pivot_root complete")
 
-// Step 3: Mount /proc, /sys, /dev inside the container
-if err := filesystem.SetupContainerMounts(); err != nil {
-return fmt.Errorf("setting up mounts: %w", err)
-}
-log.Printf("[init] Mounts configured")
+	// Step 3: Mount /proc, /sys, /dev inside the container
+	if err := filesystem.SetupContainerMounts(); err != nil {
+		return fmt.Errorf("setting up mounts: %w", err)
+	}
+	log.Printf("[init] Mounts configured")
 
-// Step 4: Change to the working directory
-if err := os.Chdir(cfg.WorkDir); err != nil {
-return fmt.Errorf("chdir to %s: %w", cfg.WorkDir, err)
-}
+	// Step 4: Change to the working directory
+	if err := os.Chdir(cfg.WorkDir); err != nil {
+		return fmt.Errorf("chdir to %s: %w", cfg.WorkDir, err)
+	}
 
-// Step 5: Set environment variables
-for _, env := range cfg.Env {
-parts := splitEnvVar(env)
-if len(parts) == 2 {
-os.Setenv(parts[0], parts[1])
-}
-}
+	// Step 5: Set environment variables
+	for _, env := range cfg.Env {
+		parts := splitEnvVar(env)
+		if len(parts) == 2 {
+			os.Setenv(parts[0], parts[1])
+		}
+	}
 
-// Step 6: Clean up the config file
-os.Remove("/.gobox-config.json")
+	// Step 6: Clean up the config file
+	os.Remove("/.gobox-config.json")
 
-// Step 7: Execute the requested command
-// syscall.Exec replaces the current process image—this never returns
-// on success.
-log.Printf("[init] Executing: %v", cfg.Command)
-binary, err := findExecutable(cfg.Command[0])
-if err != nil {
-return fmt.Errorf("finding executable %q: %w", cfg.Command[0], err)
-}
+	// Step 7: Execute the requested command
+	// syscall.Exec replaces the current process image—this never returns
+	// on success.
+	log.Printf("[init] Executing: %v", cfg.Command)
+	binary, err := findExecutable(cfg.Command[0])
+	if err != nil {
+		return fmt.Errorf("finding executable %q: %w", cfg.Command[0], err)
+	}
 
-return syscall.Exec(binary, cfg.Command, cfg.Env)
+	return syscall.Exec(binary, cfg.Command, cfg.Env)
 }
 
 // splitEnvVar splits "KEY=VALUE" into ["KEY", "VALUE"].
 func splitEnvVar(env string) []string {
-for i, c := range env {
-if c == '=' {
-return []string{env[:i], env[i+1:]}
-}
-}
-return []string{env}
+	for i, c := range env {
+		if c == '=' {
+			return []string{env[:i], env[i+1:]}
+		}
+	}
+	return []string{env}
 }
 
 // findExecutable searches PATH for the given command.
 func findExecutable(name string) (string, error) {
-// If it's already an absolute path, use it directly
-if name[0] == '/' {
-if _, err := os.Stat(name); err != nil {
-return "", fmt.Errorf("stat %s: %w", name, err)
-}
-return name, nil
-}
+	// If it's already an absolute path, use it directly
+	if name[0] == '/' {
+		if _, err := os.Stat(name); err != nil {
+			return "", fmt.Errorf("stat %s: %w", name, err)
+		}
+		return name, nil
+	}
 
-// Search PATH
-paths := []string{"/usr/local/bin", "/usr/bin", "/bin", "/sbin"}
-for _, dir := range paths {
-full := dir + "/" + name
-if _, err := os.Stat(full); err == nil {
-return full, nil
-}
-}
+	// Search PATH
+	paths := []string{"/usr/local/bin", "/usr/bin", "/bin", "/sbin"}
+	for _, dir := range paths {
+		full := dir + "/" + name
+		if _, err := os.Stat(full); err == nil {
+			return full, nil
+		}
+	}
 
-return "", fmt.Errorf("command not found: %s", name)
+	return "", fmt.Errorf("command not found: %s", name)
 }
 ```
 
@@ -1215,106 +1215,106 @@ directory, and resource limits are set by writing to files within that directory
 package cgroup
 
 import (
-"fmt"
-"log"
-"os"
-"path/filepath"
-"strconv"
-"strings"
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
 )
 
 const (
-// cgroupRoot is the cgroups v2 mount point.
-cgroupRoot = "/sys/fs/cgroup"
+	// cgroupRoot is the cgroups v2 mount point.
+	cgroupRoot = "/sys/fs/cgroup"
 
-// cgroupPrefix is our runtime's cgroup subtree.
-cgroupPrefix = "gobox"
+	// cgroupPrefix is our runtime's cgroup subtree.
+	cgroupPrefix = "gobox"
 )
 
 // Manager controls cgroup resources for a single container.
 type Manager struct {
-// containerID is the unique container identifier.
-containerID string
+	// containerID is the unique container identifier.
+	containerID string
 
-// path is the full path to this container's cgroup directory.
-path string
+	// path is the full path to this container's cgroup directory.
+	path string
 
-// resources holds the configured limits.
-resources Resources
+	// resources holds the configured limits.
+	resources Resources
 }
 
 // Resources defines the resource limits to apply.
 type Resources struct {
-// CPUQuota is the fraction of a CPU core (e.g., 0.5 = 50%).
-CPUQuota float64
+	// CPUQuota is the fraction of a CPU core (e.g., 0.5 = 50%).
+	CPUQuota float64
 
-// MemoryLimitBytes is the hard memory limit.
-MemoryLimitBytes int64
+	// MemoryLimitBytes is the hard memory limit.
+	MemoryLimitBytes int64
 
-// PidsLimit is the maximum number of processes.
-PidsLimit int64
+	// PidsLimit is the maximum number of processes.
+	PidsLimit int64
 }
 
 // NewManager creates a cgroup manager for the given container.
 func NewManager(containerID string, res Resources) *Manager {
-return &Manager{
-containerID: containerID,
-path:        filepath.Join(cgroupRoot, cgroupPrefix, containerID),
-resources:   res,
-}
+	return &Manager{
+		containerID: containerID,
+		path:        filepath.Join(cgroupRoot, cgroupPrefix, containerID),
+		resources:   res,
+	}
 }
 
 // Setup creates the cgroup directory and applies resource limits.
 func (m *Manager) Setup() error {
-log.Printf("Setting up cgroup at %s", m.path)
+	log.Printf("Setting up cgroup at %s", m.path)
 
-// Ensure the parent cgroup exists and has controllers enabled
-parentPath := filepath.Join(cgroupRoot, cgroupPrefix)
-if err := os.MkdirAll(parentPath, 0755); err != nil {
-return fmt.Errorf("creating parent cgroup: %w", err)
-}
+	// Ensure the parent cgroup exists and has controllers enabled
+	parentPath := filepath.Join(cgroupRoot, cgroupPrefix)
+	if err := os.MkdirAll(parentPath, 0755); err != nil {
+		return fmt.Errorf("creating parent cgroup: %w", err)
+	}
 
-// Enable controllers in the parent
-if err := enableControllers(parentPath); err != nil {
-return fmt.Errorf("enabling controllers: %w", err)
-}
+	// Enable controllers in the parent
+	if err := enableControllers(parentPath); err != nil {
+		return fmt.Errorf("enabling controllers: %w", err)
+	}
 
-// Create the container's cgroup directory
-if err := os.MkdirAll(m.path, 0755); err != nil {
-return fmt.Errorf("creating cgroup dir: %w", err)
-}
+	// Create the container's cgroup directory
+	if err := os.MkdirAll(m.path, 0755); err != nil {
+		return fmt.Errorf("creating cgroup dir: %w", err)
+	}
 
-// Apply resource limits
-if err := m.applyCPULimit(); err != nil {
-return fmt.Errorf("setting CPU limit: %w", err)
-}
+	// Apply resource limits
+	if err := m.applyCPULimit(); err != nil {
+		return fmt.Errorf("setting CPU limit: %w", err)
+	}
 
-if err := m.applyMemoryLimit(); err != nil {
-return fmt.Errorf("setting memory limit: %w", err)
-}
+	if err := m.applyMemoryLimit(); err != nil {
+		return fmt.Errorf("setting memory limit: %w", err)
+	}
 
-if err := m.applyPidsLimit(); err != nil {
-return fmt.Errorf("setting PIDs limit: %w", err)
-}
+	if err := m.applyPidsLimit(); err != nil {
+		return fmt.Errorf("setting PIDs limit: %w", err)
+	}
 
-log.Printf("Cgroup configured: cpu=%.1f, mem=%d MiB, pids=%d",
-m.resources.CPUQuota,
-m.resources.MemoryLimitBytes>>20,
-m.resources.PidsLimit)
+	log.Printf("Cgroup configured: cpu=%.1f, mem=%d MiB, pids=%d",
+		m.resources.CPUQuota,
+		m.resources.MemoryLimitBytes>>20,
+		m.resources.PidsLimit)
 
-return nil
+	return nil
 }
 
 // enableControllers enables cpu, memory, and pids controllers on a cgroup.
 func enableControllers(path string) error {
-controllers := "+cpu +memory +pids"
-controlFile := filepath.Join(path, "cgroup.subtree_control")
+	controllers := "+cpu +memory +pids"
+	controlFile := filepath.Join(path, "cgroup.subtree_control")
 
-if err := os.WriteFile(controlFile, []byte(controllers), 0644); err != nil {
-return fmt.Errorf("writing subtree_control at %s: %w", controlFile, err)
-}
+	if err := os.WriteFile(controlFile, []byte(controllers), 0644); err != nil {
+		return fmt.Errorf("writing subtree_control at %s: %w", controlFile, err)
+	}
 
-return nil
+	return nil
 }
 ```
 
@@ -1336,18 +1336,18 @@ Examples:
 ```go
 // applyCPULimit sets the CPU quota based on the configured fraction.
 func (m *Manager) applyCPULimit() error {
-const period = 100000 // 100ms in microseconds
+	const period = 100000 // 100ms in microseconds
 
-var quotaStr string
-if m.resources.CPUQuota <= 0 {
-quotaStr = "max" // Unlimited
-} else {
-quota := int(m.resources.CPUQuota * float64(period))
-quotaStr = strconv.Itoa(quota)
-}
+	var quotaStr string
+	if m.resources.CPUQuota <= 0 {
+		quotaStr = "max" // Unlimited
+	} else {
+		quota := int(m.resources.CPUQuota * float64(period))
+		quotaStr = strconv.Itoa(quota)
+	}
 
-value := fmt.Sprintf("%s %d", quotaStr, period)
-return m.writeFile("cpu.max", value)
+	value := fmt.Sprintf("%s %d", quotaStr, period)
+	return m.writeFile("cpu.max", value)
 }
 ```
 
@@ -1356,10 +1356,10 @@ return m.writeFile("cpu.max", value)
 ```go
 // applyMemoryLimit sets the hard memory limit.
 func (m *Manager) applyMemoryLimit() error {
-if m.resources.MemoryLimitBytes <= 0 {
-return m.writeFile("memory.max", "max")
-}
-return m.writeFile("memory.max", strconv.FormatInt(m.resources.MemoryLimitBytes, 10))
+	if m.resources.MemoryLimitBytes <= 0 {
+		return m.writeFile("memory.max", "max")
+	}
+	return m.writeFile("memory.max", strconv.FormatInt(m.resources.MemoryLimitBytes, 10))
 }
 ```
 
@@ -1368,10 +1368,10 @@ return m.writeFile("memory.max", strconv.FormatInt(m.resources.MemoryLimitBytes,
 ```go
 // applyPidsLimit sets the maximum number of processes.
 func (m *Manager) applyPidsLimit() error {
-if m.resources.PidsLimit <= 0 {
-return m.writeFile("pids.max", "max")
-}
-return m.writeFile("pids.max", strconv.FormatInt(m.resources.PidsLimit, 10))
+	if m.resources.PidsLimit <= 0 {
+		return m.writeFile("pids.max", "max")
+	}
+	return m.writeFile("pids.max", strconv.FormatInt(m.resources.PidsLimit, 10))
 }
 ```
 
@@ -1380,47 +1380,47 @@ return m.writeFile("pids.max", strconv.FormatInt(m.resources.PidsLimit, 10))
 ```go
 // AddProcess adds a process (by PID) to this cgroup.
 func (m *Manager) AddProcess(pid int) error {
-log.Printf("Adding PID %d to cgroup %s", pid, m.path)
-return m.writeFile("cgroup.procs", strconv.Itoa(pid))
+	log.Printf("Adding PID %d to cgroup %s", pid, m.path)
+	return m.writeFile("cgroup.procs", strconv.Itoa(pid))
 }
 
 // writeFile is a helper that writes a value to a cgroup control file.
 func (m *Manager) writeFile(filename, value string) error {
-path := filepath.Join(m.path, filename)
-if err := os.WriteFile(path, []byte(value), 0644); err != nil {
-return fmt.Errorf("writing %s to %s: %w", value, path, err)
-}
-log.Printf("  cgroup: %s = %s", filename, strings.TrimSpace(value))
-return nil
+	path := filepath.Join(m.path, filename)
+	if err := os.WriteFile(path, []byte(value), 0644); err != nil {
+		return fmt.Errorf("writing %s to %s: %w", value, path, err)
+	}
+	log.Printf("  cgroup: %s = %s", filename, strings.TrimSpace(value))
+	return nil
 }
 
 // GetMemoryUsage reads the current memory consumption.
 func (m *Manager) GetMemoryUsage() (int64, error) {
-data, err := os.ReadFile(filepath.Join(m.path, "memory.current"))
-if err != nil {
-return 0, fmt.Errorf("reading memory.current: %w", err)
-}
-return strconv.ParseInt(strings.TrimSpace(string(data)), 10, 64)
+	data, err := os.ReadFile(filepath.Join(m.path, "memory.current"))
+	if err != nil {
+		return 0, fmt.Errorf("reading memory.current: %w", err)
+	}
+	return strconv.ParseInt(strings.TrimSpace(string(data)), 10, 64)
 }
 
 // GetPidsCount reads the current number of processes.
 func (m *Manager) GetPidsCount() (int64, error) {
-data, err := os.ReadFile(filepath.Join(m.path, "pids.current"))
-if err != nil {
-return 0, fmt.Errorf("reading pids.current: %w", err)
-}
-return strconv.ParseInt(strings.TrimSpace(string(data)), 10, 64)
+	data, err := os.ReadFile(filepath.Join(m.path, "pids.current"))
+	if err != nil {
+		return 0, fmt.Errorf("reading pids.current: %w", err)
+	}
+	return strconv.ParseInt(strings.TrimSpace(string(data)), 10, 64)
 }
 
 // Cleanup removes the cgroup directory.
 func (m *Manager) Cleanup() error {
-log.Printf("Removing cgroup %s", m.path)
+	log.Printf("Removing cgroup %s", m.path)
 
-// We can only remove a cgroup directory when it has no processes
-if err := os.Remove(m.path); err != nil {
-return fmt.Errorf("removing cgroup %s: %w", m.path, err)
-}
-return nil
+	// We can only remove a cgroup directory when it has no processes
+	if err := os.Remove(m.path); err != nil {
+		return fmt.Errorf("removing cgroup %s: %w", m.path, err)
+	}
+	return nil
 }
 ```
 
@@ -1495,109 +1495,109 @@ The networking setup involves three key steps:
 package network
 
 import (
-"fmt"
-"log"
-"net"
-"os/exec"
-"strings"
+	"fmt"
+	"log"
+	"net"
+	"os/exec"
+	"strings"
 )
 
 // Bridge represents a Linux bridge interface.
 type Bridge struct {
-Name string
-IP   string // CIDR notation, e.g. "10.10.10.1/24"
+	Name string
+	IP   string // CIDR notation, e.g. "10.10.10.1/24"
 }
 
 // SetupBridge creates and configures a Linux bridge.
 // If the bridge already exists, it just ensures it is up.
 func SetupBridge(name, ipCIDR string) (*Bridge, error) {
-b := &Bridge{Name: name, IP: ipCIDR}
+	b := &Bridge{Name: name, IP: ipCIDR}
 
-// Check if bridge already exists
-if interfaceExists(name) {
-log.Printf("Bridge %s already exists, ensuring it is up", name)
-return b, run("ip", "link", "set", name, "up")
-}
+	// Check if bridge already exists
+	if interfaceExists(name) {
+		log.Printf("Bridge %s already exists, ensuring it is up", name)
+		return b, run("ip", "link", "set", name, "up")
+	}
 
-log.Printf("Creating bridge %s with IP %s", name, ipCIDR)
+	log.Printf("Creating bridge %s with IP %s", name, ipCIDR)
 
-// Create the bridge interface
-if err := run("ip", "link", "add", name, "type", "bridge"); err != nil {
-return nil, fmt.Errorf("creating bridge: %w", err)
-}
+	// Create the bridge interface
+	if err := run("ip", "link", "add", name, "type", "bridge"); err != nil {
+		return nil, fmt.Errorf("creating bridge: %w", err)
+	}
 
-// Assign IP address
-if err := run("ip", "addr", "add", ipCIDR, "dev", name); err != nil {
-return nil, fmt.Errorf("assigning IP to bridge: %w", err)
-}
+	// Assign IP address
+	if err := run("ip", "addr", "add", ipCIDR, "dev", name); err != nil {
+		return nil, fmt.Errorf("assigning IP to bridge: %w", err)
+	}
 
-// Bring the bridge up
-if err := run("ip", "link", "set", name, "up"); err != nil {
-return nil, fmt.Errorf("bringing bridge up: %w", err)
-}
+	// Bring the bridge up
+	if err := run("ip", "link", "set", name, "up"); err != nil {
+		return nil, fmt.Errorf("bringing bridge up: %w", err)
+	}
 
-log.Printf("Bridge %s created and up", name)
-return b, nil
+	log.Printf("Bridge %s created and up", name)
+	return b, nil
 }
 
 // EnableNAT sets up iptables rules for container internet access.
 func EnableNAT(bridgeName, subnet string) error {
-log.Printf("Enabling NAT for subnet %s via bridge %s", subnet, bridgeName)
+	log.Printf("Enabling NAT for subnet %s via bridge %s", subnet, bridgeName)
 
-// Enable IP forwarding
-if err := run("sysctl", "-w", "net.ipv4.ip_forward=1"); err != nil {
-return fmt.Errorf("enabling IP forwarding: %w", err)
-}
+	// Enable IP forwarding
+	if err := run("sysctl", "-w", "net.ipv4.ip_forward=1"); err != nil {
+		return fmt.Errorf("enabling IP forwarding: %w", err)
+	}
 
-// Add MASQUERADE rule for the container subnet
-// This rewrites the source IP of outgoing packets from the container
-// to the host's IP address.
-err := run("iptables", "-t", "nat", "-A", "POSTROUTING",
-"-s", subnet, "-j", "MASQUERADE")
-if err != nil {
-return fmt.Errorf("adding NAT rule: %w", err)
-}
+	// Add MASQUERADE rule for the container subnet
+	// This rewrites the source IP of outgoing packets from the container
+	// to the host's IP address.
+	err := run("iptables", "-t", "nat", "-A", "POSTROUTING",
+		"-s", subnet, "-j", "MASQUERADE")
+	if err != nil {
+		return fmt.Errorf("adding NAT rule: %w", err)
+	}
 
-// Allow forwarding for the bridge
-err = run("iptables", "-A", "FORWARD",
-"-i", bridgeName, "-j", "ACCEPT")
-if err != nil {
-return fmt.Errorf("adding forward rule: %w", err)
-}
+	// Allow forwarding for the bridge
+	err = run("iptables", "-A", "FORWARD",
+		"-i", bridgeName, "-j", "ACCEPT")
+	if err != nil {
+		return fmt.Errorf("adding forward rule: %w", err)
+	}
 
-err = run("iptables", "-A", "FORWARD",
-"-o", bridgeName, "-j", "ACCEPT")
-if err != nil {
-return fmt.Errorf("adding return forward rule: %w", err)
-}
+	err = run("iptables", "-A", "FORWARD",
+		"-o", bridgeName, "-j", "ACCEPT")
+	if err != nil {
+		return fmt.Errorf("adding return forward rule: %w", err)
+	}
 
-return nil
+	return nil
 }
 
 // interfaceExists checks if a network interface already exists.
 func interfaceExists(name string) bool {
-ifaces, err := net.Interfaces()
-if err != nil {
-return false
-}
-for _, iface := range ifaces {
-if iface.Name == name {
-return true
-}
-}
-return false
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return false
+	}
+	for _, iface := range ifaces {
+		if iface.Name == name {
+			return true
+		}
+	}
+	return false
 }
 
 // run executes a command and returns any error.
 func run(name string, args ...string) error {
-cmd := exec.Command(name, args...)
-output, err := cmd.CombinedOutput()
-if err != nil {
-return fmt.Errorf("%s %s: %s: %w",
-name, strings.Join(args, " "),
-strings.TrimSpace(string(output)), err)
-}
-return nil
+	cmd := exec.Command(name, args...)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("%s %s: %s: %w",
+			name, strings.Join(args, " "),
+			strings.TrimSpace(string(output)), err)
+	}
+	return nil
 }
 ```
 
@@ -1612,129 +1612,129 @@ namespace.
 package network
 
 import (
-"fmt"
-"log"
+	"fmt"
+	"log"
 )
 
 // Veth represents a virtual ethernet pair.
 type Veth struct {
-// HostName is the interface name on the host side.
-HostName string
+	// HostName is the interface name on the host side.
+	HostName string
 
-// ContainerName is the interface name inside the container.
-ContainerName string
+	// ContainerName is the interface name inside the container.
+	ContainerName string
 
-// ContainerIP is the IP address assigned to the container end.
-ContainerIP string
+	// ContainerIP is the IP address assigned to the container end.
+	ContainerIP string
 
-// GatewayIP is the default gateway inside the container.
-GatewayIP string
+	// GatewayIP is the default gateway inside the container.
+	GatewayIP string
 
-// BridgeName is the bridge to attach the host end to.
-BridgeName string
+	// BridgeName is the bridge to attach the host end to.
+	BridgeName string
 
-// ContainerPID is the PID of the container init process.
-ContainerPID int
+	// ContainerPID is the PID of the container init process.
+	ContainerPID int
 }
 
 // NewVeth creates a new veth pair configuration.
 func NewVeth(containerID string, containerPID int, cfg NetworkConfig) *Veth {
-// Use container ID to make unique interface names
-hostName := fmt.Sprintf("veth-%s", containerID[:8])
+	// Use container ID to make unique interface names
+	hostName := fmt.Sprintf("veth-%s", containerID[:8])
 
-return &Veth{
-HostName:      hostName,
-ContainerName: "eth0",
-ContainerIP:   cfg.ContainerIP,
-GatewayIP:     cfg.GatewayIP,
-BridgeName:    cfg.BridgeName,
-ContainerPID:  containerPID,
-}
+	return &Veth{
+		HostName:      hostName,
+		ContainerName: "eth0",
+		ContainerIP:   cfg.ContainerIP,
+		GatewayIP:     cfg.GatewayIP,
+		BridgeName:    cfg.BridgeName,
+		ContainerPID:  containerPID,
+	}
 }
 
 // Setup creates the veth pair and configures both ends.
 func (v *Veth) Setup() error {
-log.Printf("Setting up veth pair: %s <-> %s (PID %d)",
-v.HostName, v.ContainerName, v.ContainerPID)
+	log.Printf("Setting up veth pair: %s <-> %s (PID %d)",
+		v.HostName, v.ContainerName, v.ContainerPID)
 
-// Step 1: Create the veth pair
-err := run("ip", "link", "add", v.HostName,
-"type", "veth", "peer", "name", v.ContainerName)
-if err != nil {
-return fmt.Errorf("creating veth pair: %w", err)
-}
+	// Step 1: Create the veth pair
+	err := run("ip", "link", "add", v.HostName,
+		"type", "veth", "peer", "name", v.ContainerName)
+	if err != nil {
+		return fmt.Errorf("creating veth pair: %w", err)
+	}
 
-// Step 2: Attach host end to the bridge
-if err := run("ip", "link", "set", v.HostName, "master", v.BridgeName); err != nil {
-return fmt.Errorf("attaching %s to bridge: %w", v.HostName, err)
-}
+	// Step 2: Attach host end to the bridge
+	if err := run("ip", "link", "set", v.HostName, "master", v.BridgeName); err != nil {
+		return fmt.Errorf("attaching %s to bridge: %w", v.HostName, err)
+	}
 
-// Step 3: Bring up the host end
-if err := run("ip", "link", "set", v.HostName, "up"); err != nil {
-return fmt.Errorf("bringing up %s: %w", v.HostName, err)
-}
+	// Step 3: Bring up the host end
+	if err := run("ip", "link", "set", v.HostName, "up"); err != nil {
+		return fmt.Errorf("bringing up %s: %w", v.HostName, err)
+	}
 
-// Step 4: Move the container end into the container's network namespace
-// We reference the namespace by PID
-pidStr := fmt.Sprintf("%d", v.ContainerPID)
-err = run("ip", "link", "set", v.ContainerName, "netns", pidStr)
-if err != nil {
-return fmt.Errorf("moving %s to netns: %w", v.ContainerName, err)
-}
+	// Step 4: Move the container end into the container's network namespace
+	// We reference the namespace by PID
+	pidStr := fmt.Sprintf("%d", v.ContainerPID)
+	err = run("ip", "link", "set", v.ContainerName, "netns", pidStr)
+	if err != nil {
+		return fmt.Errorf("moving %s to netns: %w", v.ContainerName, err)
+	}
 
-// Step 5: Configure the container end (run commands in the container's netns)
-nsPrefix := []string{"nsenter", "-t", pidStr, "-n", "--"}
+	// Step 5: Configure the container end (run commands in the container's netns)
+	nsPrefix := []string{"nsenter", "-t", pidStr, "-n", "--"}
 
-// Assign IP address
-if err := runWithPrefix(nsPrefix, "ip", "addr", "add", v.ContainerIP, "dev", v.ContainerName); err != nil {
-return fmt.Errorf("assigning container IP: %w", err)
-}
+	// Assign IP address
+	if err := runWithPrefix(nsPrefix, "ip", "addr", "add", v.ContainerIP, "dev", v.ContainerName); err != nil {
+		return fmt.Errorf("assigning container IP: %w", err)
+	}
 
-// Bring up the container interface
-if err := runWithPrefix(nsPrefix, "ip", "link", "set", v.ContainerName, "up"); err != nil {
-return fmt.Errorf("bringing up container interface: %w", err)
-}
+	// Bring up the container interface
+	if err := runWithPrefix(nsPrefix, "ip", "link", "set", v.ContainerName, "up"); err != nil {
+		return fmt.Errorf("bringing up container interface: %w", err)
+	}
 
-// Bring up loopback
-if err := runWithPrefix(nsPrefix, "ip", "link", "set", "lo", "up"); err != nil {
-return fmt.Errorf("bringing up loopback: %w", err)
-}
+	// Bring up loopback
+	if err := runWithPrefix(nsPrefix, "ip", "link", "set", "lo", "up"); err != nil {
+		return fmt.Errorf("bringing up loopback: %w", err)
+	}
 
-// Extract gateway IP without CIDR prefix for the route
-gwIP := stripCIDR(v.GatewayIP)
+	// Extract gateway IP without CIDR prefix for the route
+	gwIP := stripCIDR(v.GatewayIP)
 
-// Set default route
-if err := runWithPrefix(nsPrefix, "ip", "route", "add", "default", "via", gwIP); err != nil {
-return fmt.Errorf("setting default route: %w", err)
-}
+	// Set default route
+	if err := runWithPrefix(nsPrefix, "ip", "route", "add", "default", "via", gwIP); err != nil {
+		return fmt.Errorf("setting default route: %w", err)
+	}
 
-log.Printf("Veth pair configured: %s (host) <-> %s@%s (container)",
-v.HostName, v.ContainerName, v.ContainerIP)
+	log.Printf("Veth pair configured: %s (host) <-> %s@%s (container)",
+		v.HostName, v.ContainerName, v.ContainerIP)
 
-return nil
+	return nil
 }
 
 // Cleanup removes the veth pair (removing one end removes both).
 func (v *Veth) Cleanup() error {
-log.Printf("Cleaning up veth pair %s", v.HostName)
-return run("ip", "link", "del", v.HostName)
+	log.Printf("Cleaning up veth pair %s", v.HostName)
+	return run("ip", "link", "del", v.HostName)
 }
 
 // runWithPrefix executes a command with a prefix (e.g., nsenter).
 func runWithPrefix(prefix []string, name string, args ...string) error {
-fullArgs := append(prefix, name)
-fullArgs = append(fullArgs, args...)
-return run(fullArgs[0], fullArgs[1:]...)
+	fullArgs := append(prefix, name)
+	fullArgs = append(fullArgs, args...)
+	return run(fullArgs[0], fullArgs[1:]...)
 }
 
 // stripCIDR removes the /prefix from a CIDR address.
 func stripCIDR(cidr string) string {
-for i, c := range cidr {
-if c == '/' {
-return cidr[:i]
-}
-}
-return cidr
+	for i, c := range cidr {
+		if c == '/' {
+			return cidr[:i]
+		}
+	}
+	return cidr
 }
 ```
 
@@ -1746,10 +1746,10 @@ package network
 
 // NetworkConfig holds networking parameters for a container.
 type NetworkConfig struct {
-BridgeName  string
-ContainerIP string
-GatewayIP   string
-EnableNAT   bool
+	BridgeName  string
+	ContainerIP string
+	GatewayIP   string
+	EnableNAT   bool
 }
 ```
 
@@ -1768,21 +1768,21 @@ one during filesystem setup:
 package filesystem
 
 import (
-"fmt"
-"os"
+	"fmt"
+	"os"
 )
 
 // SetupDNS creates /etc/resolv.conf inside the container rootfs.
 func SetupDNS(rootfs string) error {
-resolvConf := rootfs + "/etc/resolv.conf"
+	resolvConf := rootfs + "/etc/resolv.conf"
 
-content := "# Generated by gobox\nnameserver 8.8.8.8\nnameserver 8.8.4.4\n"
+	content := "# Generated by gobox\nnameserver 8.8.8.8\nnameserver 8.8.4.4\n"
 
-if err := os.WriteFile(resolvConf, []byte(content), 0644); err != nil {
-return fmt.Errorf("writing resolv.conf: %w", err)
-}
+	if err := os.WriteFile(resolvConf, []byte(content), 0644); err != nil {
+		return fmt.Errorf("writing resolv.conf: %w", err)
+	}
 
-return nil
+	return nil
 }
 ```
 
@@ -1799,30 +1799,30 @@ networking setup, then spawns the child process.
 
 // setupFilesystem creates the OverlayFS and prepares the rootfs.
 func (c *Container) setupFilesystem() error {
-baseDir := "/var/lib/gobox/containers"
+	baseDir := "/var/lib/gobox/containers"
 
-c.overlay = filesystem.NewOverlayFS(
-c.Config.ID,
-c.Config.RootFS,
-baseDir,
-)
+	c.overlay = filesystem.NewOverlayFS(
+		c.Config.ID,
+		c.Config.RootFS,
+		baseDir,
+	)
 
-if err := c.overlay.Mount(); err != nil {
-return fmt.Errorf("mounting overlay: %w", err)
-}
+	if err := c.overlay.Mount(); err != nil {
+		return fmt.Errorf("mounting overlay: %w", err)
+	}
 
-// Set up DNS in the merged rootfs
-if err := filesystem.SetupDNS(c.overlay.MergedDir()); err != nil {
-return fmt.Errorf("setting up DNS: %w", err)
-}
+	// Set up DNS in the merged rootfs
+	if err := filesystem.SetupDNS(c.overlay.MergedDir()); err != nil {
+		return fmt.Errorf("setting up DNS: %w", err)
+	}
 
-// Write /etc/hostname
-hostnameFile := c.overlay.MergedDir() + "/etc/hostname"
-if err := os.WriteFile(hostnameFile, []byte(c.Config.Hostname+"\n"), 0644); err != nil {
-log.Printf("WARNING: could not write hostname file: %v", err)
-}
+	// Write /etc/hostname
+	hostnameFile := c.overlay.MergedDir() + "/etc/hostname"
+	if err := os.WriteFile(hostnameFile, []byte(c.Config.Hostname+"\n"), 0644); err != nil {
+		log.Printf("WARNING: could not write hostname file: %v", err)
+	}
 
-return nil
+	return nil
 }
 ```
 
@@ -1831,13 +1831,13 @@ return nil
 ```go
 // setupCgroups creates the cgroup and applies resource limits.
 func (c *Container) setupCgroups() error {
-c.cgroup = cgroup.NewManager(c.Config.ID, cgroup.Resources{
-CPUQuota:         c.Config.Resources.CPUQuota,
-MemoryLimitBytes: c.Config.Resources.MemoryLimitBytes,
-PidsLimit:        c.Config.Resources.PidsLimit,
-})
+	c.cgroup = cgroup.NewManager(c.Config.ID, cgroup.Resources{
+		CPUQuota:         c.Config.Resources.CPUQuota,
+		MemoryLimitBytes: c.Config.Resources.MemoryLimitBytes,
+		PidsLimit:        c.Config.Resources.PidsLimit,
+	})
 
-return c.cgroup.Setup()
+	return c.cgroup.Setup()
 }
 ```
 
@@ -1846,39 +1846,39 @@ return c.cgroup.Setup()
 ```go
 // setupNetworking creates the bridge and veth pair.
 func (c *Container) setupNetworking(childPID int) error {
-netCfg := network.NetworkConfig{
-BridgeName:  c.Config.Network.BridgeName,
-ContainerIP: c.Config.Network.ContainerIP,
-GatewayIP:   c.Config.Network.GatewayIP,
-EnableNAT:   c.Config.Network.EnableNAT,
-}
+	netCfg := network.NetworkConfig{
+		BridgeName:  c.Config.Network.BridgeName,
+		ContainerIP: c.Config.Network.ContainerIP,
+		GatewayIP:   c.Config.Network.GatewayIP,
+		EnableNAT:   c.Config.Network.EnableNAT,
+	}
 
-// Create or ensure bridge exists
-_, err := network.SetupBridge(netCfg.BridgeName, netCfg.GatewayIP)
-if err != nil {
-return fmt.Errorf("setting up bridge: %w", err)
-}
+	// Create or ensure bridge exists
+	_, err := network.SetupBridge(netCfg.BridgeName, netCfg.GatewayIP)
+	if err != nil {
+		return fmt.Errorf("setting up bridge: %w", err)
+	}
 
-// Enable NAT if requested
-if netCfg.EnableNAT {
-subnet := "10.10.10.0/24"
-if err := network.EnableNAT(netCfg.BridgeName, subnet); err != nil {
-return fmt.Errorf("enabling NAT: %w", err)
-}
-}
+	// Enable NAT if requested
+	if netCfg.EnableNAT {
+		subnet := "10.10.10.0/24"
+		if err := network.EnableNAT(netCfg.BridgeName, subnet); err != nil {
+			return fmt.Errorf("enabling NAT: %w", err)
+		}
+	}
 
-// Create veth pair and configure container networking
-c.net = network.NewVeth(c.Config.ID, childPID, netCfg)
-if err := c.net.Setup(); err != nil {
-return fmt.Errorf("setting up veth: %w", err)
-}
+	// Create veth pair and configure container networking
+	c.net = network.NewVeth(c.Config.ID, childPID, netCfg)
+	if err := c.net.Setup(); err != nil {
+		return fmt.Errorf("setting up veth: %w", err)
+	}
 
-// Add child to the cgroup
-if err := c.cgroup.AddProcess(childPID); err != nil {
-return fmt.Errorf("adding process to cgroup: %w", err)
-}
+	// Add child to the cgroup
+	if err := c.cgroup.AddProcess(childPID); err != nil {
+		return fmt.Errorf("adding process to cgroup: %w", err)
+	}
 
-return nil
+	return nil
 }
 ```
 
@@ -1887,27 +1887,27 @@ return nil
 ```go
 // cleanup tears down all container resources.
 func (c *Container) cleanup() {
-log.Printf("Cleaning up container %s", c.Config.ID)
+	log.Printf("Cleaning up container %s", c.Config.ID)
 
-if c.net != nil {
-if err := c.net.Cleanup(); err != nil {
-log.Printf("WARNING: veth cleanup failed: %v", err)
-}
-}
+	if c.net != nil {
+		if err := c.net.Cleanup(); err != nil {
+			log.Printf("WARNING: veth cleanup failed: %v", err)
+		}
+	}
 
-if c.cgroup != nil {
-if err := c.cgroup.Cleanup(); err != nil {
-log.Printf("WARNING: cgroup cleanup failed: %v", err)
-}
-}
+	if c.cgroup != nil {
+		if err := c.cgroup.Cleanup(); err != nil {
+			log.Printf("WARNING: cgroup cleanup failed: %v", err)
+		}
+	}
 
-if c.overlay != nil {
-if err := c.overlay.Unmount(); err != nil {
-log.Printf("WARNING: overlay cleanup failed: %v", err)
-}
-}
+	if c.overlay != nil {
+		if err := c.overlay.Unmount(); err != nil {
+			log.Printf("WARNING: overlay cleanup failed: %v", err)
+		}
+	}
 
-log.Printf("Cleanup complete")
+	log.Printf("Cleanup complete")
 }
 ```
 
@@ -1958,96 +1958,96 @@ A container follows a well-defined lifecycle:
 package container
 
 import (
-"fmt"
-"sync"
-"time"
+	"fmt"
+	"sync"
+	"time"
 )
 
 // State represents the container lifecycle state.
 type State int
 
 const (
-StateCreated State = iota
-StateStarting
-StateRunning
-StateStopped
-StateDestroyed
+	StateCreated State = iota
+	StateStarting
+	StateRunning
+	StateStopped
+	StateDestroyed
 )
 
 // String returns a human-readable state name.
 func (s State) String() string {
-switch s {
-case StateCreated:
-return "created"
-case StateStarting:
-return "starting"
-case StateRunning:
-return "running"
-case StateStopped:
-return "stopped"
-case StateDestroyed:
-return "destroyed"
-default:
-return "unknown"
-}
+	switch s {
+	case StateCreated:
+		return "created"
+	case StateStarting:
+		return "starting"
+	case StateRunning:
+		return "running"
+	case StateStopped:
+		return "stopped"
+	case StateDestroyed:
+		return "destroyed"
+	default:
+		return "unknown"
+	}
 }
 
 // ContainerState tracks the current state and transitions.
 type ContainerState struct {
-mu        sync.Mutex
-current   State
-pid       int
-exitCode  int
-startedAt time.Time
-stoppedAt time.Time
+	mu        sync.Mutex
+	current   State
+	pid       int
+	exitCode  int
+	startedAt time.Time
+	stoppedAt time.Time
 }
 
 // NewContainerState creates a state tracker in the Created state.
 func NewContainerState() *ContainerState {
-return &ContainerState{
-current: StateCreated,
-}
+	return &ContainerState{
+		current: StateCreated,
+	}
 }
 
 // Transition moves to a new state, validating the transition is legal.
 func (cs *ContainerState) Transition(newState State) error {
-cs.mu.Lock()
-defer cs.mu.Unlock()
+	cs.mu.Lock()
+	defer cs.mu.Unlock()
 
-// Define valid transitions
-valid := map[State][]State{
-StateCreated:  {StateStarting},
-StateStarting: {StateRunning, StateStopped},
-StateRunning:  {StateStopped},
-StateStopped:  {StateDestroyed},
-}
+	// Define valid transitions
+	valid := map[State][]State{
+		StateCreated:  {StateStarting},
+		StateStarting: {StateRunning, StateStopped},
+		StateRunning:  {StateStopped},
+		StateStopped:  {StateDestroyed},
+	}
 
-allowed, ok := valid[cs.current]
-if !ok {
-return fmt.Errorf("no transitions from state %s", cs.current)
-}
+	allowed, ok := valid[cs.current]
+	if !ok {
+		return fmt.Errorf("no transitions from state %s", cs.current)
+	}
 
-for _, s := range allowed {
-if s == newState {
-cs.current = newState
-if newState == StateRunning {
-cs.startedAt = time.Now()
-}
-if newState == StateStopped {
-cs.stoppedAt = time.Now()
-}
-return nil
-}
-}
+	for _, s := range allowed {
+		if s == newState {
+			cs.current = newState
+			if newState == StateRunning {
+				cs.startedAt = time.Now()
+			}
+			if newState == StateStopped {
+				cs.stoppedAt = time.Now()
+			}
+			return nil
+		}
+	}
 
-return fmt.Errorf("invalid transition: %s → %s", cs.current, newState)
+	return fmt.Errorf("invalid transition: %s → %s", cs.current, newState)
 }
 
 // Current returns the current state.
 func (cs *ContainerState) Current() State {
-cs.mu.Lock()
-defer cs.mu.Unlock()
-return cs.current
+	cs.mu.Lock()
+	defer cs.mu.Unlock()
+	return cs.current
 }
 ```
 
@@ -2108,107 +2108,107 @@ capabilities it needs.
 package security
 
 import (
-"fmt"
-"log"
-"strings"
-"unsafe"
+	"fmt"
+	"log"
+	"strings"
+	"unsafe"
 
-"golang.org/x/sys/unix"
+	"golang.org/x/sys/unix"
 )
 
 // capabilityMap maps capability names to their numeric values.
 var capabilityMap = map[string]uintptr{
-"CAP_CHOWN":            0,
-"CAP_DAC_OVERRIDE":     1,
-"CAP_DAC_READ_SEARCH":  2,
-"CAP_FOWNER":           3,
-"CAP_FSETID":           4,
-"CAP_KILL":             5,
-"CAP_SETGID":           6,
-"CAP_SETUID":           7,
-"CAP_SETPCAP":          8,
-"CAP_NET_BIND_SERVICE": 10,
-"CAP_NET_RAW":          13,
-"CAP_SYS_CHROOT":       18,
-"CAP_SYS_PTRACE":       19,
-"CAP_SYS_ADMIN":        21,
-"CAP_SYS_MODULE":       16,
-"CAP_MKNOD":            27,
-"CAP_AUDIT_WRITE":      29,
-"CAP_SETFCAP":          31,
+	"CAP_CHOWN":            0,
+	"CAP_DAC_OVERRIDE":     1,
+	"CAP_DAC_READ_SEARCH":  2,
+	"CAP_FOWNER":           3,
+	"CAP_FSETID":           4,
+	"CAP_KILL":             5,
+	"CAP_SETGID":           6,
+	"CAP_SETUID":           7,
+	"CAP_SETPCAP":          8,
+	"CAP_NET_BIND_SERVICE": 10,
+	"CAP_NET_RAW":          13,
+	"CAP_SYS_CHROOT":       18,
+	"CAP_SYS_PTRACE":       19,
+	"CAP_SYS_ADMIN":        21,
+	"CAP_SYS_MODULE":       16,
+	"CAP_MKNOD":            27,
+	"CAP_AUDIT_WRITE":      29,
+	"CAP_SETFCAP":          31,
 }
 
 // DropCapabilities removes the specified capabilities from the current process.
 func DropCapabilities(caps []string) error {
-log.Printf("Dropping capabilities: %s", strings.Join(caps, ", "))
+	log.Printf("Dropping capabilities: %s", strings.Join(caps, ", "))
 
-for _, name := range caps {
-capNum, ok := capabilityMap[name]
-if !ok {
-return fmt.Errorf("unknown capability: %s", name)
-}
+	for _, name := range caps {
+		capNum, ok := capabilityMap[name]
+		if !ok {
+			return fmt.Errorf("unknown capability: %s", name)
+		}
 
-// Drop from the bounding set — prevents regaining via exec
-if err := unix.Prctl(unix.PR_CAPBSET_DROP, capNum, 0, 0, 0); err != nil {
-return fmt.Errorf("dropping capability %s from bounding set: %w", name, err)
-}
-}
+		// Drop from the bounding set — prevents regaining via exec
+		if err := unix.Prctl(unix.PR_CAPBSET_DROP, capNum, 0, 0, 0); err != nil {
+			return fmt.Errorf("dropping capability %s from bounding set: %w", name, err)
+		}
+	}
 
-log.Printf("Capabilities dropped successfully")
-return nil
+	log.Printf("Capabilities dropped successfully")
+	return nil
 }
 
 // SetNoNewPrivileges prevents the process (and children) from gaining
 // new privileges via setuid/setgid executables.
 func SetNoNewPrivileges() error {
-log.Printf("Setting no_new_privs")
-if err := unix.Prctl(unix.PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0); err != nil {
-return fmt.Errorf("setting no_new_privs: %w", err)
-}
-return nil
+	log.Printf("Setting no_new_privs")
+	if err := unix.Prctl(unix.PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0); err != nil {
+		return fmt.Errorf("setting no_new_privs: %w", err)
+	}
+	return nil
 }
 
 // capHeader is the Linux capability header structure.
 type capHeader struct {
-version uint32
-pid     int32
+	version uint32
+	pid     int32
 }
 
 // capData is the Linux capability data structure (per-set).
 type capData struct {
-effective   uint32
-permitted   uint32
-inheritable uint32
+	effective   uint32
+	permitted   uint32
+	inheritable uint32
 }
 
 // GetCurrentCaps returns a human-readable list of current capabilities.
 func GetCurrentCaps() ([]string, error) {
-var hdr capHeader
-hdr.version = 0x20080522 // _LINUX_CAPABILITY_VERSION_3
-hdr.pid = 0              // current process
+	var hdr capHeader
+	hdr.version = 0x20080522 // _LINUX_CAPABILITY_VERSION_3
+	hdr.pid = 0              // current process
 
-var data [2]capData
+	var data [2]capData
 
-_, _, errno := unix.Syscall(
-unix.SYS_CAPGET,
-uintptr(unsafe.Pointer(&hdr)),
-uintptr(unsafe.Pointer(&data[0])),
-0,
-)
-if errno != 0 {
-return nil, fmt.Errorf("capget: %w", errno)
-}
+	_, _, errno := unix.Syscall(
+		unix.SYS_CAPGET,
+		uintptr(unsafe.Pointer(&hdr)),
+		uintptr(unsafe.Pointer(&data[0])),
+		0,
+	)
+	if errno != 0 {
+		return nil, fmt.Errorf("capget: %w", errno)
+	}
 
-var result []string
-for name, num := range capabilityMap {
-idx := num / 32
-bit := uint32(1) << (num % 32)
-if idx < 2 && data[idx].effective&bit != 0 {
-result = append(result, name)
-}
-}
+	var result []string
+	for name, num := range capabilityMap {
+		idx := num / 32
+		bit := uint32(1) << (num % 32)
+		if idx < 2 && data[idx].effective&bit != 0 {
+			result = append(result, name)
+		}
+	}
 
-return result, nil
+	return result, nil
 }
 ```
 
@@ -2248,55 +2248,55 @@ seccomp-BPF (Berkeley Packet Filter) to define a whitelist of allowed syscalls.
 package security
 
 import (
-"log"
+	"log"
 
-"golang.org/x/sys/unix"
+	"golang.org/x/sys/unix"
 )
 
 // DefaultSeccompDenyList returns syscalls that should be blocked in containers.
 // This is a simplified version—production runtimes use more comprehensive lists.
 func DefaultSeccompDenyList() []string {
-return []string{
-"kexec_load",       // Load a new kernel
-"kexec_file_load",  // Load a new kernel from file
-"reboot",           // Reboot the system
-"init_module",      // Load a kernel module
-"finit_module",     // Load a kernel module from fd
-"delete_module",    // Unload a kernel module
-"acct",             // Process accounting
-"swapon",           // Enable swap
-"swapoff",          // Disable swap
-"mount",            // Mount filesystem (after init)
-"umount2",          // Unmount filesystem (after init)
-"pivot_root",       // Change root filesystem (after init)
-"keyctl",           // Kernel keyring manipulation
-"add_key",          // Add key to keyring
-"request_key",      // Request key from keyring
-"open_by_handle_at", // Open file by handle (CVE-2015-1322)
-}
+	return []string{
+		"kexec_load",        // Load a new kernel
+		"kexec_file_load",   // Load a new kernel from file
+		"reboot",            // Reboot the system
+		"init_module",       // Load a kernel module
+		"finit_module",      // Load a kernel module from fd
+		"delete_module",     // Unload a kernel module
+		"acct",              // Process accounting
+		"swapon",            // Enable swap
+		"swapoff",           // Disable swap
+		"mount",             // Mount filesystem (after init)
+		"umount2",           // Unmount filesystem (after init)
+		"pivot_root",        // Change root filesystem (after init)
+		"keyctl",            // Kernel keyring manipulation
+		"add_key",           // Add key to keyring
+		"request_key",       // Request key from keyring
+		"open_by_handle_at", // Open file by handle (CVE-2015-1322)
+	}
 }
 
 // ApplySeccompProfile applies a basic seccomp profile using prctl.
 // In production, you would use the SECCOMP_SET_MODE_FILTER with BPF.
 func ApplySeccompProfile() error {
-log.Printf("Applying seccomp profile")
+	log.Printf("Applying seccomp profile")
 
-// Set seccomp to strict mode as a baseline
-// Note: A full implementation would use SECCOMP_SET_MODE_FILTER
-// with a BPF program for fine-grained control.
-//
-// For a production-grade implementation, you would:
-// 1. Build a BPF filter program
-// 2. Load it via prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &prog)
-//
-// Here we demonstrate the concept with no_new_privs which is a
-// prerequisite for seccomp filters:
-if err := unix.Prctl(unix.PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0); err != nil {
-return err
-}
+	// Set seccomp to strict mode as a baseline
+	// Note: A full implementation would use SECCOMP_SET_MODE_FILTER
+	// with a BPF program for fine-grained control.
+	//
+	// For a production-grade implementation, you would:
+	// 1. Build a BPF filter program
+	// 2. Load it via prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &prog)
+	//
+	// Here we demonstrate the concept with no_new_privs which is a
+	// prerequisite for seccomp filters:
+	if err := unix.Prctl(unix.PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0); err != nil {
+		return err
+	}
 
-log.Printf("Seccomp baseline applied (no_new_privs set)")
-return nil
+	log.Printf("Seccomp baseline applied (no_new_privs set)")
+	return nil
 }
 ```
 
@@ -2309,34 +2309,34 @@ Making the root filesystem read-only prevents containers from modifying system f
 package filesystem
 
 import (
-"fmt"
-"log"
-"syscall"
+	"fmt"
+	"log"
+	"syscall"
 )
 
 // RemountReadOnly remounts the root filesystem as read-only.
 // Writable directories (/tmp, /var/run) must be tmpfs mounts.
 func RemountReadOnly() error {
-log.Printf("Remounting root filesystem as read-only")
+	log.Printf("Remounting root filesystem as read-only")
 
-// First, set up writable tmpfs mounts for directories that need writes
-writableDirs := []string{"/tmp", "/var/tmp", "/run"}
-for _, dir := range writableDirs {
-err := syscall.Mount("tmpfs", dir, "tmpfs",
-syscall.MS_NOSUID|syscall.MS_NODEV, "size=65536k")
-if err != nil {
-log.Printf("WARNING: could not mount tmpfs on %s: %v", dir, err)
-}
-}
+	// First, set up writable tmpfs mounts for directories that need writes
+	writableDirs := []string{"/tmp", "/var/tmp", "/run"}
+	for _, dir := range writableDirs {
+		err := syscall.Mount("tmpfs", dir, "tmpfs",
+			syscall.MS_NOSUID|syscall.MS_NODEV, "size=65536k")
+		if err != nil {
+			log.Printf("WARNING: could not mount tmpfs on %s: %v", dir, err)
+		}
+	}
 
-// Remount root as read-only
-err := syscall.Mount("", "/", "", syscall.MS_REMOUNT|syscall.MS_RDONLY, "")
-if err != nil {
-return fmt.Errorf("remounting / as read-only: %w", err)
-}
+	// Remount root as read-only
+	err := syscall.Mount("", "/", "", syscall.MS_REMOUNT|syscall.MS_RDONLY, "")
+	if err != nil {
+		return fmt.Errorf("remounting / as read-only: %w", err)
+	}
 
-log.Printf("Root filesystem is now read-only")
-return nil
+	log.Printf("Root filesystem is now read-only")
+	return nil
 }
 ```
 

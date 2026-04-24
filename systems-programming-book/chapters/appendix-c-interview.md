@@ -1134,12 +1134,12 @@ type Factory func(ctx context.Context) (Conn, error)
 
 // Pool manages a pool of reusable connections.
 type Pool struct {
-	factory  Factory
-	maxSize  int
-	mu       sync.Mutex
-	idle     []Conn     // idle connections available for reuse
-	active   int        // total connections currently created (idle + in-use)
-	waiters  []chan Conn // goroutines waiting for a connection
+	factory Factory
+	maxSize int
+	mu      sync.Mutex
+	idle    []Conn      // idle connections available for reuse
+	active  int         // total connections currently created (idle + in-use)
+	waiters []chan Conn // goroutines waiting for a connection
 }
 
 // New creates a connection pool with the given factory function and maximum size.

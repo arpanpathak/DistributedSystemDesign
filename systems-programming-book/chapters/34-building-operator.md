@@ -263,12 +263,12 @@ func main() {
 
 	flag.StringVar(&metricsAddr, "metrics-bind-address", "0",
 		"The address the metrics endpoint binds to. "+
-		"Use :8443 for HTTPS with /metrics on all interfaces.")
+			"Use :8443 for HTTPS with /metrics on all interfaces.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081",
 		"The address the health probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
-		"Enabling this will ensure there is only one active controller manager.")
+			"Enabling this will ensure there is only one active controller manager.")
 	flag.BoolVar(&secureMetrics, "metrics-secure", true,
 		"If set, the metrics endpoint is served securely via HTTPS.")
 	flag.BoolVar(&enableHTTP2, "enable-http2", false,
@@ -283,8 +283,8 @@ func main() {
 	tlsOpts := []func(*tls.Config){}
 	if !enableHTTP2 {
 		tlsOpts = append(tlsOpts, func(c *tls.Config) {
-				c.NextProtos = []string{"http/1.1"}
-			})
+			c.NextProtos = []string{"http/1.1"}
+		})
 	}
 
 	// Create the Manager. The Manager:
@@ -293,19 +293,19 @@ func main() {
 	// - Manages controller lifecycle (start, stop, health)
 	// - Handles leader election
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-			Scheme: scheme,
-			Metrics: metricsserver.Options{
-				BindAddress:   metricsAddr,
-				SecureServing: secureMetrics,
-				TLSOpts:       tlsOpts,
-			},
-			WebhookServer: ctrlwebhook.NewServer(ctrlwebhook.Options{
-					TLSOpts: tlsOpts,
-				}),
-			HealthProbeBindAddress: probeAddr,
-			LeaderElection:         enableLeaderElection,
-			LeaderElectionID:       "postgres-operator.example.com",
-		})
+		Scheme: scheme,
+		Metrics: metricsserver.Options{
+			BindAddress:   metricsAddr,
+			SecureServing: secureMetrics,
+			TLSOpts:       tlsOpts,
+		},
+		WebhookServer: ctrlwebhook.NewServer(ctrlwebhook.Options{
+			TLSOpts: tlsOpts,
+		}),
+		HealthProbeBindAddress: probeAddr,
+		LeaderElection:         enableLeaderElection,
+		LeaderElectionID:       "postgres-operator.example.com",
+	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
@@ -315,10 +315,10 @@ func main() {
 	// The reconciler is the core of our operator — it watches PostgresCluster
 	// resources and reconciles the cluster toward the desired state.
 	if err = (&controller.PostgresClusterReconciler{
-			Client:   mgr.GetClient(),
-			Scheme:   mgr.GetScheme(),
-			Recorder: mgr.GetEventRecorderFor("postgrescluster-controller"),
-		}).SetupWithManager(mgr); err != nil {
+		Client:   mgr.GetClient(),
+		Scheme:   mgr.GetScheme(),
+		Recorder: mgr.GetEventRecorderFor("postgrescluster-controller"),
+	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "PostgresCluster")
 		os.Exit(1)
 	}
@@ -516,7 +516,7 @@ const (
 // PostgresClusterStatus defines the observed state of a PostgreSQL cluster.
 // The status is updated by the operator during each reconcile loop and reflects
 // the actual state of the cluster, not the desired state. Consumers (users,
-	// monitoring systems, other controllers) read the status to understand what
+// monitoring systems, other controllers) read the status to understand what
 // the cluster is actually doing.
 type PostgresClusterStatus struct {
 	// Phase is the high-level lifecycle phase of the cluster.
@@ -769,7 +769,7 @@ type PostgresClusterReconciler struct {
 
 	// Scheme maps Go types to GroupVersionKinds. Required for setting
 	// owner references (the scheme tells the API machinery what GVK
-		// corresponds to our PostgresCluster Go type).
+	// corresponds to our PostgresCluster Go type).
 	Scheme *runtime.Scheme
 
 	// Recorder is used to emit Kubernetes Events on the PostgresCluster
@@ -857,9 +857,9 @@ func (r *PostgresClusterReconciler) reconcileStatefulSet(
 	// Check if the StatefulSet already exists.
 	existing := &appsv1.StatefulSet{}
 	err := r.Get(ctx, types.NamespacedName{
-			Name:      desired.Name,
-			Namespace: desired.Namespace,
-		}, existing)
+		Name:      desired.Name,
+		Namespace: desired.Namespace,
+	}, existing)
 
 	if apierrors.IsNotFound(err) {
 		// StatefulSet does not exist — create it.
@@ -912,9 +912,9 @@ func (r *PostgresClusterReconciler) statefulSetNeedsUpdate(
 
 	// Check container image (version upgrade)
 	if len(existing.Spec.Template.Spec.Containers) > 0 &&
-	len(desired.Spec.Template.Spec.Containers) > 0 {
+		len(desired.Spec.Template.Spec.Containers) > 0 {
 		if existing.Spec.Template.Spec.Containers[0].Image !=
-		desired.Spec.Template.Spec.Containers[0].Image {
+			desired.Spec.Template.Spec.Containers[0].Image {
 			return true
 		}
 	}
@@ -1216,9 +1216,9 @@ func (r *PostgresClusterReconciler) reconcileHeadlessService(
 	// Create or update the headless Service.
 	existing := &corev1.Service{}
 	err := r.Get(ctx, types.NamespacedName{
-			Name:      desired.Name,
-			Namespace: desired.Namespace,
-		}, existing)
+		Name:      desired.Name,
+		Namespace: desired.Namespace,
+	}, existing)
 
 	if apierrors.IsNotFound(err) {
 		log.Info("creating headless Service", "name", desired.Name)
@@ -1261,7 +1261,7 @@ PostgreSQL configuration is managed through a ConfigMap mounted into the contain
 //
 // When the ConfigMap changes, the StatefulSet Pods detect the volume change
 // and PostgreSQL can be signaled to reload its configuration (via SIGHUP
-	// or pg_reload_conf()).
+// or pg_reload_conf()).
 func (r *PostgresClusterReconciler) reconcileConfigMap(
 	ctx context.Context,
 	pg *postgresv1alpha1.PostgresCluster,
@@ -1292,9 +1292,9 @@ func (r *PostgresClusterReconciler) reconcileConfigMap(
 
 	existing := &corev1.ConfigMap{}
 	err := r.Get(ctx, types.NamespacedName{
-			Name:      desired.Name,
-			Namespace: desired.Namespace,
-		}, existing)
+		Name:      desired.Name,
+		Namespace: desired.Namespace,
+	}, existing)
 
 	if apierrors.IsNotFound(err) {
 		log.Info("creating ConfigMap", "name", desired.Name)
@@ -1333,25 +1333,25 @@ func (r *PostgresClusterReconciler) reconcileConfigMap(
 func buildPostgresConf(pg *postgresv1alpha1.PostgresCluster) string {
 	// Operator defaults — safe for most workloads.
 	defaults := map[string]string{
-		"listen_addresses":    "'*'",
-		"port":                "5432",
-		"max_connections":     "100",
-		"shared_buffers":      "128MB",
-		"effective_cache_size": "512MB",
-		"work_mem":            "4MB",
-		"maintenance_work_mem": "64MB",
-		"wal_level":           "replica",
-		"max_wal_senders":     "10",
-		"max_replication_slots": "10",
-		"hot_standby":         "on",
-		"logging_collector":   "on",
-		"log_directory":       "'pg_log'",
-		"log_filename":        "'postgresql-%a.log'",
+		"listen_addresses":         "'*'",
+		"port":                     "5432",
+		"max_connections":          "100",
+		"shared_buffers":           "128MB",
+		"effective_cache_size":     "512MB",
+		"work_mem":                 "4MB",
+		"maintenance_work_mem":     "64MB",
+		"wal_level":                "replica",
+		"max_wal_senders":          "10",
+		"max_replication_slots":    "10",
+		"hot_standby":              "on",
+		"logging_collector":        "on",
+		"log_directory":            "'pg_log'",
+		"log_filename":             "'postgresql-%a.log'",
 		"log_truncate_on_rotation": "on",
-		"log_rotation_age":    "1d",
-		"log_rotation_size":   "0",
-		"log_min_messages":    "warning",
-		"log_min_error_statement": "error",
+		"log_rotation_age":         "1d",
+		"log_rotation_size":        "0",
+		"log_min_messages":         "warning",
+		"log_min_error_statement":  "error",
 	}
 
 	// Override defaults with user-specified parameters.
@@ -1408,7 +1408,7 @@ primary, depending on your strategy).
 ```go
 // reconcileService ensures that a ClusterIP Service exists for client
 // connections to the PostgreSQL cluster. Unlike the headless Service (used
-	// for StatefulSet DNS), this Service provides a single stable endpoint
+// for StatefulSet DNS), this Service provides a single stable endpoint
 // that clients use to connect.
 //
 // For a simple setup, this Service targets all Pods (primary + replicas).
@@ -1449,9 +1449,9 @@ func (r *PostgresClusterReconciler) reconcileService(
 
 	existing := &corev1.Service{}
 	err := r.Get(ctx, types.NamespacedName{
-			Name:      desired.Name,
-			Namespace: desired.Namespace,
-		}, existing)
+		Name:      desired.Name,
+		Namespace: desired.Namespace,
+	}, existing)
 
 	if apierrors.IsNotFound(err) {
 		log.Info("creating Service", "name", desired.Name)
@@ -1505,9 +1505,9 @@ func (r *PostgresClusterReconciler) handleScaling(
 	// Get the current StatefulSet.
 	sts := &appsv1.StatefulSet{}
 	err = r.Get(ctx, types.NamespacedName{
-			Name:      resourceName(pg),
-			Namespace: pg.Namespace,
-		}, sts)
+		Name:      resourceName(pg),
+		Namespace: pg.Namespace,
+	}, sts)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			// StatefulSet doesn't exist yet — not scaling, just creating.
@@ -1596,9 +1596,9 @@ func (r *PostgresClusterReconciler) handleVersionUpgrade(
 	// Check if the rolling update is still in progress.
 	sts := &appsv1.StatefulSet{}
 	err = r.Get(ctx, types.NamespacedName{
-			Name:      resourceName(pg),
-			Namespace: pg.Namespace,
-		}, sts)
+		Name:      resourceName(pg),
+		Namespace: pg.Namespace,
+	}, sts)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			return false, nil
@@ -1637,9 +1637,9 @@ func (r *PostgresClusterReconciler) updateStatus(
 	// Get the current StatefulSet to read replica counts.
 	sts := &appsv1.StatefulSet{}
 	err := r.Get(ctx, types.NamespacedName{
-			Name:      resourceName(pg),
-			Namespace: pg.Namespace,
-		}, sts)
+		Name:      resourceName(pg),
+		Namespace: pg.Namespace,
+	}, sts)
 
 	if err == nil {
 		// StatefulSet exists — update replica counts from its status.
@@ -1669,79 +1669,79 @@ func (r *PostgresClusterReconciler) updateStatus(
 	// Initialized condition: True once the StatefulSet, Services, and
 	// ConfigMap have been created.
 	meta.SetStatusCondition(&pg.Status.Conditions, metav1.Condition{
-			Type:               postgresv1alpha1.ConditionTypeInitialized,
-			Status:             metav1.ConditionTrue,
-			Reason:             "ResourcesCreated",
-			Message:            "All managed resources have been created",
-			ObservedGeneration: pg.Generation,
-			LastTransitionTime: now,
-		})
+		Type:               postgresv1alpha1.ConditionTypeInitialized,
+		Status:             metav1.ConditionTrue,
+		Reason:             "ResourcesCreated",
+		Message:            "All managed resources have been created",
+		ObservedGeneration: pg.Generation,
+		LastTransitionTime: now,
+	})
 
 	// Available condition: True when at least one replica is ready.
 	if pg.Status.ReadyReplicas > 0 {
 		meta.SetStatusCondition(&pg.Status.Conditions, metav1.Condition{
-				Type:               postgresv1alpha1.ConditionTypeAvailable,
-				Status:             metav1.ConditionTrue,
-				Reason:             "ReplicasAvailable",
-				Message:            fmt.Sprintf("%d replica(s) available", pg.Status.ReadyReplicas),
-				ObservedGeneration: pg.Generation,
-				LastTransitionTime: now,
-			})
+			Type:               postgresv1alpha1.ConditionTypeAvailable,
+			Status:             metav1.ConditionTrue,
+			Reason:             "ReplicasAvailable",
+			Message:            fmt.Sprintf("%d replica(s) available", pg.Status.ReadyReplicas),
+			ObservedGeneration: pg.Generation,
+			LastTransitionTime: now,
+		})
 	} else {
 		meta.SetStatusCondition(&pg.Status.Conditions, metav1.Condition{
-				Type:               postgresv1alpha1.ConditionTypeAvailable,
-				Status:             metav1.ConditionFalse,
-				Reason:             "NoReplicasAvailable",
-				Message:            "No replicas are ready",
-				ObservedGeneration: pg.Generation,
-				LastTransitionTime: now,
-			})
+			Type:               postgresv1alpha1.ConditionTypeAvailable,
+			Status:             metav1.ConditionFalse,
+			Reason:             "NoReplicasAvailable",
+			Message:            "No replicas are ready",
+			ObservedGeneration: pg.Generation,
+			LastTransitionTime: now,
+		})
 	}
 
 	// Ready condition: True when ALL desired replicas are ready.
 	if pg.Status.ReadyReplicas == pg.Spec.Replicas {
 		meta.SetStatusCondition(&pg.Status.Conditions, metav1.Condition{
-				Type:               postgresv1alpha1.ConditionTypeReady,
-				Status:             metav1.ConditionTrue,
-				Reason:             "AllReplicasReady",
-				Message:            fmt.Sprintf("All %d replicas are ready", pg.Spec.Replicas),
-				ObservedGeneration: pg.Generation,
-				LastTransitionTime: now,
-			})
+			Type:               postgresv1alpha1.ConditionTypeReady,
+			Status:             metav1.ConditionTrue,
+			Reason:             "AllReplicasReady",
+			Message:            fmt.Sprintf("All %d replicas are ready", pg.Spec.Replicas),
+			ObservedGeneration: pg.Generation,
+			LastTransitionTime: now,
+		})
 	} else {
 		meta.SetStatusCondition(&pg.Status.Conditions, metav1.Condition{
-				Type:               postgresv1alpha1.ConditionTypeReady,
-				Status:             metav1.ConditionFalse,
-				Reason:             "ReplicasNotReady",
-				Message: fmt.Sprintf("%d of %d replicas are ready",
-					pg.Status.ReadyReplicas, pg.Spec.Replicas),
-				ObservedGeneration: pg.Generation,
-				LastTransitionTime: now,
-			})
+			Type:   postgresv1alpha1.ConditionTypeReady,
+			Status: metav1.ConditionFalse,
+			Reason: "ReplicasNotReady",
+			Message: fmt.Sprintf("%d of %d replicas are ready",
+				pg.Status.ReadyReplicas, pg.Spec.Replicas),
+			ObservedGeneration: pg.Generation,
+			LastTransitionTime: now,
+		})
 	}
 
 	// Progressing condition: True when the operator is actively making changes.
 	isProgressing := phase == postgresv1alpha1.PhaseCreating ||
-	phase == postgresv1alpha1.PhaseScaling ||
-	phase == postgresv1alpha1.PhaseUpgrading
+		phase == postgresv1alpha1.PhaseScaling ||
+		phase == postgresv1alpha1.PhaseUpgrading
 	if isProgressing {
 		meta.SetStatusCondition(&pg.Status.Conditions, metav1.Condition{
-				Type:               postgresv1alpha1.ConditionTypeProgressing,
-				Status:             metav1.ConditionTrue,
-				Reason:             string(phase),
-				Message:            fmt.Sprintf("Cluster is %s", phase),
-				ObservedGeneration: pg.Generation,
-				LastTransitionTime: now,
-			})
+			Type:               postgresv1alpha1.ConditionTypeProgressing,
+			Status:             metav1.ConditionTrue,
+			Reason:             string(phase),
+			Message:            fmt.Sprintf("Cluster is %s", phase),
+			ObservedGeneration: pg.Generation,
+			LastTransitionTime: now,
+		})
 	} else {
 		meta.SetStatusCondition(&pg.Status.Conditions, metav1.Condition{
-				Type:               postgresv1alpha1.ConditionTypeProgressing,
-				Status:             metav1.ConditionFalse,
-				Reason:             "Stable",
-				Message:            "Cluster is stable",
-				ObservedGeneration: pg.Generation,
-				LastTransitionTime: now,
-			})
+			Type:               postgresv1alpha1.ConditionTypeProgressing,
+			Status:             metav1.ConditionFalse,
+			Reason:             "Stable",
+			Message:            "Cluster is stable",
+			ObservedGeneration: pg.Generation,
+			LastTransitionTime: now,
+		})
 	}
 
 	// Write the status subresource.
@@ -1824,7 +1824,7 @@ func (r *PostgresClusterReconciler) Reconcile(
 			log.Info("running finalizer cleanup")
 
 			// Perform any external cleanup here (e.g., delete DNS records,
-				// revoke cloud IAM bindings, remove monitoring dashboards).
+			// revoke cloud IAM bindings, remove monitoring dashboards).
 			// For this operator, we just log it.
 			r.Recorder.Event(pg, corev1.EventTypeNormal, "Cleanup",
 				"Running pre-deletion cleanup")
@@ -1953,15 +1953,15 @@ func (r *PostgresClusterReconciler) Reconcile(
 // for that PostgresCluster (not for the child resource itself).
 func (r *PostgresClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-	// Primary watch: PostgresCluster custom resources.
-	For(&postgresv1alpha1.PostgresCluster{}).
-	// Secondary watches: owned resources.
-	// When a StatefulSet/Service/ConfigMap changes, reconcile the
-	// owning PostgresCluster.
-	Owns(&appsv1.StatefulSet{}).
-	Owns(&corev1.Service{}).
-	Owns(&corev1.ConfigMap{}).
-	Complete(r)
+		// Primary watch: PostgresCluster custom resources.
+		For(&postgresv1alpha1.PostgresCluster{}).
+		// Secondary watches: owned resources.
+		// When a StatefulSet/Service/ConfigMap changes, reconcile the
+		// owning PostgresCluster.
+		Owns(&appsv1.StatefulSet{}).
+		Owns(&corev1.Service{}).
+		Owns(&corev1.ConfigMap{}).
+		Complete(r)
 }
 ```
 
@@ -2202,10 +2202,10 @@ func newTestReconciler(objs ...runtime.Object) *PostgresClusterReconciler {
 	_ = corev1.AddToScheme(scheme)
 
 	client := fake.NewClientBuilder().
-	WithScheme(scheme).
-	WithRuntimeObjects(objs...).
-	WithStatusSubresource(&postgresv1alpha1.PostgresCluster{}).
-	Build()
+		WithScheme(scheme).
+		WithRuntimeObjects(objs...).
+		WithStatusSubresource(&postgresv1alpha1.PostgresCluster{}).
+		Build()
 
 	return &PostgresClusterReconciler{
 		Client:   client,
@@ -2243,29 +2243,29 @@ func TestReconcile_CreatesResources(t *testing.T) {
 
 	// First reconcile: adds finalizer and requeues.
 	result, err := r.Reconcile(ctx, ctrl.Request{
-			NamespacedName: types.NamespacedName{
-				Name:      pg.Name,
-				Namespace: pg.Namespace,
-			},
-		})
+		NamespacedName: types.NamespacedName{
+			Name:      pg.Name,
+			Namespace: pg.Namespace,
+		},
+	})
 	require.NoError(t, err)
 	assert.True(t, result.Requeue, "expected requeue after adding finalizer")
 
 	// Second reconcile: creates resources.
 	result, err = r.Reconcile(ctx, ctrl.Request{
-			NamespacedName: types.NamespacedName{
-				Name:      pg.Name,
-				Namespace: pg.Namespace,
-			},
-		})
+		NamespacedName: types.NamespacedName{
+			Name:      pg.Name,
+			Namespace: pg.Namespace,
+		},
+	})
 	require.NoError(t, err)
 
 	// Verify StatefulSet was created.
 	sts := &appsv1.StatefulSet{}
 	err = r.Get(ctx, types.NamespacedName{
-			Name:      "test-pg",
-			Namespace: "default",
-		}, sts)
+		Name:      "test-pg",
+		Namespace: "default",
+	}, sts)
 	require.NoError(t, err)
 	assert.Equal(t, int32(3), *sts.Spec.Replicas)
 	assert.Equal(t, "postgres:16.2", sts.Spec.Template.Spec.Containers[0].Image)
@@ -2273,26 +2273,26 @@ func TestReconcile_CreatesResources(t *testing.T) {
 	// Verify headless Service was created.
 	headlessSvc := &corev1.Service{}
 	err = r.Get(ctx, types.NamespacedName{
-			Name:      "test-pg-headless",
-			Namespace: "default",
-		}, headlessSvc)
+		Name:      "test-pg-headless",
+		Namespace: "default",
+	}, headlessSvc)
 	require.NoError(t, err)
 	assert.Equal(t, corev1.ClusterIPNone, headlessSvc.Spec.ClusterIP)
 
 	// Verify client Service was created.
 	clientSvc := &corev1.Service{}
 	err = r.Get(ctx, types.NamespacedName{
-			Name:      "test-pg",
-			Namespace: "default",
-		}, clientSvc)
+		Name:      "test-pg",
+		Namespace: "default",
+	}, clientSvc)
 	require.NoError(t, err)
 
 	// Verify ConfigMap was created.
 	cm := &corev1.ConfigMap{}
 	err = r.Get(ctx, types.NamespacedName{
-			Name:      "test-pg-config",
-			Namespace: "default",
-		}, cm)
+		Name:      "test-pg-config",
+		Namespace: "default",
+	}, cm)
 	require.NoError(t, err)
 	assert.Contains(t, cm.Data, "postgresql.conf")
 	assert.Contains(t, cm.Data, "pg_hba.conf")
@@ -2306,11 +2306,11 @@ func TestReconcile_HandlesNotFound(t *testing.T) {
 	ctx := context.Background()
 
 	result, err := r.Reconcile(ctx, ctrl.Request{
-			NamespacedName: types.NamespacedName{
-				Name:      "does-not-exist",
-				Namespace: "default",
-			},
-		})
+		NamespacedName: types.NamespacedName{
+			Name:      "does-not-exist",
+			Namespace: "default",
+		},
+	})
 	require.NoError(t, err)
 	assert.Equal(t, ctrl.Result{}, result)
 }
@@ -2325,26 +2325,26 @@ func TestReconcile_UpdatesStatefulSetOnScaleChange(t *testing.T) {
 
 	// Initial reconcile (adds finalizer).
 	_, _ = r.Reconcile(ctx, ctrl.Request{
-			NamespacedName: types.NamespacedName{
-				Name:      pg.Name,
-				Namespace: pg.Namespace,
-			},
-		})
+		NamespacedName: types.NamespacedName{
+			Name:      pg.Name,
+			Namespace: pg.Namespace,
+		},
+	})
 
 	// Second reconcile (creates resources).
 	_, _ = r.Reconcile(ctx, ctrl.Request{
-			NamespacedName: types.NamespacedName{
-				Name:      pg.Name,
-				Namespace: pg.Namespace,
-			},
-		})
+		NamespacedName: types.NamespacedName{
+			Name:      pg.Name,
+			Namespace: pg.Namespace,
+		},
+	})
 
 	// Update the replica count.
 	updatedPG := &postgresv1alpha1.PostgresCluster{}
 	err := r.Get(ctx, types.NamespacedName{
-			Name:      pg.Name,
-			Namespace: pg.Namespace,
-		}, updatedPG)
+		Name:      pg.Name,
+		Namespace: pg.Namespace,
+	}, updatedPG)
 	require.NoError(t, err)
 
 	updatedPG.Spec.Replicas = 5
@@ -2353,19 +2353,19 @@ func TestReconcile_UpdatesStatefulSetOnScaleChange(t *testing.T) {
 
 	// Reconcile again.
 	_, err = r.Reconcile(ctx, ctrl.Request{
-			NamespacedName: types.NamespacedName{
-				Name:      pg.Name,
-				Namespace: pg.Namespace,
-			},
-		})
+		NamespacedName: types.NamespacedName{
+			Name:      pg.Name,
+			Namespace: pg.Namespace,
+		},
+	})
 	require.NoError(t, err)
 
 	// Verify the StatefulSet was updated.
 	sts := &appsv1.StatefulSet{}
 	err = r.Get(ctx, types.NamespacedName{
-			Name:      "test-pg",
-			Namespace: "default",
-		}, sts)
+		Name:      "test-pg",
+		Namespace: "default",
+	}, sts)
 	require.NoError(t, err)
 	assert.Equal(t, int32(5), *sts.Spec.Replicas)
 }
@@ -2425,100 +2425,100 @@ func TestAPIs(t *testing.T) {
 
 // BeforeSuite starts the envtest environment and the controller manager.
 var _ = BeforeSuite(func() {
-		logf.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
+	logf.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
 
-		ctx, cancel = context.WithCancel(context.TODO())
+	ctx, cancel = context.WithCancel(context.TODO())
 
-		// Start envtest with CRD paths.
-		testEnv = &envtest.Environment{
-			CRDDirectoryPaths: []string{
-				filepath.Join("..", "..", "config", "crd", "bases"),
-			},
-			ErrorIfCRDPathMissing: true,
-		}
+	// Start envtest with CRD paths.
+	testEnv = &envtest.Environment{
+		CRDDirectoryPaths: []string{
+			filepath.Join("..", "..", "config", "crd", "bases"),
+		},
+		ErrorIfCRDPathMissing: true,
+	}
 
-		var err error
-		cfg, err = testEnv.Start()
+	var err error
+	cfg, err = testEnv.Start()
+	Expect(err).NotTo(HaveOccurred())
+	Expect(cfg).NotTo(BeNil())
+
+	// Register schemes.
+	err = postgresv1alpha1.AddToScheme(scheme.Scheme)
+	Expect(err).NotTo(HaveOccurred())
+
+	// Create a client.
+	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
+	Expect(err).NotTo(HaveOccurred())
+
+	// Start the controller manager in a goroutine.
+	mgr, err := ctrl.NewManager(cfg, ctrl.Options{Scheme: scheme.Scheme})
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&controller.PostgresClusterReconciler{
+		Client:   mgr.GetClient(),
+		Scheme:   mgr.GetScheme(),
+		Recorder: mgr.GetEventRecorderFor("test"),
+	}).SetupWithManager(mgr)
+	Expect(err).NotTo(HaveOccurred())
+
+	go func() {
+		defer GinkgoRecover()
+		err = mgr.Start(ctx)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(cfg).NotTo(BeNil())
-
-		// Register schemes.
-		err = postgresv1alpha1.AddToScheme(scheme.Scheme)
-		Expect(err).NotTo(HaveOccurred())
-
-		// Create a client.
-		k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
-		Expect(err).NotTo(HaveOccurred())
-
-		// Start the controller manager in a goroutine.
-		mgr, err := ctrl.NewManager(cfg, ctrl.Options{Scheme: scheme.Scheme})
-		Expect(err).NotTo(HaveOccurred())
-
-		err = (&controller.PostgresClusterReconciler{
-				Client:   mgr.GetClient(),
-				Scheme:   mgr.GetScheme(),
-				Recorder: mgr.GetEventRecorderFor("test"),
-			}).SetupWithManager(mgr)
-		Expect(err).NotTo(HaveOccurred())
-
-		go func() {
-			defer GinkgoRecover()
-			err = mgr.Start(ctx)
-			Expect(err).NotTo(HaveOccurred())
-		}()
-	})
+	}()
+})
 
 // AfterSuite tears down the envtest environment.
 var _ = AfterSuite(func() {
-		cancel()
-		err := testEnv.Stop()
-		Expect(err).NotTo(HaveOccurred())
-	})
+	cancel()
+	err := testEnv.Stop()
+	Expect(err).NotTo(HaveOccurred())
+})
 
 // Integration test: verify that creating a PostgresCluster resource
 // results in the expected child resources being created.
 var _ = Describe("PostgresCluster Controller", func() {
-		Context("When creating a PostgresCluster", func() {
-				It("Should create the expected child resources", func() {
-						pg := &postgresv1alpha1.PostgresCluster{
-							ObjectMeta: metav1.ObjectMeta{
-								Name:      "integration-test-pg",
-								Namespace: "default",
-							},
-							Spec: postgresv1alpha1.PostgresClusterSpec{
-								Version:  "16.2",
-								Replicas: 1,
-								Storage: postgresv1alpha1.StorageSpec{
-									Size: resource.MustParse("1Gi"),
-								},
-							},
-						}
+	Context("When creating a PostgresCluster", func() {
+		It("Should create the expected child resources", func() {
+			pg := &postgresv1alpha1.PostgresCluster{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "integration-test-pg",
+					Namespace: "default",
+				},
+				Spec: postgresv1alpha1.PostgresClusterSpec{
+					Version:  "16.2",
+					Replicas: 1,
+					Storage: postgresv1alpha1.StorageSpec{
+						Size: resource.MustParse("1Gi"),
+					},
+				},
+			}
 
-						Expect(k8sClient.Create(ctx, pg)).Should(Succeed())
+			Expect(k8sClient.Create(ctx, pg)).Should(Succeed())
 
-						// Wait for the StatefulSet to be created.
-						stsKey := types.NamespacedName{
-							Name:      "integration-test-pg",
-							Namespace: "default",
-						}
-						Eventually(func() error {
-								return k8sClient.Get(ctx, stsKey, &appsv1.StatefulSet{})
-							}, 30*time.Second, time.Second).Should(Succeed())
+			// Wait for the StatefulSet to be created.
+			stsKey := types.NamespacedName{
+				Name:      "integration-test-pg",
+				Namespace: "default",
+			}
+			Eventually(func() error {
+				return k8sClient.Get(ctx, stsKey, &appsv1.StatefulSet{})
+			}, 30*time.Second, time.Second).Should(Succeed())
 
-						// Wait for the headless Service.
-						headlessKey := types.NamespacedName{
-							Name:      "integration-test-pg-headless",
-							Namespace: "default",
-						}
-						Eventually(func() error {
-								return k8sClient.Get(ctx, headlessKey, &corev1.Service{})
-							}, 30*time.Second, time.Second).Should(Succeed())
+			// Wait for the headless Service.
+			headlessKey := types.NamespacedName{
+				Name:      "integration-test-pg-headless",
+				Namespace: "default",
+			}
+			Eventually(func() error {
+				return k8sClient.Get(ctx, headlessKey, &corev1.Service{})
+			}, 30*time.Second, time.Second).Should(Succeed())
 
-						// Cleanup.
-						Expect(k8sClient.Delete(ctx, pg)).Should(Succeed())
-					})
-			})
+			// Cleanup.
+			Expect(k8sClient.Delete(ctx, pg)).Should(Succeed())
+		})
 	})
+})
 ```
 
 ### 34.7.3 E2E Tests with a Real Cluster
@@ -2835,22 +2835,22 @@ func (r *PostgresClusterReconciler) reconcileServiceAlternative(
 	// CreateOrUpdate: get the resource, call the mutate func, then
 	// create or update as needed. The result tells you what happened.
 	result, err := controllerutil.CreateOrUpdate(ctx, r.Client, svc, func() error {
-			// Mutate function: set the desired fields.
-			// This is called with either an empty Service (create) or the
-			// existing Service (update).
-			svc.Labels = labels
-			svc.Spec.Selector = labels
-			svc.Spec.Type = corev1.ServiceTypeClusterIP
-			svc.Spec.Ports = []corev1.ServicePort{
-				{
-					Name:       "postgresql",
-					Port:       5432,
-					TargetPort: intstr.FromString("postgresql"),
-					Protocol:   corev1.ProtocolTCP,
-				},
-			}
-			return controllerutil.SetControllerReference(pg, svc, r.Scheme)
-		})
+		// Mutate function: set the desired fields.
+		// This is called with either an empty Service (create) or the
+		// existing Service (update).
+		svc.Labels = labels
+		svc.Spec.Selector = labels
+		svc.Spec.Type = corev1.ServiceTypeClusterIP
+		svc.Spec.Ports = []corev1.ServicePort{
+			{
+				Name:       "postgresql",
+				Port:       5432,
+				TargetPort: intstr.FromString("postgresql"),
+				Protocol:   corev1.ProtocolTCP,
+			},
+		}
+		return controllerutil.SetControllerReference(pg, svc, r.Scheme)
+	})
 	if err != nil {
 		return fmt.Errorf("reconciling Service: %w", err)
 	}

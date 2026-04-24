@@ -563,15 +563,15 @@ func getEnv(key, defaultVal string) string {
 // Each field counts time (in USER_HZ ticks) spent in a mode.
 // ----------------------------------------------------------------
 type cpuStat struct {
-	cpu    string  // CPU identifier (e.g., "cpu0", "cpu1")
-	user   float64 // Time in user mode
-	nice   float64 // Time in user mode with low priority (nice)
-	system float64 // Time in kernel mode
-	idle   float64 // Time doing nothing
-	iowait float64 // Time waiting for I/O
-	irq    float64 // Time servicing hardware interrupts
+	cpu     string  // CPU identifier (e.g., "cpu0", "cpu1")
+	user    float64 // Time in user mode
+	nice    float64 // Time in user mode with low priority (nice)
+	system  float64 // Time in kernel mode
+	idle    float64 // Time doing nothing
+	iowait  float64 // Time waiting for I/O
+	irq     float64 // Time servicing hardware interrupts
 	softirq float64 // Time servicing software interrupts
-	steal  float64 // Time stolen by a hypervisor
+	steal   float64 // Time stolen by a hypervisor
 }
 
 // readCPUStats parses /proc/stat and returns per-CPU time stats.
@@ -711,11 +711,11 @@ func readLoadAvg(procPath string) (loadAvg, error) {
 // /proc/net/dev.
 // ----------------------------------------------------------------
 type netStat struct {
-	iface       string // Interface name (e.g., "eth0")
-	rxBytes     uint64 // Total bytes received
-	txBytes     uint64 // Total bytes transmitted
-	rxPackets   uint64 // Total packets received
-	txPackets   uint64 // Total packets transmitted
+	iface     string // Interface name (e.g., "eth0")
+	rxBytes   uint64 // Total bytes received
+	txBytes   uint64 // Total bytes transmitted
+	rxPackets uint64 // Total packets received
+	txPackets uint64 // Total packets transmitted
 }
 
 // readNetStats parses /proc/net/dev and returns per-interface
@@ -757,12 +757,12 @@ func readNetStats(procPath string) ([]netStat, error) {
 		txPackets, _ := strconv.ParseUint(fields[9], 10, 64)
 
 		stats = append(stats, netStat{
-				iface:     iface,
-				rxBytes:   rxBytes,
-				txBytes:   txBytes,
-				rxPackets: rxPackets,
-				txPackets: txPackets,
-			})
+			iface:     iface,
+			rxBytes:   rxBytes,
+			txBytes:   txBytes,
+			rxPackets: rxPackets,
+			txPackets: txPackets,
+		})
 	}
 
 	return stats, scanner.Err()
@@ -874,9 +874,9 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/metrics", metricsHandler(cfg))
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			fmt.Fprintln(w, "ok")
-		})
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintln(w, "ok")
+	})
 
 	server := &http.Server{
 		Addr:         cfg.listenAddr,
@@ -2682,7 +2682,7 @@ type WorkItem struct {
 	ID string `json:"id"`
 
 	// Payload contains the work-specific data (e.g., an image URL,
-		// a database query, a transformation spec).
+	// a database query, a transformation spec).
 	Payload string `json:"payload"`
 
 	// Priority indicates processing urgency (higher = more urgent).
@@ -2818,7 +2818,7 @@ func (qp *queueProcessor) claimItem() (*WorkItem, string, error) {
 
 // processItem simulates processing a single work item. In a real
 // application, this would perform the actual work (image
-	// processing, data transformation, API calls, etc.).
+// processing, data transformation, API calls, etc.).
 //
 // Returns an error if processing fails.
 func (qp *queueProcessor) processItem(item *WorkItem) error {
@@ -3001,7 +3001,7 @@ func main() {
 	}
 
 	// Set up graceful shutdown on SIGTERM (sent by Kubernetes during
-		// Pod termination) and SIGINT (for local development).
+	// Pod termination) and SIGINT (for local development).
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 

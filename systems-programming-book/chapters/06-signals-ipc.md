@@ -499,30 +499,30 @@ func main() {
 	// Create a handler that simulates slow requests.
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			duration := 2 * time.Second
-			log.Printf("Handling request %s (will take %v)", r.URL.Path, duration)
+		duration := 2 * time.Second
+		log.Printf("Handling request %s (will take %v)", r.URL.Path, duration)
 
-			select {
-			case <-time.After(duration):
-				fmt.Fprintf(w, "Request completed after %v\n", duration)
-			case <-r.Context().Done():
-				log.Printf("Request %s cancelled: %v", r.URL.Path, r.Context().Err())
-				return
-			}
-		})
+		select {
+		case <-time.After(duration):
+			fmt.Fprintf(w, "Request completed after %v\n", duration)
+		case <-r.Context().Done():
+			log.Printf("Request %s cancelled: %v", r.URL.Path, r.Context().Err())
+			return
+		}
+	})
 
 	server := NewGracefulServer(":8080", mux, 15*time.Second)
 
 	// Register cleanup handlers.
 	server.OnShutdown(func() error {
-			log.Println("Closing database connection pool...")
-			time.Sleep(100 * time.Millisecond)
-			return nil
-		})
+		log.Println("Closing database connection pool...")
+		time.Sleep(100 * time.Millisecond)
+		return nil
+	})
 	server.OnShutdown(func() error {
-			log.Println("Flushing metrics buffer...")
-			return nil
-		})
+		log.Println("Flushing metrics buffer...")
+		return nil
+	})
 
 	if err := server.ListenAndServeWithGracefulShutdown(); err != nil {
 		log.Fatalf("Server failed: %v", err)
@@ -735,8 +735,9 @@ func (cm *ConfigManager) validate(cfg *Config) error {
 // a config reload. This is the standard Unix pattern for live reloading.
 //
 // Usage:
-//   cm.WatchSignals()
-//   // Now: kill -USR1 <pid> triggers a reload
+//
+//	cm.WatchSignals()
+//	// Now: kill -USR1 <pid> triggers a reload
 func (cm *ConfigManager) WatchSignals() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGUSR1)
@@ -855,13 +856,13 @@ import (
 // signals inside containers.
 //
 // PID 1 considerations:
-//   1. MUST register signal handlers -- unhandled signals are ignored
-//      for PID 1 (the kernel's special treatment of init).
-//   2. MUST reap zombie children -- if this process spawns children
-//      (directly or via exec), their zombies won't be cleaned up
-//      by anyone else.
-//   3. SHOULD propagate signals to child processes -- so the entire
-//      process tree shuts down gracefully.
+//  1. MUST register signal handlers -- unhandled signals are ignored
+//     for PID 1 (the kernel's special treatment of init).
+//  2. MUST reap zombie children -- if this process spawns children
+//     (directly or via exec), their zombies won't be cleaned up
+//     by anyone else.
+//  3. SHOULD propagate signals to child processes -- so the entire
+//     process tree shuts down gracefully.
 //
 // Alternative: Use a proper init like tini or dumb-init as PID 1,
 // and run your app as PID 2+. But understanding the problem is essential.
@@ -900,11 +901,11 @@ func (cs *ContainerServer) reapZombies() {
 // Run starts the server and handles PID-1-appropriate shutdown.
 //
 // The shutdown flow for a container:
-//   1. Container runtime sends SIGTERM (docker stop, kubectl delete pod).
-//   2. We catch SIGTERM and initiate graceful shutdown.
-//   3. We stop accepting new connections and drain existing ones.
-//   4. If shutdown completes within the timeout, we exit 0.
-//   5. If not, the container runtime sends SIGKILL after its grace period.
+//  1. Container runtime sends SIGTERM (docker stop, kubectl delete pod).
+//  2. We catch SIGTERM and initiate graceful shutdown.
+//  3. We stop accepting new connections and drain existing ones.
+//  4. If shutdown completes within the timeout, we exit 0.
+//  5. If not, the container runtime sends SIGKILL after its grace period.
 func (cs *ContainerServer) Run() error {
 	// Warn if we are PID 1 -- this is important information.
 	if os.Getpid() == 1 {
@@ -941,9 +942,9 @@ func (cs *ContainerServer) Run() error {
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("OK"))
-		})
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
 
 	cs := &ContainerServer{
 		server: &http.Server{Addr: ":8080", Handler: mux},
@@ -1144,10 +1145,10 @@ type PipelineStage struct {
 //     reads from the pipe.
 //
 // Implementation mirrors how a shell (bash, zsh) implements pipelines:
-//   1. Create N-1 pipes for N stages.
-//   2. Fork/exec each stage with appropriate stdin/stdout wiring.
-//   3. Close unused pipe ends in each process.
-//   4. Wait for all processes to complete.
+//  1. Create N-1 pipes for N stages.
+//  2. Fork/exec each stage with appropriate stdin/stdout wiring.
+//  3. Close unused pipe ends in each process.
+//  4. Wait for all processes to complete.
 type Pipeline struct {
 	// stages are the commands in the pipeline, in order.
 	stages []PipelineStage
@@ -1178,9 +1179,9 @@ func NewPipeline(cmdString string) *Pipeline {
 			continue
 		}
 		stages = append(stages, PipelineStage{
-				Name: fields[0],
-				Args: fields[1:],
-			})
+			Name: fields[0],
+			Args: fields[1:],
+		})
 	}
 
 	return &Pipeline{stages: stages}
@@ -1199,13 +1200,13 @@ func (p *Pipeline) SetOutput(w io.Writer) {
 // Execute runs the entire pipeline and waits for completion.
 //
 // Execution flow:
-//   1. Create os.Pipe() between each pair of adjacent stages.
-//   2. Configure each exec.Cmd with the correct stdin/stdout.
-//   3. Start all commands concurrently.
-//   4. Close our copies of the pipe file descriptors (critical!
-	//      if we don't close them, readers will never see EOF).
-//   5. Wait for all commands to finish.
-//   6. Return the first error encountered, or nil.
+//  1. Create os.Pipe() between each pair of adjacent stages.
+//  2. Configure each exec.Cmd with the correct stdin/stdout.
+//  3. Start all commands concurrently.
+//  4. Close our copies of the pipe file descriptors (critical!
+//     if we don't close them, readers will never see EOF).
+//  5. Wait for all commands to finish.
+//  6. Return the first error encountered, or nil.
 //
 // This correctly handles backpressure: if a downstream stage is slow,
 // the pipe buffer fills up, and upstream stages block on write().
@@ -1508,6 +1509,7 @@ addr := &net.UnixAddr{
 	Name: "\x00myapp-abstract-socket",
 	Net:  "unix",
 }
+
 ```
 
 ### 6.3.3 Passing File Descriptors Over Unix Sockets (SCM_RIGHTS)
@@ -1674,7 +1676,7 @@ func (s *RPCServer) Serve() error {
 // handleConnection processes all RPC requests on a single connection.
 //
 // A single connection can carry multiple sequential requests (like
-	// HTTP keep-alive). The connection is closed when the client disconnects
+// HTTP keep-alive). The connection is closed when the client disconnects
 // or an encoding error occurs.
 func (s *RPCServer) handleConnection(conn net.Conn) {
 	defer conn.Close()
@@ -1730,16 +1732,16 @@ func main() {
 
 	// Register methods.
 	server.RegisterMethod("GetStatus", func(args map[string]string) (string, error) {
-			return fmt.Sprintf("uptime=%v, goroutines=running", time.Since(time.Now())), nil
-		})
+		return fmt.Sprintf("uptime=%v, goroutines=running", time.Since(time.Now())), nil
+	})
 
 	server.RegisterMethod("Echo", func(args map[string]string) (string, error) {
-			msg, ok := args["message"]
-			if !ok {
-				return "", fmt.Errorf("missing 'message' argument")
-			}
-			return msg, nil
-		})
+		msg, ok := args["message"]
+		if !ok {
+			return "", fmt.Errorf("missing 'message' argument")
+		}
+		return msg, nil
+	})
 
 	// Graceful shutdown on SIGTERM/SIGINT.
 	sigChan := make(chan os.Signal, 1)
@@ -1903,7 +1905,7 @@ func demonstrateFDPassing() {
 		log.Fatalf("sendFD: %v", err)
 	}
 	log.Println("Parent: fd sent successfully")
-	file.Close()    // Parent can close its copy now.
+	file.Close() // Parent can close its copy now.
 	parentUDS.Close()
 
 	<-done // Wait for child to finish.
@@ -2050,12 +2052,13 @@ import (
 // when new data is available.
 //
 // Memory layout (64 bytes):
-//   Offset 0:  Version   (uint64) -- schema version for compatibility.
-//   Offset 8:  Sequence  (uint64) -- incremented on each write.
-//   Offset 16: Timestamp (int64)  -- Unix nanoseconds of last write.
-//   Offset 24: DataLen   (uint32) -- length of the data payload.
-//   Offset 28: Padding   (36 bytes)
-//   Offset 64: Data      (variable length)
+//
+//	Offset 0:  Version   (uint64) -- schema version for compatibility.
+//	Offset 8:  Sequence  (uint64) -- incremented on each write.
+//	Offset 16: Timestamp (int64)  -- Unix nanoseconds of last write.
+//	Offset 24: DataLen   (uint32) -- length of the data payload.
+//	Offset 28: Padding   (36 bytes)
+//	Offset 64: Data      (variable length)
 //
 // The reader polls the Sequence field. When it changes, new data is
 // available. This is a simple (but effective) form of lock-free
@@ -2147,11 +2150,12 @@ func main() {
 // Note: For production use, replace the polling-based synchronization
 // with proper atomic operations:
 //
-//   import "sync/atomic"
-//   atomic.StoreUint64((*uint64)(unsafe.Pointer(&data[8])), seq)
+//	import "sync/atomic"
+//	atomic.StoreUint64((*uint64)(unsafe.Pointer(&data[8])), seq)
 //
 // And on the reader side:
-//   seq := atomic.LoadUint64((*uint64)(unsafe.Pointer(&data[8])))
+//
+//	seq := atomic.LoadUint64((*uint64)(unsafe.Pointer(&data[8])))
 //
 // The unsafe import above is referenced to show the concept.
 var _ = unsafe.Pointer(nil)
@@ -2410,7 +2414,7 @@ type QueueMessage struct {
 //
 // The directory is created if it doesn't exist. A subdirectory
 // "processing" holds messages that are being processed (dequeued
-	// but not yet acknowledged).
+// but not yet acknowledged).
 func NewFileMessageQueue(dir string) (*FileMessageQueue, error) {
 	procDir := filepath.Join(dir, "processing")
 	if err := os.MkdirAll(procDir, 0755); err != nil {
@@ -2754,11 +2758,12 @@ import (
 // of glibc's pthread_mutex and Go's sync.Mutex on Linux.
 //
 // The mutex has three states encoded in a single uint32:
-//   0: Unlocked -- nobody holds the lock.
-//   1: Locked, no waiters -- one thread holds the lock, nobody is
-//      waiting in the kernel.
-//   2: Locked, with waiters -- one thread holds the lock, and at
-//      least one other thread is sleeping in a futex wait.
+//
+//	0: Unlocked -- nobody holds the lock.
+//	1: Locked, no waiters -- one thread holds the lock, nobody is
+//	   waiting in the kernel.
+//	2: Locked, with waiters -- one thread holds the lock, and at
+//	   least one other thread is sleeping in a futex wait.
 //
 // State 2 is important: it tells Unlock() that it MUST call
 // FUTEX_WAKE. Without this optimization, every Unlock() would
@@ -2793,7 +2798,7 @@ func (m *FutexMutex) Lock() {
 // lockSlow is the contention path for Lock().
 //
 // We first spin briefly (checking if the lock becomes free without
-	// going to the kernel), then fall back to futex wait.
+// going to the kernel), then fall back to futex wait.
 //
 // Spinning is beneficial when:
 //   - The lock holder is on another CPU and will release soon.
@@ -2801,7 +2806,7 @@ func (m *FutexMutex) Lock() {
 //
 // Spinning is wasteful when:
 //   - The lock holder is on the same CPU (we're burning cycles
-	//     it could use to finish and unlock).
+//     it could use to finish and unlock).
 //   - The critical section is long.
 //
 // We limit spinning to 4 iterations as a compromise.
@@ -2983,11 +2988,11 @@ import (
 // access to a shared resource across processes.
 //
 // How it works:
-//   1. Open (or create) a lock file.
-//   2. Call flock() with LOCK_EX to acquire an exclusive lock.
-//   3. The lock is held as long as the file descriptor is open.
-//   4. If the process crashes, the OS automatically releases the lock
-//      (because it closes all file descriptors).
+//  1. Open (or create) a lock file.
+//  2. Call flock() with LOCK_EX to acquire an exclusive lock.
+//  3. The lock is held as long as the file descriptor is open.
+//  4. If the process crashes, the OS automatically releases the lock
+//     (because it closes all file descriptors).
 //
 // This is better than PID files alone because:
 //   - PID files can become stale if the process crashes without cleanup.
@@ -3085,13 +3090,14 @@ func (fl *FileLock) Unlock() error {
 // SingleInstance ensures only one instance of the application runs.
 //
 // Usage pattern for daemons:
-//   lock := NewFileLock("/var/run/myapp.lock")
-//   acquired, err := lock.TryLock()
-//   if !acquired {
-	//       log.Fatal("Another instance is already running")
-	//   }
-//   defer lock.Unlock()
-//   // ... run the daemon ...
+//
+//	lock := NewFileLock("/var/run/myapp.lock")
+//	acquired, err := lock.TryLock()
+//	if !acquired {
+//	    log.Fatal("Another instance is already running")
+//	}
+//	defer lock.Unlock()
+//	// ... run the daemon ...
 func main() {
 	lock := NewFileLock("/tmp/myapp.lock")
 
@@ -3486,14 +3492,14 @@ type hchan struct {
 //
 // Each sudog represents one goroutine waiting on this channel.
 // When a goroutine blocks on a channel operation, the runtime:
-//   1. Creates a sudog with a pointer to the goroutine.
-//   2. Enqueues the sudog in either sendq or recvq.
-//   3. Parks the goroutine (removes it from the run queue).
+//  1. Creates a sudog with a pointer to the goroutine.
+//  2. Enqueues the sudog in either sendq or recvq.
+//  3. Parks the goroutine (removes it from the run queue).
 //
 // When the matching operation occurs:
-//   1. Dequeue the sudog.
-//   2. Copy data directly (for unbuffered) or from/to the buffer.
-//   3. Ready the goroutine (add it back to a run queue).
+//  1. Dequeue the sudog.
+//  2. Copy data directly (for unbuffered) or from/to the buffer.
+//  3. Ready the goroutine (add it back to a run queue).
 type waitq struct {
 	first *sudog
 	last  *sudog
@@ -3594,10 +3600,10 @@ On Linux, the actual sleep/wake mechanism is futex:
 // concurrent callers.
 //
 // Implementation:
-//   1. First caller: acquires a mutex, runs the function, sets a
-//      "done" flag atomically.
-//   2. Subsequent callers: check the "done" flag with atomic.Load.
-//      If set, return immediately (fast path -- no lock).
+//  1. First caller: acquires a mutex, runs the function, sets a
+//     "done" flag atomically.
+//  2. Subsequent callers: check the "done" flag with atomic.Load.
+//     If set, return immediately (fast path -- no lock).
 //
 // The hot path (checking done) is a single atomic load -- extremely fast.
 // Only the first call pays the cost of the mutex.
@@ -3608,8 +3614,8 @@ var dbPool *sql.DB
 
 func GetDB() *sql.DB {
 	dbOnce.Do(func() {
-			dbPool, _ = sql.Open("postgres", "...")
-		})
+		dbPool, _ = sql.Open("postgres", "...")
+	})
 	return dbPool
 }
 ```
@@ -3757,7 +3763,7 @@ type AtomicCounter struct {
 	val atomic.Int64
 }
 
-func (c *AtomicCounter) Inc() { c.val.Add(1) }
+func (c *AtomicCounter) Inc()       { c.val.Add(1) }
 func (c *AtomicCounter) Get() int64 { return c.val.Load() }
 
 // MutexCounter uses sync.Mutex for traditional locking.
@@ -3831,9 +3837,9 @@ func NewChannelCounter() *ChannelCounter {
 	return c
 }
 
-func (c *ChannelCounter) Inc() { c.incCh <- struct{}{} }
+func (c *ChannelCounter) Inc()       { c.incCh <- struct{}{} }
 func (c *ChannelCounter) Get() int64 { return <-c.getCh }
-func (c *ChannelCounter) Close() { close(c.done) }
+func (c *ChannelCounter) Close()     { close(c.done) }
 
 // Benchmark functions for use with `go test -bench=.`
 func BenchmarkAtomicCounter(b *testing.B) {
@@ -3910,13 +3916,13 @@ import (
 //
 // Internal architecture:
 //
-//   Submit() --> [job channel (buffered)] --> Worker goroutines
-//                                              |
-//                                              v
-//                                          Execute task
-//                                              |
-//                                              v
-//                                          [result channel] --> Collector
+//	Submit() --> [job channel (buffered)] --> Worker goroutines
+//	                                           |
+//	                                           v
+//	                                       Execute task
+//	                                           |
+//	                                           v
+//	                                       [result channel] --> Collector
 type WorkPool struct {
 	// workers is the number of concurrent worker goroutines.
 	workers int
@@ -4069,10 +4075,11 @@ func (p *WorkPool) worker(id int) {
 //
 // Usage:
 //
-//resultCh := pool.Submit("job-1", func(ctx context.Context) (interface{}, error) {
-		//    return doExpensiveWork(ctx)
-		//})
-//result := <-resultCh
+//	resultCh := pool.Submit("job-1", func(ctx context.Context) (interface{}, error) {
+//	   return doExpensiveWork(ctx)
+//	})
+//
+// result := <-resultCh
 func (p *WorkPool) Submit(id string, fn func(ctx context.Context) (interface{}, error)) (<-chan JobResult, error) {
 	resultCh := make(chan JobResult, 1) // Buffered so worker never blocks.
 
@@ -4132,16 +4139,16 @@ func main() {
 	for i := 0; i < 20; i++ {
 		jobID := fmt.Sprintf("job-%03d", i)
 		resultCh, err := pool.Submit(jobID, func(ctx context.Context) (interface{}, error) {
-				// Simulate variable-duration work.
-				duration := time.Duration(50+rand.Intn(200)) * time.Millisecond
+			// Simulate variable-duration work.
+			duration := time.Duration(50+rand.Intn(200)) * time.Millisecond
 
-				select {
-				case <-time.After(duration):
-					return fmt.Sprintf("result from %s (took %v)", jobID, duration), nil
-				case <-ctx.Done():
-					return nil, ctx.Err()
-				}
-			})
+			select {
+			case <-time.After(duration):
+				return fmt.Sprintf("result from %s (took %v)", jobID, duration), nil
+			case <-ctx.Done():
+				return nil, ctx.Err()
+			}
+		})
 		if err != nil {
 			log.Printf("Submit failed: %v", err)
 			continue
@@ -4302,10 +4309,11 @@ import (
 //   - Managing the system (reboot, poweroff, etc.).
 //
 // D-Bus connection details:
-//   Bus:       System bus (org.freedesktop.DBus)
-//   Service:   org.freedesktop.systemd1
-//   Object:    /org/freedesktop/systemd1
-//   Interface: org.freedesktop.systemd1.Manager
+//
+//	Bus:       System bus (org.freedesktop.DBus)
+//	Service:   org.freedesktop.systemd1
+//	Object:    /org/freedesktop/systemd1
+//	Interface: org.freedesktop.systemd1.Manager
 type SystemdManager struct {
 	// conn is the D-Bus system bus connection.
 	conn *dbus.Conn
@@ -4320,16 +4328,17 @@ type SystemdManager struct {
 // org.freedesktop.systemd1.Manager interface.
 //
 // Fields match the D-Bus signature: (ssssssouso)
-//   s: unit name
-//   s: description
-//   s: load state (loaded, not-found, masked, etc.)
-//   s: active state (active, inactive, activating, deactivating, failed)
-//   s: sub state (running, exited, dead, failed, etc.)
-//   s: following unit (empty if not following another)
-//   o: unit object path on D-Bus
-//   u: job ID (0 if no pending job)
-//   s: job type (empty if no pending job)
-//   o: job object path (empty if no pending job)
+//
+//	s: unit name
+//	s: description
+//	s: load state (loaded, not-found, masked, etc.)
+//	s: active state (active, inactive, activating, deactivating, failed)
+//	s: sub state (running, exited, dead, failed, etc.)
+//	s: following unit (empty if not following another)
+//	o: unit object path on D-Bus
+//	u: job ID (0 if no pending job)
+//	s: job type (empty if no pending job)
+//	o: job object path (empty if no pending job)
 type UnitStatus struct {
 	Name        string
 	Description string
@@ -4347,7 +4356,7 @@ type UnitStatus struct {
 // manager for interacting with systemd.
 //
 // Requires appropriate permissions (usually root or membership in
-	// the systemd-related polkit groups).
+// the systemd-related polkit groups).
 func NewSystemdManager() (*SystemdManager, error) {
 	// Connect to the system bus.
 	// The system bus socket is at /run/dbus/system_bus_socket.
@@ -4358,8 +4367,8 @@ func NewSystemdManager() (*SystemdManager, error) {
 
 	// Get the systemd Manager object.
 	obj := conn.Object(
-		"org.freedesktop.systemd1",           // Bus name (service).
-		"/org/freedesktop/systemd1",          // Object path.
+		"org.freedesktop.systemd1",  // Bus name (service).
+		"/org/freedesktop/systemd1", // Object path.
 	)
 
 	return &SystemdManager{conn: conn, obj: obj}, nil
@@ -4448,10 +4457,11 @@ func (m *SystemdManager) GetUnitStatus(unitName string) (string, error) {
 // RestartUnit restarts a systemd unit.
 //
 // mode is the restart mode:
-//   "replace":    Queue the restart, replacing any pending job.
-//   "fail":       Fail if there is already a pending job.
-//   "isolate":    Stop all other units.
-//   "ignore-dependencies": Skip dependency checks.
+//
+//	"replace":    Queue the restart, replacing any pending job.
+//	"fail":       Fail if there is already a pending job.
+//	"isolate":    Stop all other units.
+//	"ignore-dependencies": Skip dependency checks.
 //
 // This is equivalent to `systemctl restart <unitName>`.
 func (m *SystemdManager) RestartUnit(unitName, mode string) error {

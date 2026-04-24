@@ -605,10 +605,11 @@ created in namespaces labelled `sidecar-injection: enabled`.
 // a JSON patch that adds the sidecar container to the pod spec.
 //
 // Usage:
-//   go run ./cmd/sidecar-injector \
-//     --tls-cert=/etc/webhook/certs/tls.crt \
-//     --tls-key=/etc/webhook/certs/tls.key \
-//     --port=8443
+//
+//	go run ./cmd/sidecar-injector \
+//	  --tls-cert=/etc/webhook/certs/tls.crt \
+//	  --tls-key=/etc/webhook/certs/tls.key \
+//	  --port=8443
 package main
 
 import (
@@ -743,36 +744,36 @@ func handleMutate(w http.ResponseWriter, r *http.Request) {
 		// If there are no containers (shouldn't happen for valid pods),
 		// create the array with just the sidecar.
 		patches = append(patches, jsonPatchOp{
-				Op:    "add",
-				Path:  "/spec/containers",
-				Value: []corev1.Container{sidecarContainer},
-			})
+			Op:    "add",
+			Path:  "/spec/containers",
+			Value: []corev1.Container{sidecarContainer},
+		})
 	} else {
 		// Append the sidecar to the existing containers list.
 		// The "-" in the JSON pointer means "append to array".
 		patches = append(patches, jsonPatchOp{
-				Op:    "add",
-				Path:  "/spec/containers/-",
-				Value: sidecarContainer,
-			})
+			Op:    "add",
+			Path:  "/spec/containers/-",
+			Value: sidecarContainer,
+		})
 	}
 
 	// Also add an annotation indicating the sidecar was injected.
 	// This helps operators understand why a pod has extra containers.
 	if pod.Annotations == nil {
 		patches = append(patches, jsonPatchOp{
-				Op:    "add",
-				Path:  "/metadata/annotations",
-				Value: map[string]string{
-					"sidecar-injector.example.com/injected": "true",
-				},
-			})
+			Op:   "add",
+			Path: "/metadata/annotations",
+			Value: map[string]string{
+				"sidecar-injector.example.com/injected": "true",
+			},
+		})
 	} else {
 		patches = append(patches, jsonPatchOp{
-				Op:    "add",
-				Path:  "/metadata/annotations/sidecar-injector.example.com~1injected",
-				Value: "true",
-			})
+			Op:    "add",
+			Path:  "/metadata/annotations/sidecar-injector.example.com~1injected",
+			Value: "true",
+		})
 	}
 
 	patchBytes, err := json.Marshal(patches)
@@ -966,7 +967,7 @@ func handleValidate(w http.ResponseWriter, r *http.Request) {
 	if len(missingLabels) > 0 {
 		msg := fmt.Sprintf(
 			"Deployment %q is missing required labels: [%s]. "+
-			"All Deployments must have 'owner' and 'cost-centre' labels.",
+				"All Deployments must have 'owner' and 'cost-centre' labels.",
 			deployment.Name,
 			strings.Join(missingLabels, ", "),
 		)
@@ -1031,8 +1032,8 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/validate", handleValidate)
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-		})
+		w.WriteHeader(http.StatusOK)
+	})
 
 	addr := fmt.Sprintf(":%d", port)
 	log.Printf("INFO: starting label-validator webhook on %s", addr)
@@ -1782,31 +1783,31 @@ func main() {
 	// pointer fields so the API server can distinguish "field not
 	// specified" from "field set to zero value".
 	deployApplyConfig := appsv1apply.Deployment("nginx-ssa-demo", "default").
-	WithLabels(map[string]string{
-			"app":    "nginx",
-			"owner":  "ssa-demo",
+		WithLabels(map[string]string{
+			"app":   "nginx",
+			"owner": "ssa-demo",
 		}).
-	WithSpec(appsv1apply.DeploymentSpec().
-		WithReplicas(3).
-		WithSelector(metav1apply.LabelSelector().
-			WithMatchLabels(map[string]string{"app": "nginx"}),
-		).
-		WithTemplate(corev1apply.PodTemplateSpec().
-			WithLabels(map[string]string{"app": "nginx"}).
-			WithSpec(corev1apply.PodSpec().
-				WithContainers(
-					corev1apply.Container().
-					WithName("nginx").
-					WithImage("nginx:1.25").
-					WithPorts(
-						corev1apply.ContainerPort().
-						WithContainerPort(80).
-						WithProtocol(corev1.ProtocolTCP),
+		WithSpec(appsv1apply.DeploymentSpec().
+			WithReplicas(3).
+			WithSelector(metav1apply.LabelSelector().
+				WithMatchLabels(map[string]string{"app": "nginx"}),
+			).
+			WithTemplate(corev1apply.PodTemplateSpec().
+				WithLabels(map[string]string{"app": "nginx"}).
+				WithSpec(corev1apply.PodSpec().
+					WithContainers(
+						corev1apply.Container().
+							WithName("nginx").
+							WithImage("nginx:1.25").
+							WithPorts(
+								corev1apply.ContainerPort().
+									WithContainerPort(80).
+									WithProtocol(corev1.ProtocolTCP),
+							),
 					),
 				),
 			),
-		),
-	)
+		)
 
 	// ── Apply the Deployment using Server-Side Apply ────────────
 	// The fieldManager identifies this client. The API server uses
@@ -1849,17 +1850,17 @@ func main() {
 	// Server-Side Apply will merge this with the existing object,
 	// only taking ownership of the fields we specify.
 	updateConfig := appsv1apply.Deployment("nginx-ssa-demo", "default").
-	WithSpec(appsv1apply.DeploymentSpec().
-		WithTemplate(corev1apply.PodTemplateSpec().
-			WithSpec(corev1apply.PodSpec().
-				WithContainers(
-					corev1apply.Container().
-					WithName("nginx").
-					WithImage("nginx:1.26"),  // updated image
+		WithSpec(appsv1apply.DeploymentSpec().
+			WithTemplate(corev1apply.PodTemplateSpec().
+				WithSpec(corev1apply.PodSpec().
+					WithContainers(
+						corev1apply.Container().
+							WithName("nginx").
+							WithImage("nginx:1.26"), // updated image
+					),
 				),
 			),
-		),
-	)
+		)
 
 	updated, err := clientset.AppsV1().Deployments("default").Apply(
 		ctx,
@@ -1921,8 +1922,8 @@ Every Kubernetes type implements `runtime.Object`:
 ```go
 // runtime.Object is the interface that all Kubernetes API objects
 // must implement. It provides two capabilities:
-//   1. GetObjectKind() — returns the GVK (Group/Version/Kind) of the object
-//   2. DeepCopyObject() — returns a deep copy of the object
+//  1. GetObjectKind() — returns the GVK (Group/Version/Kind) of the object
+//  2. DeepCopyObject() — returns a deep copy of the object
 //
 // This is how the API machinery can handle any Kubernetes object
 // generically, without knowing its concrete type at compile time.
@@ -1982,10 +1983,10 @@ The Scheme is the central registry that maps between Go types and GVKs:
 //
 // scheme-demo demonstrates how the Kubernetes Scheme works. The Scheme
 // is the type registry that the API machinery uses to:
-//   1. Map Go types to GVKs (and vice versa)
-//   2. Create new instances of types by GVK
-//   3. Convert between versions of the same type
-//   4. Apply default values to objects
+//  1. Map Go types to GVKs (and vice versa)
+//  2. Create new instances of types by GVK
+//  3. Convert between versions of the same type
+//  4. Apply default values to objects
 //
 // Every Kubernetes client library and controller depends on a Scheme
 // that knows about the types it works with.
@@ -2046,18 +2047,18 @@ func main() {
 
 	// ── Check if a type is registered ──────────────────────────
 	registered := scheme.Recognizes(schema.GroupVersionKind{
-			Group:   "apps",
-			Version: "v1",
-			Kind:    "Deployment",
-		})
+		Group:   "apps",
+		Version: "v1",
+		Kind:    "Deployment",
+	})
 	fmt.Printf("Deployment registered: %v\n", registered)
 	// Output: true
 
 	unregistered := scheme.Recognizes(schema.GroupVersionKind{
-			Group:   "custom.example.com",
-			Version: "v1",
-			Kind:    "Widget",
-		})
+		Group:   "custom.example.com",
+		Version: "v1",
+		Kind:    "Widget",
+	})
 	fmt.Printf("Widget registered: %v\n", unregistered)
 	// Output: false
 
@@ -2190,8 +2191,8 @@ func main() {
 	// ── Resource Quantities ────────────────────────────────────
 	// Resource quantities handle CPU (millicores) and memory (bytes)
 	// with proper unit parsing and arithmetic.
-	cpu := resource.MustParse("500m")     // 500 millicores = 0.5 CPU
-	memory := resource.MustParse("1Gi")   // 1 gibibyte
+	cpu := resource.MustParse("500m")   // 500 millicores = 0.5 CPU
+	memory := resource.MustParse("1Gi") // 1 gibibyte
 
 	fmt.Printf("CPU: %s (millivalue: %d)\n", cpu.String(), cpu.MilliValue())
 	fmt.Printf("Memory: %s (bytes: %d)\n", memory.String(), memory.Value())
@@ -2203,7 +2204,7 @@ func main() {
 	fmt.Printf("Total CPU: %s\n", totalCPU.String()) // 750m
 
 	// Comparison.
-	limit := resource.MustParse("1")  // 1 CPU = 1000m
+	limit := resource.MustParse("1") // 1 CPU = 1000m
 	if totalCPU.Cmp(limit) < 0 {
 		fmt.Printf("%s is under the %s limit\n", totalCPU.String(), limit.String())
 	}
@@ -2326,10 +2327,10 @@ a layered abstraction:
 // Kubernetes resources. Instead of polling or using raw watches, we use
 // the SharedInformerFactory from client-go, which:
 //
-//   1. Performs an initial List to populate an in-memory cache
-//   2. Opens a Watch to receive incremental updates
-//   3. Dispatches events to our registered handlers
-//   4. Provides a Lister for fast, in-memory reads
+//  1. Performs an initial List to populate an in-memory cache
+//  2. Opens a Watch to receive incremental updates
+//  3. Dispatches events to our registered handlers
+//  4. Provides a Lister for fast, in-memory reads
 //
 // This is the same pattern used by every built-in Kubernetes controller.
 // It is the recommended way to watch resources in production code.
@@ -2385,8 +2386,8 @@ func main() {
 		//
 		// Optionally filter by labels:
 		// informers.WithTweakListOptions(func(opts *metav1.ListOptions) {
-				//     opts.LabelSelector = "app=myapp"
-				// }),
+		//     opts.LabelSelector = "app=myapp"
+		// }),
 	)
 
 	// ── Get the Pod informer ───────────────────────────────────
@@ -2401,62 +2402,62 @@ func main() {
 	// goroutine, so keep them fast. For heavy work, enqueue
 	// items to a workqueue (covered in the Controllers chapter).
 	podInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-			// AddFunc is called when a new Pod appears in the cache.
-			// This fires for every existing pod during initial sync,
-			// and for genuinely new pods after that.
-			AddFunc: func(obj interface{}) {
-				pod, ok := obj.(*corev1.Pod)
+		// AddFunc is called when a new Pod appears in the cache.
+		// This fires for every existing pod during initial sync,
+		// and for genuinely new pods after that.
+		AddFunc: func(obj interface{}) {
+			pod, ok := obj.(*corev1.Pod)
+			if !ok {
+				return
+			}
+			log.Printf("POD ADDED: %s/%s (phase: %s)",
+				pod.Namespace, pod.Name, pod.Status.Phase)
+		},
+
+		// UpdateFunc is called when an existing Pod changes.
+		// Both the old and new versions of the object are provided.
+		// Compare them to determine what actually changed.
+		UpdateFunc: func(oldObj, newObj interface{}) {
+			oldPod, ok1 := oldObj.(*corev1.Pod)
+			newPod, ok2 := newObj.(*corev1.Pod)
+			if !ok1 || !ok2 {
+				return
+			}
+
+			// Only log if the phase changed — pods are updated
+			// frequently (status, conditions, etc.) and logging
+			// every update would be extremely noisy.
+			if oldPod.Status.Phase != newPod.Status.Phase {
+				log.Printf("POD PHASE CHANGED: %s/%s: %s → %s",
+					newPod.Namespace, newPod.Name,
+					oldPod.Status.Phase, newPod.Status.Phase)
+			}
+		},
+
+		// DeleteFunc is called when a Pod is removed from the cache.
+		// The object may be a *corev1.Pod or a cache.DeletedFinalStateUnknown
+		// wrapper (when the delete event was missed and discovered during resync).
+		DeleteFunc: func(obj interface{}) {
+			// Handle the DeletedFinalStateUnknown wrapper.
+			// This occurs when the informer missed the delete event
+			// and discovered the deletion during a re-list.
+			pod, ok := obj.(*corev1.Pod)
+			if !ok {
+				tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
 				if !ok {
+					log.Printf("ERROR: unexpected object type: %T", obj)
 					return
 				}
-				log.Printf("POD ADDED: %s/%s (phase: %s)",
-					pod.Namespace, pod.Name, pod.Status.Phase)
-			},
-
-			// UpdateFunc is called when an existing Pod changes.
-			// Both the old and new versions of the object are provided.
-			// Compare them to determine what actually changed.
-			UpdateFunc: func(oldObj, newObj interface{}) {
-				oldPod, ok1 := oldObj.(*corev1.Pod)
-				newPod, ok2 := newObj.(*corev1.Pod)
-				if !ok1 || !ok2 {
+				pod, ok = tombstone.Obj.(*corev1.Pod)
+				if !ok {
+					log.Printf("ERROR: unexpected tombstone object type: %T",
+						tombstone.Obj)
 					return
 				}
-
-				// Only log if the phase changed — pods are updated
-				// frequently (status, conditions, etc.) and logging
-				// every update would be extremely noisy.
-				if oldPod.Status.Phase != newPod.Status.Phase {
-					log.Printf("POD PHASE CHANGED: %s/%s: %s → %s",
-						newPod.Namespace, newPod.Name,
-						oldPod.Status.Phase, newPod.Status.Phase)
-				}
-			},
-
-			// DeleteFunc is called when a Pod is removed from the cache.
-			// The object may be a *corev1.Pod or a cache.DeletedFinalStateUnknown
-			// wrapper (when the delete event was missed and discovered during resync).
-			DeleteFunc: func(obj interface{}) {
-				// Handle the DeletedFinalStateUnknown wrapper.
-				// This occurs when the informer missed the delete event
-				// and discovered the deletion during a re-list.
-				pod, ok := obj.(*corev1.Pod)
-				if !ok {
-					tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
-					if !ok {
-						log.Printf("ERROR: unexpected object type: %T", obj)
-						return
-					}
-					pod, ok = tombstone.Obj.(*corev1.Pod)
-					if !ok {
-						log.Printf("ERROR: unexpected tombstone object type: %T",
-							tombstone.Obj)
-						return
-					}
-				}
-				log.Printf("POD DELETED: %s/%s", pod.Namespace, pod.Name)
-			},
-		})
+			}
+			log.Printf("POD DELETED: %s/%s", pod.Namespace, pod.Name)
+		},
+	})
 
 	// ── Start the informer factory ─────────────────────────────
 	// This starts all registered informers in background goroutines.

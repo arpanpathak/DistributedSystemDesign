@@ -2052,26 +2052,26 @@ func (ic *IngressController) Run(ctx context.Context, listenAddr string) error {
 	// Register event handlers. These are called by the informer whenever
 	// Ingress resources are created, updated, or deleted.
 	ingressInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-			// AddFunc is called when a new Ingress is created.
-			AddFunc: func(obj interface{}) {
-				log.Printf("[INFO] Ingress added: %s/%s",
-					obj.(*networkingv1.Ingress).Namespace,
-					obj.(*networkingv1.Ingress).Name)
-				ic.rebuildRoutes(ingressInformer.GetStore())
-			},
-			// UpdateFunc is called when an existing Ingress is modified.
-			UpdateFunc: func(oldObj, newObj interface{}) {
-				log.Printf("[INFO] Ingress updated: %s/%s",
-					newObj.(*networkingv1.Ingress).Namespace,
-					newObj.(*networkingv1.Ingress).Name)
-				ic.rebuildRoutes(ingressInformer.GetStore())
-			},
-			// DeleteFunc is called when an Ingress is deleted.
-			DeleteFunc: func(obj interface{}) {
-				log.Printf("[INFO] Ingress deleted")
-				ic.rebuildRoutes(ingressInformer.GetStore())
-			},
-		})
+		// AddFunc is called when a new Ingress is created.
+		AddFunc: func(obj interface{}) {
+			log.Printf("[INFO] Ingress added: %s/%s",
+				obj.(*networkingv1.Ingress).Namespace,
+				obj.(*networkingv1.Ingress).Name)
+			ic.rebuildRoutes(ingressInformer.GetStore())
+		},
+		// UpdateFunc is called when an existing Ingress is modified.
+		UpdateFunc: func(oldObj, newObj interface{}) {
+			log.Printf("[INFO] Ingress updated: %s/%s",
+				newObj.(*networkingv1.Ingress).Namespace,
+				newObj.(*networkingv1.Ingress).Name)
+			ic.rebuildRoutes(ingressInformer.GetStore())
+		},
+		// DeleteFunc is called when an Ingress is deleted.
+		DeleteFunc: func(obj interface{}) {
+			log.Printf("[INFO] Ingress deleted")
+			ic.rebuildRoutes(ingressInformer.GetStore())
+		},
+	})
 
 	// Start all registered informers. This begins the watch connection
 	// to the Kubernetes API server.
@@ -2137,7 +2137,7 @@ func (ic *IngressController) rebuildRoutes(store cache.Store) {
 		// Skip Ingresses that don't match our IngressClass.
 		// This allows multiple controllers to coexist.
 		if ingress.Spec.IngressClassName != nil &&
-		*ingress.Spec.IngressClassName != ic.ingressClassName {
+			*ingress.Spec.IngressClassName != ic.ingressClassName {
 			continue
 		}
 
@@ -2189,49 +2189,49 @@ func (ic *IngressController) rebuildRoutes(store cache.Store) {
 //   - X-Forwarded-Proto: the original protocol (http/https)
 func (ic *IngressController) httpHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Extract the hostname (strip port if present).
-			host := r.Host
-			if idx := strings.Index(host, ":"); idx != -1 {
-				host = host[:idx]
-			}
+		// Extract the hostname (strip port if present).
+		host := r.Host
+		if idx := strings.Index(host, ":"); idx != -1 {
+			host = host[:idx]
+		}
 
-			// Look up the backend for this host and path.
-			b := ic.routes.lookup(host, r.URL.Path)
-			if b == nil {
-				log.Printf("[WARN] No route for %s%s", host, r.URL.Path)
-				http.Error(w, "No route found", http.StatusNotFound)
-				return
-			}
+		// Look up the backend for this host and path.
+		b := ic.routes.lookup(host, r.URL.Path)
+		if b == nil {
+			log.Printf("[WARN] No route for %s%s", host, r.URL.Path)
+			http.Error(w, "No route found", http.StatusNotFound)
+			return
+		}
 
-			// Create a reverse proxy targeting the backend Service.
-			// httputil.NewSingleHostReverseProxy handles:
-			//   - Rewriting the request URL to the backend
-			//   - Copying request headers
-			//   - Streaming the response back to the client
-			proxy := httputil.NewSingleHostReverseProxy(b.serviceURL)
+		// Create a reverse proxy targeting the backend Service.
+		// httputil.NewSingleHostReverseProxy handles:
+		//   - Rewriting the request URL to the backend
+		//   - Copying request headers
+		//   - Streaming the response back to the client
+		proxy := httputil.NewSingleHostReverseProxy(b.serviceURL)
 
-			// Customize the Director to add proxy headers.
-			// The Director function modifies the outgoing request before it's sent.
-			originalDirector := proxy.Director
-			proxy.Director = func(req *http.Request) {
-				originalDirector(req)
-				// Set standard proxy headers so the backend knows about the
-				// original client request.
-				req.Header.Set("X-Forwarded-For", r.RemoteAddr)
-				req.Header.Set("X-Forwarded-Host", r.Host)
-				req.Header.Set("X-Forwarded-Proto", "http")
-			}
+		// Customize the Director to add proxy headers.
+		// The Director function modifies the outgoing request before it's sent.
+		originalDirector := proxy.Director
+		proxy.Director = func(req *http.Request) {
+			originalDirector(req)
+			// Set standard proxy headers so the backend knows about the
+			// original client request.
+			req.Header.Set("X-Forwarded-For", r.RemoteAddr)
+			req.Header.Set("X-Forwarded-Host", r.Host)
+			req.Header.Set("X-Forwarded-Proto", "http")
+		}
 
-			// Custom error handler: return 502 if the backend is unreachable.
-			proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
-				log.Printf("[ERROR] Proxy error for %s%s → %s: %v",
-					host, r.URL.Path, b.serviceURL, err)
-				http.Error(w, "Bad Gateway", http.StatusBadGateway)
-			}
+		// Custom error handler: return 502 if the backend is unreachable.
+		proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
+			log.Printf("[ERROR] Proxy error for %s%s → %s: %v",
+				host, r.URL.Path, b.serviceURL, err)
+			http.Error(w, "Bad Gateway", http.StatusBadGateway)
+		}
 
-			log.Printf("[INFO] %s %s%s → %s", r.Method, host, r.URL.Path, b.serviceURL)
-			proxy.ServeHTTP(w, r)
-		})
+		log.Printf("[INFO] %s %s%s → %s", r.Method, host, r.URL.Path, b.serviceURL)
+		proxy.ServeHTTP(w, r)
+	})
 }
 
 // buildKubeClient creates a Kubernetes client. It first attempts to use

@@ -1093,9 +1093,9 @@ cosign verify-attestation \
 // audit tools that verify image integrity before deployment.
 //
 // The program verifies:
-//   1. Key-based signatures — using a known public key
-//   2. Keyless signatures — using OIDC identity and Sigstore
-//   3. Attestations — verifying SBOM or provenance attestations
+//  1. Key-based signatures — using a known public key
+//  2. Keyless signatures — using OIDC identity and Sigstore
+//  3. Attestations — verifying SBOM or provenance attestations
 //
 // In production, this logic would run inside a Kubernetes admission
 // webhook, a CI/CD pipeline step, or a periodic audit job.
@@ -1268,9 +1268,9 @@ func (v *ImageVerifier) VerifyWithKey(
 // VerifyKeyless verifies an image using Sigstore's keyless
 // signing infrastructure. Instead of a static public key, it
 // verifies that:
-//   1. The image was signed with a certificate from Fulcio
-//   2. The certificate was issued to the expected OIDC identity
-//   3. The signing event is recorded in Rekor
+//  1. The image was signed with a certificate from Fulcio
+//  2. The certificate was issued to the expected OIDC identity
+//  3. The signing event is recorded in Rekor
 //
 // This is the recommended verification method for images signed
 // in CI/CD pipelines (e.g., GitHub Actions).

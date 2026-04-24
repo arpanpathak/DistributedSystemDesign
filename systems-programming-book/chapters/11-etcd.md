@@ -825,7 +825,7 @@ func main() {
 		log.Fatalf("Failed to create etcd client: %v", err)
 	}
 	// Always close the client when done to release resources (gRPC
-		// connections, goroutines, etc.).
+	// connections, goroutines, etc.).
 	defer client.Close()
 
 	// Create a context with a 5-second timeout for our status check.
@@ -868,7 +868,7 @@ func main() {
 // File: crud/main.go
 //
 // This program demonstrates the fundamental CRUD (Create, Read, Update,
-	// Delete) operations on etcd using the Go client. It covers:
+// Delete) operations on etcd using the Go client. It covers:
 //
 //   - Put: storing a key-value pair
 //   - Get: retrieving a single key
@@ -895,9 +895,9 @@ func main() {
 	// Connect to the etcd cluster. See connect/main.go for details
 	// on the configuration options.
 	client, err := clientv3.New(clientv3.Config{
-			Endpoints:   []string{"localhost:2379"},
-			DialTimeout: 5 * time.Second,
-		})
+		Endpoints:   []string{"localhost:2379"},
+		DialTimeout: 5 * time.Second,
+	})
 	if err != nil {
 		log.Fatalf("Failed to create etcd client: %v", err)
 	}
@@ -939,7 +939,7 @@ func main() {
 	}
 
 	// The response contains a slice of KeyValue pairs (usually 1
-		// for a single-key Get). Each KeyValue has:
+	// for a single-key Get). Each KeyValue has:
 	//   - Key:            the key bytes
 	//   - Value:          the value bytes
 	//   - CreateRevision: the revision when this key was first created
@@ -1059,10 +1059,10 @@ func main() {
 // relevant controller is notified via a watch event.
 //
 // This example:
-//   1. Starts a watch on the prefix "/events/" from the current revision.
-//   2. In a separate goroutine, writes several keys under "/events/".
-//   3. The main goroutine prints each watch event as it arrives.
-//   4. Demonstrates how to handle watch cancellation and errors.
+//  1. Starts a watch on the prefix "/events/" from the current revision.
+//  2. In a separate goroutine, writes several keys under "/events/".
+//  3. The main goroutine prints each watch event as it arrives.
+//  4. Demonstrates how to handle watch cancellation and errors.
 //
 // Prerequisites:
 //   - A running etcd instance on localhost:2379
@@ -1075,16 +1075,16 @@ import (
 	"sync"
 	"time"
 
-	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/api/v3/mvccpb"
+	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 func main() {
 	// Create the etcd client.
 	client, err := clientv3.New(clientv3.Config{
-			Endpoints:   []string{"localhost:2379"},
-			DialTimeout: 5 * time.Second,
-		})
+		Endpoints:   []string{"localhost:2379"},
+		DialTimeout: 5 * time.Second,
+	})
 	if err != nil {
 		log.Fatalf("Failed to create etcd client: %v", err)
 	}
@@ -1149,7 +1149,7 @@ func main() {
 						event.Kv.Key, event.Kv.Value, event.Kv.ModRevision)
 
 					// If the previous value is available (because
-						// we used WithPrevKV), show what changed.
+					// we used WithPrevKV), show what changed.
 					if event.PrevKv != nil {
 						fmt.Printf("        prev value=%s\n", event.PrevKv.Value)
 					}
@@ -1228,8 +1228,8 @@ func main() {
 // This program demonstrates distributed locking using etcd's concurrency
 // package. Distributed locks are essential when multiple processes need
 // exclusive access to a shared resource (e.g., a database migration,
-	// a cron job that must run on exactly one node, or a critical section
-	// in a microservices architecture).
+// a cron job that must run on exactly one node, or a critical section
+// in a microservices architecture).
 //
 // etcd's distributed lock is built on top of:
 //   - Leases: the lock is automatically released if the holder crashes
@@ -1253,9 +1253,9 @@ import (
 func main() {
 	// Connect to etcd.
 	client, err := clientv3.New(clientv3.Config{
-			Endpoints:   []string{"localhost:2379"},
-			DialTimeout: 5 * time.Second,
-		})
+		Endpoints:   []string{"localhost:2379"},
+		DialTimeout: 5 * time.Second,
+	})
 	if err != nil {
 		log.Fatalf("Failed to create etcd client: %v", err)
 	}
@@ -1284,10 +1284,10 @@ func main() {
 //   - workerID: a unique identifier for this worker (for logging)
 //
 // The function demonstrates:
-//   1. Creating a session with a TTL (lease-based auto-expiry)
-//   2. Acquiring a mutex (blocks until the lock is available)
-//   3. Performing work while holding the lock
-//   4. Releasing the lock (explicit unlock + session close)
+//  1. Creating a session with a TTL (lease-based auto-expiry)
+//  2. Acquiring a mutex (blocks until the lock is available)
+//  3. Performing work while holding the lock
+//  4. Releasing the lock (explicit unlock + session close)
 func acquireAndWork(client *clientv3.Client, workerID int) {
 	// Create a new session. A session is backed by an etcd lease.
 	// If this process crashes, the lease expires (after TTL seconds),
@@ -1356,13 +1356,13 @@ func acquireAndWork(client *clientv3.Client, workerID int) {
 // package. Leader election is a core pattern in distributed systems:
 // among a group of replicas, exactly one is elected as the "leader"
 // and performs work that must happen on a single node (e.g., a
-	// scheduler, a singleton controller, a primary database).
+// scheduler, a singleton controller, a primary database).
 //
 // etcd's leader election differs from distributed locking:
 //   - A lock has no concept of "campaigning" — you acquire or wait.
 //   - An election allows participants to campaign, observe the current
 //     leader, and resign. The leader can announce a value (e.g., its
-	//     address) that followers can read.
+//     address) that followers can read.
 //
 // This example simulates 3 candidates competing for leadership.
 package main
@@ -1381,9 +1381,9 @@ import (
 func main() {
 	// Connect to etcd.
 	client, err := clientv3.New(clientv3.Config{
-			Endpoints:   []string{"localhost:2379"},
-			DialTimeout: 5 * time.Second,
-		})
+		Endpoints:   []string{"localhost:2379"},
+		DialTimeout: 5 * time.Second,
+	})
 	if err != nil {
 		log.Fatalf("Failed to create etcd client: %v", err)
 	}
@@ -1413,11 +1413,11 @@ func main() {
 //   - candidateID: a unique identifier for this candidate (for logging)
 //
 // The function demonstrates:
-//   1. Creating a session with a TTL for automatic leadership release
-//   2. Campaigning for leadership (blocks until elected)
-//   3. Announcing a value as leader (e.g., the leader's address)
-//   4. Observing the current leader from another goroutine
-//   5. Resigning leadership gracefully
+//  1. Creating a session with a TTL for automatic leadership release
+//  2. Campaigning for leadership (blocks until elected)
+//  3. Announcing a value as leader (e.g., the leader's address)
+//  4. Observing the current leader from another goroutine
+//  5. Resigning leadership gracefully
 func runCandidate(client *clientv3.Client, candidateID int) {
 	// Create a session with a 15-second TTL. If this candidate
 	// crashes while leading, leadership is released within 15s.
@@ -1487,19 +1487,20 @@ func runCandidate(client *clientv3.Client, candidateID int) {
 // concurrency control.
 //
 // A transaction has the form:
-//   IF   (conditions are met)
-//   THEN (execute these operations)
-//   ELSE (execute these operations instead)
+//
+//	IF   (conditions are met)
+//	THEN (execute these operations)
+//	ELSE (execute these operations instead)
 //
 // All conditions are evaluated atomically, and either the THEN or ELSE
 // branch executes atomically. This is how you build safe concurrent
 // operations without locks.
 //
 // This example demonstrates:
-//   1. Basic compare-and-swap: update a key only if its value matches
-//   2. Create-if-not-exists: set a key only if it doesn't exist
-//   3. Multi-key transactions: atomic operations on multiple keys
-//   4. Kubernetes-style optimistic concurrency using mod_revision
+//  1. Basic compare-and-swap: update a key only if its value matches
+//  2. Create-if-not-exists: set a key only if it doesn't exist
+//  3. Multi-key transactions: atomic operations on multiple keys
+//  4. Kubernetes-style optimistic concurrency using mod_revision
 package main
 
 import (
@@ -1514,9 +1515,9 @@ import (
 func main() {
 	// Connect to etcd.
 	client, err := clientv3.New(clientv3.Config{
-			Endpoints:   []string{"localhost:2379"},
-			DialTimeout: 5 * time.Second,
-		})
+		Endpoints:   []string{"localhost:2379"},
+		DialTimeout: 5 * time.Second,
+	})
 	if err != nil {
 		log.Fatalf("Failed to create etcd client: %v", err)
 	}
@@ -1546,16 +1547,16 @@ func main() {
 	// clientv3.OpPut and clientv3.OpGet create operations for the
 	// THEN and ELSE branches.
 	txnResp, err := client.Txn(ctx).
-	If(clientv3.Compare(clientv3.CreateRevision("/lock/resource-1"), "=", 0)).
-	Then(clientv3.OpPut("/lock/resource-1", "holder-A")).
-	Else(clientv3.OpGet("/lock/resource-1")).
-	Commit()
+		If(clientv3.Compare(clientv3.CreateRevision("/lock/resource-1"), "=", 0)).
+		Then(clientv3.OpPut("/lock/resource-1", "holder-A")).
+		Else(clientv3.OpGet("/lock/resource-1")).
+		Commit()
 	if err != nil {
 		log.Fatalf("Transaction failed: %v", err)
 	}
 
 	// txnResp.Succeeded is true if the IF condition was met (THEN
-		// branch executed), false if the ELSE branch executed.
+	// branch executed), false if the ELSE branch executed.
 	if txnResp.Succeeded {
 		fmt.Println("  Lock acquired by holder-A (key created)")
 	} else {
@@ -1566,10 +1567,10 @@ func main() {
 
 	// Try again — this time the key exists, so ELSE executes.
 	txnResp2, err := client.Txn(ctx).
-	If(clientv3.Compare(clientv3.CreateRevision("/lock/resource-1"), "=", 0)).
-	Then(clientv3.OpPut("/lock/resource-1", "holder-B")).
-	Else(clientv3.OpGet("/lock/resource-1")).
-	Commit()
+		If(clientv3.Compare(clientv3.CreateRevision("/lock/resource-1"), "=", 0)).
+		Then(clientv3.OpPut("/lock/resource-1", "holder-B")).
+		Else(clientv3.OpGet("/lock/resource-1")).
+		Commit()
 	if err != nil {
 		log.Fatalf("Transaction failed: %v", err)
 	}
@@ -1600,16 +1601,16 @@ func main() {
 	fmt.Printf("  Current value: %s (revision: %d)\n", currentKV.Value, currentRevision)
 
 	// Update only if the revision hasn't changed (no one else modified
-		// the key since we read it). This is exactly what the Kubernetes
+	// the key since we read it). This is exactly what the Kubernetes
 	// API server does when processing an Update request.
 	//
 	// ModRevision(key) == currentRevision means "no one has modified
 	// this key since we last read it."
 	txnResp3, err := client.Txn(ctx).
-	If(clientv3.Compare(clientv3.ModRevision("/registry/configmaps/default/myconfig"), "=", currentRevision)).
-	Then(clientv3.OpPut("/registry/configmaps/default/myconfig", `{"data":"v2"}`)).
-	Else(clientv3.OpGet("/registry/configmaps/default/myconfig")).
-	Commit()
+		If(clientv3.Compare(clientv3.ModRevision("/registry/configmaps/default/myconfig"), "=", currentRevision)).
+		Then(clientv3.OpPut("/registry/configmaps/default/myconfig", `{"data":"v2"}`)).
+		Else(clientv3.OpGet("/registry/configmaps/default/myconfig")).
+		Commit()
 	if err != nil {
 		log.Fatalf("Transaction failed: %v", err)
 	}
@@ -1624,10 +1625,10 @@ func main() {
 
 	// Simulate a conflict: try to update with the OLD revision.
 	txnResp4, err := client.Txn(ctx).
-	If(clientv3.Compare(clientv3.ModRevision("/registry/configmaps/default/myconfig"), "=", currentRevision)).
-	Then(clientv3.OpPut("/registry/configmaps/default/myconfig", `{"data":"v3-conflicting"}`)).
-	Else(clientv3.OpGet("/registry/configmaps/default/myconfig")).
-	Commit()
+		If(clientv3.Compare(clientv3.ModRevision("/registry/configmaps/default/myconfig"), "=", currentRevision)).
+		Then(clientv3.OpPut("/registry/configmaps/default/myconfig", `{"data":"v3-conflicting"}`)).
+		Else(clientv3.OpGet("/registry/configmaps/default/myconfig")).
+		Commit()
 	if err != nil {
 		log.Fatalf("Transaction failed: %v", err)
 	}
@@ -1655,25 +1656,25 @@ func main() {
 	// Atomic transfer: debit A and credit B in a single transaction.
 	// The IF clause checks that both accounts exist (have been created).
 	txnResp5, err := client.Txn(ctx).
-	If(
-		// Both accounts must exist.
-		clientv3.Compare(clientv3.CreateRevision("/accounts/A"), ">", 0),
-		clientv3.Compare(clientv3.CreateRevision("/accounts/B"), ">", 0),
-	).
-	Then(
-		// Note: etcd doesn't support arithmetic in transactions.
-		// In a real system, you would read the balances first,
-		// compute the new values, then use ModRevision checks
-		// to ensure no concurrent modification.
-		clientv3.OpPut("/accounts/A", "80"),
-		clientv3.OpPut("/accounts/B", "70"),
-	).
-	Else(
-		// One or both accounts don't exist.
-		clientv3.OpGet("/accounts/A"),
-		clientv3.OpGet("/accounts/B"),
-	).
-	Commit()
+		If(
+			// Both accounts must exist.
+			clientv3.Compare(clientv3.CreateRevision("/accounts/A"), ">", 0),
+			clientv3.Compare(clientv3.CreateRevision("/accounts/B"), ">", 0),
+		).
+		Then(
+			// Note: etcd doesn't support arithmetic in transactions.
+			// In a real system, you would read the balances first,
+			// compute the new values, then use ModRevision checks
+			// to ensure no concurrent modification.
+			clientv3.OpPut("/accounts/A", "80"),
+			clientv3.OpPut("/accounts/B", "70"),
+		).
+		Else(
+			// One or both accounts don't exist.
+			clientv3.OpGet("/accounts/A"),
+			clientv3.OpGet("/accounts/B"),
+		).
+		Commit()
 	if err != nil {
 		log.Fatalf("Transaction failed: %v", err)
 	}
@@ -2021,9 +2022,9 @@ echo "Cluster is ready! Endpoints: localhost:2379, localhost:2479, localhost:257
 // run this as a CronJob in Kubernetes or as a scheduled task.
 //
 // The program:
-//   1. Takes a snapshot of the etcd database.
-//   2. Verifies the snapshot integrity.
-//   3. Reports the snapshot metadata (revision, key count, size).
+//  1. Takes a snapshot of the etcd database.
+//  2. Verifies the snapshot integrity.
+//  3. Reports the snapshot metadata (revision, key count, size).
 //
 // For restore, use the etcdctl command-line tool (shown in comments).
 package main
@@ -2042,9 +2043,9 @@ import (
 func main() {
 	// Connect to the etcd cluster.
 	client, err := clientv3.New(clientv3.Config{
-			Endpoints:   []string{"localhost:2379"},
-			DialTimeout: 5 * time.Second,
-		})
+		Endpoints:   []string{"localhost:2379"},
+		DialTimeout: 5 * time.Second,
+	})
 	if err != nil {
 		log.Fatalf("Failed to create etcd client: %v", err)
 	}
@@ -2145,9 +2146,9 @@ func main() {
 
 	// Connect to the cluster.
 	client, err := clientv3.New(clientv3.Config{
-			Endpoints:   endpoints,
-			DialTimeout: 5 * time.Second,
-		})
+		Endpoints:   endpoints,
+		DialTimeout: 5 * time.Second,
+	})
 	if err != nil {
 		log.Fatalf("Failed to create etcd client: %v", err)
 	}
@@ -2584,6 +2585,7 @@ etcd's read and write performance are fundamentally different:
 // This skips the Raft consensus check, so the response may lag
 // behind the leader by a few milliseconds.
 resp, err := client.Get(ctx, "/my-key", clientv3.WithSerializable())
+
 ```
 
 ### 11.9.2 Linearizable vs Serializable Reads — When to Use Each

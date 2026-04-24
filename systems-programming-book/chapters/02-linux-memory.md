@@ -274,8 +274,9 @@ address space layout we discussed above.
 // permissions and backing.
 //
 // The format of each line is:
-//   address           perms offset  dev   inode   pathname
-//   00400000-0040b000 r-xp 00000000 08:01 1234567 /usr/bin/foo
+//
+//	address           perms offset  dev   inode   pathname
+//	00400000-0040b000 r-xp 00000000 08:01 1234567 /usr/bin/foo
 //
 // This program parses each field and categorizes the region by type
 // (stack, heap, mmap, vDSO, etc.) to help you understand what occupies
@@ -674,11 +675,13 @@ faults and measures them.
 // exactly one minor fault.
 //
 // Usage:
-//   go build -o pagefaults ./cmd/pagefaults
-//   ./pagefaults
+//
+//	go build -o pagefaults ./cmd/pagefaults
+//	./pagefaults
 //
 // For more detail, run under perf:
-//   perf stat -e page-faults,minor-faults,major-faults ./pagefaults
+//
+//	perf stat -e page-faults,minor-faults,major-faults ./pagefaults
 package main
 
 import (
@@ -729,11 +732,11 @@ func main() {
 	// Allocate memory using mmap. This creates a virtual mapping but does
 	// NOT allocate any physical memory yet (demand paging).
 	data, err := syscall.Mmap(
-		-1,                                                // fd: -1 for anonymous mapping
-		0,                                                 // offset: 0
-		allocSize,                                         // length: 64 MB
-		syscall.PROT_READ|syscall.PROT_WRITE,             // permissions
-		syscall.MAP_PRIVATE|syscall.MAP_ANONYMOUS,         // flags
+		-1,                                   // fd: -1 for anonymous mapping
+		0,                                    // offset: 0
+		allocSize,                            // length: 64 MB
+		syscall.PROT_READ|syscall.PROT_WRITE, // permissions
+		syscall.MAP_PRIVATE|syscall.MAP_ANONYMOUS, // flags
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "mmap failed: %v\n", err)
@@ -1101,7 +1104,7 @@ pages are shared directly.
 //
 // mmapfile demonstrates high-performance file processing using mmap.
 // It maps a file into memory and performs analysis (counting lines and
-	// bytes) without any explicit read() system calls.
+// bytes) without any explicit read() system calls.
 //
 // The kernel handles all I/O transparently through page faults:
 // when we access a byte that is not yet in memory, a page fault occurs,
@@ -1121,8 +1124,9 @@ pages are shared directly.
 //   - Cannot easily handle files that grow while being read
 //
 // Usage:
-//   go build -o mmapfile ./cmd/mmapfile
-//   ./mmapfile /path/to/large/file
+//
+//	go build -o mmapfile ./cmd/mmapfile
+//	./mmapfile /path/to/large/file
 package main
 
 import (
@@ -1233,22 +1237,22 @@ wrapping reads and writes become simple linear operations.
 //
 // Traditional ring buffer (wrapping required):
 //
-//   Physical:  [ A B C _ _ X Y Z ]
-//                        ^       ^
-//                       write   read
-//   Reading "XYZ" + "ABC" requires two separate copy operations because
-//   the data wraps around the end of the buffer.
+//	Physical:  [ A B C _ _ X Y Z ]
+//	                     ^       ^
+//	                    write   read
+//	Reading "XYZ" + "ABC" requires two separate copy operations because
+//	the data wraps around the end of the buffer.
 //
 // mmap double-mapping trick:
 //
-//   Virtual:   [ A B C _ _ X Y Z | A B C _ _ X Y Z ]
-//                                  ^               ^
-//                       Same physical memory mapped twice!
-//   Now reading "XYZABC" is a single contiguous read from the second 'X'
-//   to the second 'C', even though it logically wraps around.
+//	Virtual:   [ A B C _ _ X Y Z | A B C _ _ X Y Z ]
+//	                               ^               ^
+//	                    Same physical memory mapped twice!
+//	Now reading "XYZABC" is a single contiguous read from the second 'X'
+//	to the second 'C', even though it logically wraps around.
 //
 // This technique is used in production by logging systems (e.g., the Linux
-	// kernel's perf ring buffer) and high-performance message queues.
+// kernel's perf ring buffer) and high-performance message queues.
 package main
 
 import (
@@ -1279,10 +1283,10 @@ type RingBuffer struct {
 // NewRingBuffer creates a ring buffer of the given size (rounded up to page size).
 //
 // Implementation:
-//   1. Create a memfd (anonymous file in memory) of the desired size.
-//   2. mmap the memfd at a chosen address for size*2 bytes (to reserve space).
-//   3. mmap the memfd again at address+size, overlapping the second half.
-//   This makes both halves of the virtual mapping point to the same physical pages.
+//  1. Create a memfd (anonymous file in memory) of the desired size.
+//  2. mmap the memfd at a chosen address for size*2 bytes (to reserve space).
+//  3. mmap the memfd again at address+size, overlapping the second half.
+//     This makes both halves of the virtual mapping point to the same physical pages.
 //
 // Note: This simplified version uses a basic approach. A production implementation
 // would use MAP_FIXED to ensure the two mappings are adjacent.
@@ -1644,7 +1648,9 @@ the heap (requires GC to reclaim).
 // cmd/escape/main.go
 //
 // escape demonstrates Go's escape analysis. Run this program's build with:
-//   go build -gcflags="-m -m" ./cmd/escape
+//
+//	go build -gcflags="-m -m" ./cmd/escape
+//
 // to see the compiler's escape analysis decisions, including WHY each
 // variable escapes or stays on the stack.
 //
@@ -1768,7 +1774,8 @@ $ go build -gcflags="-m -m" ./cmd/escape 2>&1 | head -30
 //   - Per-size-class allocation counts
 //
 // Usage:
-//   go run ./cmd/memstats
+//
+//	go run ./cmd/memstats
 package main
 
 import (
@@ -2066,10 +2073,10 @@ program continues running while dedicated GC goroutines scan the heap.
 // Run it with different settings to see how they affect GC frequency,
 // pause times, and memory usage:
 //
-//   GOGC=100 go run ./cmd/gctune              # default
-//   GOGC=50 go run ./cmd/gctune               # more frequent GC
-//   GOGC=200 go run ./cmd/gctune              # less frequent GC
-//   GOGC=off GOMEMLIMIT=256MiB go run ./cmd/gctune  # memory-limit-only mode
+//	GOGC=100 go run ./cmd/gctune              # default
+//	GOGC=50 go run ./cmd/gctune               # more frequent GC
+//	GOGC=200 go run ./cmd/gctune              # less frequent GC
+//	GOGC=off GOMEMLIMIT=256MiB go run ./cmd/gctune  # memory-limit-only mode
 //
 // This pattern (GOGC=off + GOMEMLIMIT) is recommended for containerized
 // services where you know the exact memory budget.
@@ -2176,12 +2183,14 @@ func main() {
 //   - Goroutine scheduling events
 //
 // Usage:
-//   go run ./cmd/gctrace
-//   go tool trace trace.out
-//   # Opens a browser with an interactive timeline visualization
+//
+//	go run ./cmd/gctrace
+//	go tool trace trace.out
+//	# Opens a browser with an interactive timeline visualization
 //
 // You can also use GODEBUG=gctrace=1 for text-based GC logging:
-//   GODEBUG=gctrace=1 go run ./cmd/gctrace
+//
+//	GODEBUG=gctrace=1 go run ./cmd/gctrace
 package main
 
 import (
@@ -2304,20 +2313,22 @@ With 2 MB huge pages, 1,536 TLB entries cover 3 GB — more than enough for most
 // from Go using the mmap system call with MAP_HUGETLB flag.
 //
 // Prerequisites:
-//   # Check available huge pages
-//   cat /proc/meminfo | grep HugePages
 //
-//   # Allocate 100 huge pages (200 MB) if not already available
-//   echo 100 | sudo tee /proc/sys/vm/nr_hugepages
+//	# Check available huge pages
+//	cat /proc/meminfo | grep HugePages
 //
-//   # Verify
-//   cat /proc/meminfo | grep HugePages
-//   # HugePages_Total:     100
-//   # HugePages_Free:      100
+//	# Allocate 100 huge pages (200 MB) if not already available
+//	echo 100 | sudo tee /proc/sys/vm/nr_hugepages
+//
+//	# Verify
+//	cat /proc/meminfo | grep HugePages
+//	# HugePages_Total:     100
+//	# HugePages_Free:      100
 //
 // Usage:
-//   go build -o hugepages ./cmd/hugepages
-//   ./hugepages
+//
+//	go build -o hugepages ./cmd/hugepages
+//	./hugepages
 //
 // If you get "cannot allocate memory", ensure huge pages are configured
 // as shown above.
@@ -2506,15 +2517,17 @@ read and write directly to shared physical frames.
 // overhead is cache coherency between CPU cores (typically ~50-100 ns).
 //
 // Memory layout of the shared region:
-//   Bytes 0-7:    uint64 sequence number (writer increments atomically)
-//   Bytes 8-263:  message payload (256 bytes, null-terminated)
-//   Bytes 264+:   unused
+//
+//	Bytes 0-7:    uint64 sequence number (writer increments atomically)
+//	Bytes 8-263:  message payload (256 bytes, null-terminated)
+//	Bytes 264+:   unused
 //
 // Usage:
-//   go build -o shmwriter ./cmd/shmwriter
-//   go build -o shmreader ./cmd/shmreader
-//   ./shmwriter &
-//   ./shmreader
+//
+//	go build -o shmwriter ./cmd/shmwriter
+//	go build -o shmreader ./cmd/shmreader
+//	./shmwriter &
+//	./shmreader
 package main
 
 import (
@@ -2594,7 +2607,7 @@ func main() {
 		// Ensure the write is flushed from CPU write buffers to the
 		// shared cache line.
 		// (On x86, stores are already ordered, but atomic.Store provides
-			// the memory ordering guarantee we need.)
+		// the memory ordering guarantee we need.)
 
 		if i%10 == 0 {
 			fmt.Printf("Writer: wrote message #%d\n", i)
@@ -2622,11 +2635,12 @@ func main() {
 // mediated only by CPU cache coherency.
 //
 // Usage:
-//   # In terminal 1:
-//   ./shmwriter
 //
-//   # In terminal 2:
-//   ./shmreader
+//	# In terminal 1:
+//	./shmwriter
+//
+//	# In terminal 2:
+//	./shmreader
 package main
 
 import (
@@ -2732,27 +2746,29 @@ func main() {
 //   - Compaction / garbage collection
 //
 // File layout:
-//   ┌──────────────────────────────────────────┐
-//   │ Header (64 bytes)                        │
-//   │   magic:   uint32 (0x4D4D4B56 = "MMKV") │
-//   │   version: uint32                        │
-//   │   count:   uint64 (number of entries)    │
-//   │   cap:     uint64 (max entries)          │
-//   │   padding: 40 bytes                      │
-//   ├──────────────────────────────────────────┤
-//   │ Entry 0 (324 bytes)                      │
-//   │   used:  uint32 (0=empty, 1=used)        │
-//   │   key:   [64]byte                        │
-//   │   value: [256]byte                       │
-//   ├──────────────────────────────────────────┤
-//   │ Entry 1 (324 bytes)                      │
-//   │   ...                                    │
-//   ├──────────────────────────────────────────┤
-//   │ ...                                      │
-//   └──────────────────────────────────────────┘
+//
+//	┌──────────────────────────────────────────┐
+//	│ Header (64 bytes)                        │
+//	│   magic:   uint32 (0x4D4D4B56 = "MMKV") │
+//	│   version: uint32                        │
+//	│   count:   uint64 (number of entries)    │
+//	│   cap:     uint64 (max entries)          │
+//	│   padding: 40 bytes                      │
+//	├──────────────────────────────────────────┤
+//	│ Entry 0 (324 bytes)                      │
+//	│   used:  uint32 (0=empty, 1=used)        │
+//	│   key:   [64]byte                        │
+//	│   value: [256]byte                       │
+//	├──────────────────────────────────────────┤
+//	│ Entry 1 (324 bytes)                      │
+//	│   ...                                    │
+//	├──────────────────────────────────────────┤
+//	│ ...                                      │
+//	└──────────────────────────────────────────┘
 //
 // Usage:
-//   go run ./cmd/mmapkv
+//
+//	go run ./cmd/mmapkv
 package main
 
 import (
@@ -2800,7 +2816,7 @@ type MmapKV struct {
 //
 // The entire store is mapped into memory with MAP_SHARED, so all writes
 // are immediately reflected in the file (though not necessarily flushed
-	// to disk until msync or munmap).
+// to disk until msync or munmap).
 func OpenKV(path string, capacity uint64) (*MmapKV, error) {
 	totalSize := headerSize + int(capacity)*entrySize
 
@@ -3126,7 +3142,8 @@ For NUMA-sensitive workloads, you can:
 // only one NUMA node (node0) containing all CPUs and memory.
 //
 // Usage:
-//   go run ./cmd/numainfo
+//
+//	go run ./cmd/numainfo
 package main
 
 import (
@@ -3184,8 +3201,8 @@ func main() {
 			// Parse out total and free memory lines.
 			for _, line := range strings.Split(memInfo, "\n") {
 				if strings.Contains(line, "MemTotal") ||
-				strings.Contains(line, "MemFree") ||
-				strings.Contains(line, "MemUsed") {
+					strings.Contains(line, "MemFree") ||
+					strings.Contains(line, "MemUsed") {
 					fmt.Printf("  %s\n", strings.TrimSpace(line))
 				}
 			}
@@ -3285,7 +3302,7 @@ Every process has two OOM-related files in `/proc`:
 // In a containerized deployment:
 //   - Set oom_score_adj = -999 for your most critical service
 //     (but NOT -1000, because that makes it immune and could cause
-	//     the entire cgroup to be OOM-killed instead)
+//     the entire cgroup to be OOM-killed instead)
 //   - Set oom_score_adj = +500 for less important worker processes
 //   - The init/PID 1 process usually has oom_score_adj = -1000
 //
@@ -3293,8 +3310,9 @@ Every process has two OOM-related files in `/proc`:
 // CAP_SYS_RESOURCE capability (usually root).
 //
 // Usage:
-//   go run ./cmd/oomadj
-//   sudo go run ./cmd/oomadj   # for lowering oom_score_adj
+//
+//	go run ./cmd/oomadj
+//	sudo go run ./cmd/oomadj   # for lowering oom_score_adj
 package main
 
 import (
@@ -3347,11 +3365,12 @@ func getOOMScoreAdj(pid int) (int, error) {
 // CAP_SYS_RESOURCE (typically root).
 //
 // Common values:
-//   -1000: Never kill (use sparingly — can cause cgroup-level OOM)
-//    -999: Almost never kill (good for critical services)
-//       0: Default
-//    +500: Prefer to kill (good for batch/worker processes)
-//   +1000: Always kill first (good for sacrificial processes)
+//
+//	-1000: Never kill (use sparingly — can cause cgroup-level OOM)
+//	 -999: Almost never kill (good for critical services)
+//	    0: Default
+//	 +500: Prefer to kill (good for batch/worker processes)
+//	+1000: Always kill first (good for sacrificial processes)
 func setOOMScoreAdj(pid int, adj int) error {
 	if adj < -1000 || adj > 1000 {
 		return fmt.Errorf("oom_score_adj must be between -1000 and 1000, got %d", adj)

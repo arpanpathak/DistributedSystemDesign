@@ -631,16 +631,16 @@ func main() {
 	// Watch for changes. The callback receives the new configuration
 	// whenever the ConfigMap is updated. In a real application, this
 	// callback would update a thread-safe config holder (e.g., using
-		// sync/atomic.Value) and reconfigure runtime components.
+	// sync/atomic.Value) and reconfigure runtime components.
 	err = watchConfigMap(configPath, func(newConfig *AppConfig) {
-			// In a production application, you would:
-			// 1. Store the new config atomically (atomic.Value or sync.RWMutex).
-			// 2. Reconfigure the logger.
-			// 3. Update feature flag checks.
-			// 4. Optionally resize database connection pools.
-			fmt.Printf("[app] Applied new configuration: log=%s cache=%v\n",
-				newConfig.Logging.Level, newConfig.Features.EnableCache)
-		})
+		// In a production application, you would:
+		// 1. Store the new config atomically (atomic.Value or sync.RWMutex).
+		// 2. Reconfigure the logger.
+		// 3. Update feature flag checks.
+		// 4. Optionally resize database connection pools.
+		fmt.Printf("[app] Applied new configuration: log=%s cache=%v\n",
+			newConfig.Logging.Level, newConfig.Features.EnableCache)
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Watcher failed: %v\n", err)
 		os.Exit(1)
@@ -993,7 +993,7 @@ EOF
 //  1. Files are mounted on tmpfs (RAM) — never written to disk.
 //  2. File permissions can be restricted (mode 0400 = owner read-only).
 //  3. Changes are reflected automatically (unlike env vars which are fixed
-	//     at Pod startup).
+//     at Pod startup).
 //  4. No risk of leaking through process listings or crash dumps.
 //
 // The Secret is mounted as a volume in the Pod spec:
@@ -1589,14 +1589,14 @@ func newPodIdentityFromEnv() (*PodIdentity, error) {
 	if name == "" {
 		return nil, fmt.Errorf(
 			"POD_NAME environment variable not set; " +
-			"configure the Downward API in your Pod spec")
+				"configure the Downward API in your Pod spec")
 	}
 
 	namespace := os.Getenv("POD_NAMESPACE")
 	if namespace == "" {
 		return nil, fmt.Errorf(
 			"POD_NAMESPACE environment variable not set; " +
-			"configure the Downward API in your Pod spec")
+				"configure the Downward API in your Pod spec")
 	}
 
 	identity := &PodIdentity{
@@ -1646,9 +1646,9 @@ func main() {
 	// This is useful for debugging and verifying the Downward API
 	// configuration from outside the Pod.
 	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(identity)
-		})
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(identity)
+	})
 
 	addr := ":8080"
 	fmt.Printf("Listening on %s\n", addr)

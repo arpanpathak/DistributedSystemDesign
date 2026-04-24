@@ -166,8 +166,9 @@ Most Go developers use `net.Listen` and `net.Accept`. Here, we bypass the entire
 // but every call maps 1:1 to a Linux syscall.
 //
 // Usage:
-//   go run tcp_raw_server.go
-//   # In another terminal: echo "hello" | nc localhost 8080
+//
+//	go run tcp_raw_server.go
+//	# In another terminal: echo "hello" | nc localhost 8080
 package main
 
 import (
@@ -355,8 +356,9 @@ UDP is simpler — no connection setup, no handshake, no state machine.
 // Each recvfrom() returns one complete datagram with the sender's address.
 //
 // Usage:
-//   go run udp_raw_server.go
-//   # In another terminal: echo "hello" | nc -u localhost 9090
+//
+//	go run udp_raw_server.go
+//	# In another terminal: echo "hello" | nc -u localhost 9090
 package main
 
 import (
@@ -834,9 +836,9 @@ import (
 func setTCPNoDelay(fd int) error {
 	return unix.SetsockoptInt(
 		fd,
-		unix.IPPROTO_TCP,  // Level: TCP protocol options
-		unix.TCP_NODELAY,  // Option: disable Nagle
-		1,                 // Value: 1 = enabled (yes, disable Nagle)
+		unix.IPPROTO_TCP, // Level: TCP protocol options
+		unix.TCP_NODELAY, // Option: disable Nagle
+		1,                // Value: 1 = enabled (yes, disable Nagle)
 	)
 }
 
@@ -959,17 +961,18 @@ func main() {
 // tcp_keepalive.go
 //
 // TCP keepalive sends periodic probes on idle connections to detect:
-//   1. Dead peers (crashed without sending FIN)
-//   2. Network path failures
-//   3. Stateful firewall/NAT timeout (firewalls drop idle connections)
+//  1. Dead peers (crashed without sending FIN)
+//  2. Network path failures
+//  3. Stateful firewall/NAT timeout (firewalls drop idle connections)
 //
 // Without keepalive, a TCP connection to a crashed peer will appear
 // "established" forever — reads will block indefinitely.
 //
 // Keepalive parameters:
-//   TCP_KEEPIDLE  — seconds of idle time before first probe (default: 7200 = 2 hours!)
-//   TCP_KEEPINTVL — seconds between probes (default: 75)
-//   TCP_KEEPCNT   — number of failed probes before giving up (default: 9)
+//
+//	TCP_KEEPIDLE  — seconds of idle time before first probe (default: 7200 = 2 hours!)
+//	TCP_KEEPINTVL — seconds between probes (default: 75)
+//	TCP_KEEPCNT   — number of failed probes before giving up (default: 9)
 //
 // With defaults: 2 hours + 9 × 75s = ~2h11m before detecting a dead peer.
 // In production, you want much shorter values.
@@ -1085,15 +1088,17 @@ echo bbr > /proc/sys/net/ipv4/tcp_congestion_control
 // This is the same data that `ss` and `netstat` display.
 //
 // /proc/net/tcp format (each line is a socket):
-//   sl  local_address rem_address   st tx_queue rx_queue ...
+//
+//	sl  local_address rem_address   st tx_queue rx_queue ...
 //
 // The "st" field is the TCP state as a hex number:
-//   01 = ESTABLISHED    06 = TIME_WAIT
-//   02 = SYN_SENT       07 = CLOSE
-//   03 = SYN_RECV       08 = CLOSE_WAIT
-//   04 = FIN_WAIT1      09 = LAST_ACK
-//   05 = FIN_WAIT2      0A = LISTEN
-//                        0B = CLOSING
+//
+//	01 = ESTABLISHED    06 = TIME_WAIT
+//	02 = SYN_SENT       07 = CLOSE
+//	03 = SYN_RECV       08 = CLOSE_WAIT
+//	04 = FIN_WAIT1      09 = LAST_ACK
+//	05 = FIN_WAIT2      0A = LISTEN
+//	                     0B = CLOSING
 package main
 
 import (
@@ -1208,19 +1213,21 @@ func main() {
 // TCP streams bidirectionally.
 //
 // Architecture:
-//   Client ←──TCP──→ Proxy ←──TCP──→ Backend
+//
+//	Client ←──TCP──→ Proxy ←──TCP──→ Backend
 //
 // For each client connection, the proxy:
-//   1. Accepts the client connection
-//   2. Opens a new connection to the backend
-//   3. Spawns two goroutines to copy data in both directions
-//   4. When either side closes, both connections are torn down
+//  1. Accepts the client connection
+//  2. Opens a new connection to the backend
+//  3. Spawns two goroutines to copy data in both directions
+//  4. When either side closes, both connections are torn down
 //
 // This is essentially what HAProxy, Envoy, and kube-proxy do at the
 // TCP level (though they add health checking, load balancing, etc.)
 //
 // Usage:
-//   go run tcp_proxy.go -listen :8080 -backend 127.0.0.1:3000
+//
+//	go run tcp_proxy.go -listen :8080 -backend 127.0.0.1:3000
 package main
 
 import (
@@ -1353,19 +1360,21 @@ Raw sockets require `CAP_NET_RAW` capability (usually root access).
 // Ping sends ICMP Echo Request packets and listens for Echo Reply.
 //
 // ICMP Echo Request packet format:
-//   ┌──────┬──────┬──────────────────┐
-//   │ Type │ Code │    Checksum      │  (4 bytes)
-//   │  8   │  0   │                  │
-//   ├──────┴──────┼──────────────────┤
-//   │ Identifier  │ Sequence Number  │  (4 bytes)
-//   ├─────────────┴──────────────────┤
-//   │          Payload               │  (variable)
-//   └────────────────────────────────┘
+//
+//	┌──────┬──────┬──────────────────┐
+//	│ Type │ Code │    Checksum      │  (4 bytes)
+//	│  8   │  0   │                  │
+//	├──────┴──────┼──────────────────┤
+//	│ Identifier  │ Sequence Number  │  (4 bytes)
+//	├─────────────┴──────────────────┤
+//	│          Payload               │  (variable)
+//	└────────────────────────────────┘
 //
 // ICMP Echo Reply has Type=0, same Identifier and Sequence.
 //
 // Usage:
-//   sudo go run raw_ping.go 8.8.8.8
+//
+//	sudo go run raw_ping.go 8.8.8.8
 //
 // Note: Requires root or CAP_NET_RAW capability.
 package main
@@ -1466,7 +1475,7 @@ func main() {
 	// IPPROTO_ICMP = We want to send/receive ICMP packets
 	//
 	// The kernel handles the IP header for us (unless we set
-		// IP_HDRINCL). We only need to construct the ICMP portion.
+	// IP_HDRINCL). We only need to construct the ICMP portion.
 	// ──────────────────────────────────────────────────────
 	fd, err := unix.Socket(unix.AF_INET, unix.SOCK_RAW, unix.IPPROTO_ICMP)
 	if err != nil {
@@ -2185,8 +2194,9 @@ echo "  bridge: 10.0.0.254"
 // (Calico, Flannel, Cilium) do to set up container networking.
 //
 // Dependencies:
-//   go get github.com/vishvananda/netlink
-//   go get github.com/vishvananda/netns
+//
+//	go get github.com/vishvananda/netlink
+//	go get github.com/vishvananda/netns
 //
 // Must run as root.
 package main
@@ -2495,21 +2505,23 @@ bpftrace -e 'tracepoint:tcp:tcp_retransmit_skb {
 // clang/LLVM to BPF bytecode, and load it from Go.
 //
 // Dependencies:
-//   go get github.com/cilium/ebpf
+//
+//	go get github.com/cilium/ebpf
 //
 // The eBPF C program (compiled separately):
-//   SEC("xdp")
-//   int xdp_drop_icmp(struct xdp_md *ctx) {
-	//       void *data = (void *)(long)ctx->data;
-	//       void *data_end = (void *)(long)ctx->data_end;
-	//       struct ethhdr *eth = data;
-	//       if (eth + 1 > data_end) return XDP_PASS;
-	//       if (eth->h_proto != htons(ETH_P_IP)) return XDP_PASS;
-	//       struct iphdr *ip = (void *)(eth + 1);
-	//       if (ip + 1 > data_end) return XDP_PASS;
-	//       if (ip->protocol == IPPROTO_ICMP) return XDP_DROP;
-	//       return XDP_PASS;
-	//   }
+//
+//	SEC("xdp")
+//	int xdp_drop_icmp(struct xdp_md *ctx) {
+//	    void *data = (void *)(long)ctx->data;
+//	    void *data_end = (void *)(long)ctx->data_end;
+//	    struct ethhdr *eth = data;
+//	    if (eth + 1 > data_end) return XDP_PASS;
+//	    if (eth->h_proto != htons(ETH_P_IP)) return XDP_PASS;
+//	    struct iphdr *ip = (void *)(eth + 1);
+//	    if (ip + 1 > data_end) return XDP_PASS;
+//	    if (ip->protocol == IPPROTO_ICMP) return XDP_DROP;
+//	    return XDP_PASS;
+//	}
 package main
 
 import (
@@ -2549,9 +2561,9 @@ func main() {
 	// Every packet received on this interface will now pass through
 	// our eBPF program BEFORE entering the normal network stack.
 	xdpLink, err := link.AttachXDP(link.XDPOptions{
-			Program:   prog,
-			Interface: 2, // Interface index (use net.InterfaceByName to look up)
-		})
+		Program:   prog,
+		Interface: 2, // Interface index (use net.InterfaceByName to look up)
+	})
 	if err != nil {
 		log.Fatalf("Failed to attach XDP program: %v", err)
 	}
@@ -2704,12 +2716,14 @@ request.
 // connections to the same server (databases, APIs, microservices).
 //
 // Without pooling:
-//   Each request: DNS lookup + TCP handshake + TLS handshake + request + close
-//   Cost: ~1-50ms per connection setup
+//
+//	Each request: DNS lookup + TCP handshake + TLS handshake + request + close
+//	Cost: ~1-50ms per connection setup
 //
 // With pooling:
-//   First request: Full setup (same as above)
-//   Subsequent requests: Reuse existing connection (~0ms setup)
+//
+//	First request: Full setup (same as above)
+//	Subsequent requests: Reuse existing connection (~0ms setup)
 //
 // This pool implements:
 //   - Configurable max connections per host
@@ -2863,9 +2877,9 @@ func (p *ConnPool) Put(conn net.Conn) {
 	}
 
 	p.idleConns = append(p.idleConns, &poolConn{
-			conn:      conn,
-			idleSince: time.Now(),
-		})
+		conn:      conn,
+		idleSince: time.Now(),
+	})
 }
 
 // Close shuts down the pool and closes all idle connections.
@@ -2971,7 +2985,8 @@ func main() {
 // explicit event loops.
 //
 // Usage:
-//   go run reverse_proxy.go -listen :8080 -backends "http://localhost:3001,http://localhost:3002"
+//
+//	go run reverse_proxy.go -listen :8080 -backends "http://localhost:3001,http://localhost:3002"
 package main
 
 import (
@@ -3001,15 +3016,15 @@ var (
 // Backend represents a single backend server.
 // It tracks health status so we can avoid sending traffic to dead backends.
 type Backend struct {
-	URL     *url.URL   // The backend's base URL.
-	Alive   atomic.Bool // Whether the backend is currently healthy.
+	URL   *url.URL    // The backend's base URL.
+	Alive atomic.Bool // Whether the backend is currently healthy.
 }
 
 // LoadBalancer distributes requests across multiple backends.
 // It uses simple round-robin selection, skipping unhealthy backends.
 type LoadBalancer struct {
-	backends []*Backend      // List of all backends.
-	current  atomic.Uint64   // Round-robin counter.
+	backends []*Backend    // List of all backends.
+	current  atomic.Uint64 // Round-robin counter.
 	mu       sync.RWMutex
 }
 
@@ -3098,10 +3113,10 @@ type ProxyHandler struct {
 }
 
 // ServeHTTP handles each incoming request by:
-//   1. Selecting a healthy backend
-//   2. Creating a new request to that backend
-//   3. Forwarding the request (including body)
-//   4. Streaming the response back to the client
+//  1. Selecting a healthy backend
+//  2. Creating a new request to that backend
+//  3. Forwarding the request (including body)
+//  4. Streaming the response back to the client
 func (ph *ProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Select a backend.
 	backend := ph.lb.Next()
@@ -3196,9 +3211,9 @@ func main() {
 
 		// DialContext configures the TCP connection to backends.
 		DialContext: (&net.Dialer{
-				Timeout:   5 * time.Second,  // TCP handshake timeout
-				KeepAlive: 30 * time.Second, // TCP keepalive interval
-			}).DialContext,
+			Timeout:   5 * time.Second,  // TCP handshake timeout
+			KeepAlive: 30 * time.Second, // TCP keepalive interval
+		}).DialContext,
 
 		// ForceAttemptHTTP2 enables HTTP/2 if the backend supports it.
 		// HTTP/2 multiplexes requests over a single TCP connection.

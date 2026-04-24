@@ -870,12 +870,12 @@ func (r *WebsiteReconciler) updateStatus(
 
 	// Set a condition to provide detailed status information.
 	meta.SetStatusCondition(&website.Status.Conditions, metav1.Condition{
-			Type:               "Ready",
-			Status:             metav1.ConditionTrue,
-			Reason:             "AllReplicasReady",
-			Message:            fmt.Sprintf("%d/%d replicas ready", readyReplicas, website.Spec.Replicas),
-			LastTransitionTime: metav1.Now(),
-		})
+		Type:               "Ready",
+		Status:             metav1.ConditionTrue,
+		Reason:             "AllReplicasReady",
+		Message:            fmt.Sprintf("%d/%d replicas ready", readyReplicas, website.Spec.Replicas),
+		LastTransitionTime: metav1.Now(),
+	})
 
 	// Status().Update() calls the /status subresource endpoint.
 	// Only .status changes are persisted — any .spec changes are ignored.
@@ -1103,12 +1103,14 @@ spec:
 // Website resources between v1beta1 and v1 versions.
 //
 // Conversion flow:
-//   Client requests v1 → API server has v1beta1 in etcd → API server
-//   calls this webhook to convert v1beta1 → v1 → returns v1 to client.
+//
+//	Client requests v1 → API server has v1beta1 in etcd → API server
+//	calls this webhook to convert v1beta1 → v1 → returns v1 to client.
 //
 // The webhook must handle ALL version pairs:
-//   v1beta1 → v1   (reading old objects as new version)
-//   v1 → v1beta1   (reading new objects as old version)
+//
+//	v1beta1 → v1   (reading old objects as new version)
+//	v1 → v1beta1   (reading new objects as old version)
 //
 // Conversion must be lossless for fields that exist in both versions.
 // Fields that only exist in one version may use defaults when converting.
@@ -1190,7 +1192,7 @@ func ConvertHandler(w http.ResponseWriter, r *http.Request) {
 //   - Preserve ALL fields that exist in both versions.
 //   - Set sensible defaults for fields that only exist in the target.
 //   - Drop fields that do not exist in the target (but preserve them
-	//     in annotations if round-trip fidelity is needed).
+//     in annotations if round-trip fidelity is needed).
 func convert(
 	obj *unstructured.Unstructured,
 	desiredVersion string,
@@ -1330,9 +1332,9 @@ types give you:
 // group. These types define the structure of the Website custom
 // resource and are used by:
 //
-//   1. Controllers — to read and write Website objects with type safety.
-//   2. controller-gen — to generate the CRD YAML schema.
-//   3. code-generator — to generate typed clients, listers, informers.
+//  1. Controllers — to read and write Website objects with type safety.
+//  2. controller-gen — to generate the CRD YAML schema.
+//  3. code-generator — to generate typed clients, listers, informers.
 //
 // The +kubebuilder markers on these types control CRD generation.
 // controller-gen reads these markers and produces:
@@ -1549,7 +1551,7 @@ the Kubernetes API machinery for safe concurrent access to API objects.
 // DeepCopyObject returns a deep copy of the Website as a
 // runtime.Object interface. This is called by the API machinery
 // when it needs to copy an API object (e.g., for caching,
-	// informer event delivery, etc.).
+// informer event delivery, etc.).
 func (in *Website) DeepCopyObject() runtime.Object {
 	if c := in.DeepCopy(); c != nil {
 		return c
@@ -1617,8 +1619,8 @@ func main() {
 	webappv1.AddToScheme(scheme)
 
 	cl, err := client.New(ctrl.GetConfigOrDie(), client.Options{
-			Scheme: scheme,
-		})
+		Scheme: scheme,
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -1647,9 +1649,9 @@ func main() {
 	// Get a specific Website by namespace/name.
 	var fetched webappv1.Website
 	err = cl.Get(ctx, types.NamespacedName{
-			Namespace: "default",
-			Name:      "my-blog",
-		}, &fetched)
+		Namespace: "default",
+		Name:      "my-blog",
+	}, &fetched)
 	if err != nil {
 		panic(err)
 	}
@@ -1787,8 +1789,8 @@ func main() {
 	}
 
 	created, err := dynClient.Resource(websiteGVR).
-	Namespace("default").
-	Create(ctx, website, metav1.CreateOptions{})
+		Namespace("default").
+		Create(ctx, website, metav1.CreateOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -1797,8 +1799,8 @@ func main() {
 	// ---------- READ ----------
 	// Get a specific resource.
 	fetched, err := dynClient.Resource(websiteGVR).
-	Namespace("default").
-	Get(ctx, "dynamic-site", metav1.GetOptions{})
+		Namespace("default").
+		Get(ctx, "dynamic-site", metav1.GetOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -1822,8 +1824,8 @@ func main() {
 	// ---------- LIST ----------
 	// List all Websites in a namespace.
 	list, err := dynClient.Resource(websiteGVR).
-	Namespace("default").
-	List(ctx, metav1.ListOptions{})
+		Namespace("default").
+		List(ctx, metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -1845,8 +1847,8 @@ func main() {
 	}
 
 	updated, err := dynClient.Resource(websiteGVR).
-	Namespace("default").
-	Update(ctx, fetched, metav1.UpdateOptions{})
+		Namespace("default").
+		Update(ctx, fetched, metav1.UpdateOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -1854,8 +1856,8 @@ func main() {
 
 	// ---------- DELETE ----------
 	err = dynClient.Resource(websiteGVR).
-	Namespace("default").
-	Delete(ctx, "dynamic-site", metav1.DeleteOptions{})
+		Namespace("default").
+		Delete(ctx, "dynamic-site", metav1.DeleteOptions{})
 	if err != nil {
 		panic(err)
 	}

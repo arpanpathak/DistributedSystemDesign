@@ -1498,10 +1498,10 @@ func (s *server) handleGet(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		writeJSON(w, http.StatusOK, map[string]string{
-				"key":    key,
-				"value":  val,
-				"served_by": s.podName,
-			})
+			"key":       key,
+			"value":     val,
+			"served_by": s.podName,
+		})
 		return
 	}
 
@@ -1525,10 +1525,10 @@ func (s *server) handleSet(w http.ResponseWriter, r *http.Request) {
 	if owner == s.ordinal {
 		s.store.Set(key, value)
 		writeJSON(w, http.StatusOK, map[string]string{
-				"status":    "ok",
-				"key":       key,
-				"stored_by": s.podName,
-			})
+			"status":    "ok",
+			"key":       key,
+			"stored_by": s.podName,
+		})
 		return
 	}
 
@@ -1576,11 +1576,11 @@ func (s *server) proxyToOwner(w http.ResponseWriter, _ *http.Request, ownerOrdin
 // handlePeers returns the list of currently discovered peers.
 func (s *server) handlePeers(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]interface{}{
-			"self":    s.podName,
-			"ordinal": s.ordinal,
-			"fqdn":    s.fqdn,
-			"peers":   s.discovery.Peers(),
-		})
+		"self":    s.podName,
+		"ordinal": s.ordinal,
+		"fqdn":    s.fqdn,
+		"peers":   s.discovery.Peers(),
+	})
 }
 
 // handleHealth returns a simple health check response.

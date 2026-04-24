@@ -321,12 +321,12 @@ events. This is the foundation for everything that follows.
 // resource changes without polling the API server.
 //
 // This program:
-//   1. Creates a Kubernetes client from the local kubeconfig.
-//   2. Creates a SharedInformerFactory that manages informer lifecycle.
-//   3. Obtains a Pod informer from the factory.
-//   4. Registers event handlers (OnAdd, OnUpdate, OnDelete) that print
-//      a human-readable summary of each event.
-//   5. Starts the informer and blocks until interrupted.
+//  1. Creates a Kubernetes client from the local kubeconfig.
+//  2. Creates a SharedInformerFactory that manages informer lifecycle.
+//  3. Obtains a Pod informer from the factory.
+//  4. Registers event handlers (OnAdd, OnUpdate, OnDelete) that print
+//     a human-readable summary of each event.
+//  5. Starts the informer and blocks until interrupted.
 //
 // This is intentionally simple — no work queue, no reconciler. We will
 // add those in subsequent examples.
@@ -349,9 +349,9 @@ func main() {
 	// ---------- Step 1: Build a Kubernetes client ----------
 	//
 	// clientcmd.BuildConfigFromFlags reads the kubeconfig file (typically
-		// ~/.kube/config) and returns a *rest.Config suitable for creating
+	// ~/.kube/config) and returns a *rest.Config suitable for creating
 	// API clients. The first argument is the master URL (empty string
-		// means "use kubeconfig"), and the second is the kubeconfig path.
+	// means "use kubeconfig"), and the second is the kubeconfig path.
 	kubeconfig := os.Getenv("KUBECONFIG")
 	if kubeconfig == "" {
 		kubeconfig = os.Getenv("HOME") + "/.kube/config"
@@ -425,7 +425,7 @@ func main() {
 	// their initial list and populated their local caches. This is
 	// critical — you must not start reconciling until the cache is warm,
 	// or you will see "phantom deletes" (objects that exist but are not
-		// yet in the cache).
+	// yet in the cache).
 	factory.WaitForCacheSync(stopCh)
 	fmt.Println("Cache synced. Watching for Pod events...")
 
@@ -469,7 +469,7 @@ func (h *informerEventHandler) OnUpdate(oldObj, newObj interface{}) {
 
 // OnDelete is called when a Pod is deleted. The obj parameter may be a
 // *corev1.Pod or a cache.DeletedFinalStateUnknown (if the delete event
-	// was missed and only discovered during a re-list). Production code
+// was missed and only discovered during a re-list). Production code
 // should handle both cases.
 func (h *informerEventHandler) OnDelete(obj interface{}) {
 	pod, ok := obj.(*corev1.Pod)
@@ -561,12 +561,12 @@ processes items overall.
 // and rate limiting.
 //
 // This program:
-//   1. Creates a rate-limited work queue.
-//   2. Starts a Pod informer that enqueues object keys into the queue.
-//   3. Runs a worker loop that dequeues keys and "reconciles" them
-//      (in this demo, just prints the pod's current state from cache).
-//   4. Demonstrates retry logic — if reconciliation fails, the key is
-//      requeued with exponential backoff.
+//  1. Creates a rate-limited work queue.
+//  2. Starts a Pod informer that enqueues object keys into the queue.
+//  3. Runs a worker loop that dequeues keys and "reconciles" them
+//     (in this demo, just prints the pod's current state from cache).
+//  4. Demonstrates retry logic — if reconciliation fails, the key is
+//     requeued with exponential backoff.
 package main
 
 import (
@@ -630,34 +630,34 @@ func main() {
 	// The event handlers' only job is to compute the object key and
 	// enqueue it. They must be fast — no API calls, no heavy computation.
 	podInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-			// AddFunc is called for new objects. We extract the key
-			// (namespace/name) using cache.MetaNamespaceKeyFunc and add
-			// it to the work queue.
-			AddFunc: func(obj interface{}) {
-				key, err := cache.MetaNamespaceKeyFunc(obj)
-				if err == nil {
-					queue.Add(key)
-				}
-			},
-			// UpdateFunc is called for modified objects. We enqueue the
-			// NEW object's key (not the old one — the key does not change,
-				// but using newObj is the convention).
-			UpdateFunc: func(oldObj, newObj interface{}) {
-				key, err := cache.MetaNamespaceKeyFunc(newObj)
-				if err == nil {
-					queue.Add(key)
-				}
-			},
-			// DeleteFunc is called for deleted objects. We still enqueue
-			// the key — the reconciler will notice the object is gone and
-			// take appropriate action (e.g., clean up external resources).
-			DeleteFunc: func(obj interface{}) {
-				key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
-				if err == nil {
-					queue.Add(key)
-				}
-			},
-		})
+		// AddFunc is called for new objects. We extract the key
+		// (namespace/name) using cache.MetaNamespaceKeyFunc and add
+		// it to the work queue.
+		AddFunc: func(obj interface{}) {
+			key, err := cache.MetaNamespaceKeyFunc(obj)
+			if err == nil {
+				queue.Add(key)
+			}
+		},
+		// UpdateFunc is called for modified objects. We enqueue the
+		// NEW object's key (not the old one — the key does not change,
+		// but using newObj is the convention).
+		UpdateFunc: func(oldObj, newObj interface{}) {
+			key, err := cache.MetaNamespaceKeyFunc(newObj)
+			if err == nil {
+				queue.Add(key)
+			}
+		},
+		// DeleteFunc is called for deleted objects. We still enqueue
+		// the key — the reconciler will notice the object is gone and
+		// take appropriate action (e.g., clean up external resources).
+		DeleteFunc: func(obj interface{}) {
+			key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
+			if err == nil {
+				queue.Add(key)
+			}
+		},
+	})
 
 	// ---------- Start informer ----------
 	stopCh := make(chan struct{})
@@ -683,8 +683,8 @@ func main() {
 	//
 	// In production, you would run multiple workers in parallel:
 	//   for i := 0; i < workerCount; i++ {
-		//       go worker(queue, podInformer.Lister(), stopCh)
-		//   }
+	//       go worker(queue, podInformer.Lister(), stopCh)
+	//   }
 	// The work queue ensures that no two workers process the same key
 	// concurrently.
 	go worker(queue, podInformer.Lister(), stopCh)
@@ -759,12 +759,12 @@ func processNextItem(queue workqueue.RateLimitingInterface) bool {
 
 // reconcile processes a single key. In this demo, it just prints the
 // key. A real controller would:
-//   1. Split the key into namespace/name.
-//   2. Get the object from the informer's cache (lister).
-//   3. If the object does not exist in the cache, it was deleted —
-//      clean up external resources if needed.
-//   4. If the object exists, compare desired state (spec) to actual
-//      state and take action to close the gap.
+//  1. Split the key into namespace/name.
+//  2. Get the object from the informer's cache (lister).
+//  3. If the object does not exist in the cache, it was deleted —
+//     clean up external resources if needed.
+//  4. If the object exists, compare desired state (spec) to actual
+//     state and take action to close the gap.
 func reconcile(key string) error {
 	fmt.Printf("Reconciling: %s\n", key)
 	// Real reconciliation logic goes here.
@@ -828,10 +828,10 @@ The `client-go/tools/leaderelection` package handles all of this for you.
 // leader fails.
 //
 // The program:
-//   1. Creates a Kubernetes client.
-//   2. Configures a leader election resource lock (Lease object).
-//   3. Runs leader election — when elected, runs the main controller
-//      logic; when leadership is lost, shuts down gracefully.
+//  1. Creates a Kubernetes client.
+//  2. Configures a leader election resource lock (Lease object).
+//  3. Runs leader election — when elected, runs the main controller
+//     logic; when leadership is lost, shuts down gracefully.
 package main
 
 import (
@@ -906,48 +906,48 @@ func main() {
 	defer cancel()
 
 	leaderelection.RunOrDie(ctx, leaderelection.LeaderElectionConfig{
-			Lock:            lock,
-			LeaseDuration:   15 * time.Second,
-			RenewDeadline:   10 * time.Second,
-			RetryPeriod:     2 * time.Second,
-			ReleaseOnCancel: true,
+		Lock:            lock,
+		LeaseDuration:   15 * time.Second,
+		RenewDeadline:   10 * time.Second,
+		RetryPeriod:     2 * time.Second,
+		ReleaseOnCancel: true,
 
-			Callbacks: leaderelection.LeaderCallbacks{
-				// OnStartedLeading is called when this instance becomes the
-				// leader. The provided context is cancelled when leadership
-				// is lost. Your controller logic should respect this context
-				// and shut down gracefully when it is cancelled.
-				OnStartedLeading: func(ctx context.Context) {
-					klog.Info("Became leader — starting controller")
-					runController(ctx)
-				},
-
-				// OnStoppedLeading is called when this instance loses
-				// leadership. This can happen because:
-				//   - The context was cancelled (graceful shutdown).
-				//   - The lease renewal failed (network issue, API server down).
-				//   - Another instance forcibly acquired the lease.
-				//
-				// The controller should have already stopped via context
-				// cancellation, but this callback is a good place for
-				// final cleanup.
-				OnStoppedLeading: func() {
-					klog.Warning("Lost leadership — shutting down")
-					cancel()
-				},
-
-				// OnNewLeader is called when the leader identity changes.
-				// This is called on ALL instances, not just the leader.
-				// Useful for logging or metrics.
-				OnNewLeader: func(identity string) {
-					if identity == hostname {
-						klog.Info("Still the leader")
-					} else {
-						klog.Infof("New leader elected: %s", identity)
-					}
-				},
+		Callbacks: leaderelection.LeaderCallbacks{
+			// OnStartedLeading is called when this instance becomes the
+			// leader. The provided context is cancelled when leadership
+			// is lost. Your controller logic should respect this context
+			// and shut down gracefully when it is cancelled.
+			OnStartedLeading: func(ctx context.Context) {
+				klog.Info("Became leader — starting controller")
+				runController(ctx)
 			},
-		})
+
+			// OnStoppedLeading is called when this instance loses
+			// leadership. This can happen because:
+			//   - The context was cancelled (graceful shutdown).
+			//   - The lease renewal failed (network issue, API server down).
+			//   - Another instance forcibly acquired the lease.
+			//
+			// The controller should have already stopped via context
+			// cancellation, but this callback is a good place for
+			// final cleanup.
+			OnStoppedLeading: func() {
+				klog.Warning("Lost leadership — shutting down")
+				cancel()
+			},
+
+			// OnNewLeader is called when the leader identity changes.
+			// This is called on ALL instances, not just the leader.
+			// Useful for logging or metrics.
+			OnNewLeader: func(identity string) {
+				if identity == hostname {
+					klog.Info("Still the leader")
+				} else {
+					klog.Infof("New leader elected: %s", identity)
+				}
+			},
+		},
+	})
 }
 
 // runController is a placeholder for the actual controller logic. In a
@@ -1018,7 +1018,7 @@ resources. The only difference is what happens inside the `reconcile` function.
 // logs state transitions (phase changes), demonstrating the full
 // controller pattern:
 //
-//   Informer → Event Handlers → Work Queue → Worker → Reconciler
+//	Informer → Event Handlers → Work Queue → Worker → Reconciler
 //
 // No frameworks (controller-runtime, kubebuilder) are used. Every
 // component is wired manually so you can see exactly how the pieces
@@ -1055,12 +1055,12 @@ import (
 // PodMonitorController watches Pods and logs phase transitions. It
 // demonstrates the complete controller pattern:
 //
-//   1. An informer watches Pods and calls event handlers.
-//   2. Event handlers extract the object key and enqueue it.
-//   3. A worker loop dequeues keys and calls the reconciler.
-//   4. The reconciler reads the Pod from the informer cache and logs
-//      any interesting state.
-//   5. If reconciliation fails, the key is requeued with backoff.
+//  1. An informer watches Pods and calls event handlers.
+//  2. Event handlers extract the object key and enqueue it.
+//  3. A worker loop dequeues keys and calls the reconciler.
+//  4. The reconciler reads the Pod from the informer cache and logs
+//     any interesting state.
+//  5. If reconciliation fails, the key is requeued with backoff.
 //
 // This struct holds all the components needed by the controller. In
 // production, you would also add a Kubernetes clientset for making
@@ -1094,7 +1094,7 @@ const maxRetries = 10
 //
 // Parameters:
 //   - clientset: Kubernetes API client (not used in this read-only
-	//     controller, but included to show the standard pattern).
+//     controller, but included to show the standard pattern).
 //   - factory: SharedInformerFactory that provides the Pod informer.
 //
 // Returns:
@@ -1118,16 +1118,16 @@ func NewPodMonitorController(
 	// are intentionally minimal — they extract the object key and
 	// enqueue it, nothing more.
 	podInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-			AddFunc: func(obj interface{}) {
-				c.enqueue(obj)
-			},
-			UpdateFunc: func(oldObj, newObj interface{}) {
-				c.enqueue(newObj)
-			},
-			DeleteFunc: func(obj interface{}) {
-				c.enqueue(obj)
-			},
-		})
+		AddFunc: func(obj interface{}) {
+			c.enqueue(obj)
+		},
+		UpdateFunc: func(oldObj, newObj interface{}) {
+			c.enqueue(newObj)
+		},
+		DeleteFunc: func(obj interface{}) {
+			c.enqueue(obj)
+		},
+	})
 
 	return c
 }
@@ -1146,10 +1146,10 @@ func (c *PodMonitorController) enqueue(obj interface{}) {
 }
 
 // Run starts the controller. It:
-//   1. Waits for the informer cache to sync (initial list complete).
-//   2. Starts the specified number of worker goroutines.
-//   3. Blocks until stopCh is closed (typically from a signal handler).
-//   4. Shuts down the work queue, which causes workers to exit.
+//  1. Waits for the informer cache to sync (initial list complete).
+//  2. Starts the specified number of worker goroutines.
+//  3. Blocks until stopCh is closed (typically from a signal handler).
+//  4. Shuts down the work queue, which causes workers to exit.
 //
 // Parameters:
 //   - workers: number of concurrent worker goroutines. More workers
@@ -1193,7 +1193,7 @@ func (c *PodMonitorController) runWorker() {
 // reconciles it, and handles success/failure.
 //
 // Returns false when the queue is shut down (signaling the worker
-	// to exit).
+// to exit).
 //
 // The error handling flow:
 //   - Success: forget the key (reset backoff), mark Done.
@@ -1240,12 +1240,12 @@ func (c *PodMonitorController) processNextItem() bool {
 // logging its current state.
 //
 // In a real controller, this function would:
-//   1. Split the key into namespace and name.
-//   2. Get the object from the lister (local cache).
-//   3. If not found, the object was deleted — clean up external state.
-//   4. If found, compare desired state to actual state and take action
-//      (create, update, or delete dependent resources).
-//   5. Update the object's status subresource to reflect current state.
+//  1. Split the key into namespace and name.
+//  2. Get the object from the lister (local cache).
+//  3. If not found, the object was deleted — clean up external state.
+//  4. If found, compare desired state to actual state and take action
+//     (create, update, or delete dependent resources).
+//  5. Update the object's status subresource to reflect current state.
 //
 // IMPORTANT: This function must be idempotent. It may be called
 // multiple times for the same key, and must produce the same result
@@ -1437,10 +1437,11 @@ example, you might only want to reconcile when a Pod's phase changes, not
 on every annotation update. Predicates are composable:
 
 ```go
-predicate.GenerationChangedPredicate{}  // Only spec changes (not status)
-predicate.Or(pred1, pred2)              // Either predicate matches
-predicate.And(pred1, pred2)             // Both predicates match
-predicate.Not(pred)                     // Invert a predicate
+predicate.GenerationChangedPredicate{} // Only spec changes (not status)
+predicate.Or(pred1, pred2)             // Either predicate matches
+predicate.And(pred1, pred2)            // Both predicates match
+predicate.Not(pred)                    // Invert a predicate
+
 ```
 
 ### 32.6.3 Hands-On: Pod Monitor with Controller-Runtime
@@ -1549,9 +1550,9 @@ func main() {
 	//   - Serves metrics and health check endpoints.
 	//   - Manages graceful shutdown.
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-			// LeaderElection: true,
-			// LeaderElectionID: "pod-monitor-leader",
-		})
+		// LeaderElection: true,
+		// LeaderElectionID: "pod-monitor-leader",
+	})
 	if err != nil {
 		ctrl.Log.Error(err, "unable to create manager")
 		os.Exit(1)
@@ -1567,8 +1568,8 @@ func main() {
 	// registers event handlers, and wires up a work queue — exactly
 	// what we did manually in section 32.5.
 	err = ctrl.NewControllerManagedBy(mgr).
-	For(&corev1.Pod{}).
-	Complete(&PodMonitorReconciler{
+		For(&corev1.Pod{}).
+		Complete(&PodMonitorReconciler{
 			Client: mgr.GetClient(),
 		})
 	if err != nil {
@@ -1661,6 +1662,7 @@ myObj.Status.Conditions = append(myObj.Status.Conditions, condition)
 if err := r.Status().Update(ctx, myObj); err != nil {
 	return ctrl.Result{}, err
 }
+
 ```
 
 ### 32.7.3 Implement Exponential Backoff
@@ -1693,6 +1695,7 @@ creates ReplicaSets), set the `ownerReferences` field on the child. This:
 if err := ctrl.SetControllerReference(parent, childPod, r.Scheme()); err != nil {
 	return ctrl.Result{}, err
 }
+
 ```
 
 ### 32.7.6 Do Not Block in Reconcile
@@ -1731,11 +1734,11 @@ func TestReconcile_PodNotFound(t *testing.T) {
 
 	reconciler := &PodMonitorReconciler{Client: fakeClient}
 	result, err := reconciler.Reconcile(context.Background(), ctrl.Request{
-			NamespacedName: types.NamespacedName{
-				Namespace: "default",
-				Name:      "nonexistent-pod",
-			},
-		})
+		NamespacedName: types.NamespacedName{
+			Namespace: "default",
+			Name:      "nonexistent-pod",
+		},
+	})
 
 	// Should succeed (pod deleted is not an error).
 	assert.NoError(t, err)
@@ -1788,7 +1791,7 @@ configuration (CA certificates, common environment variables, etc.).
 // copies them to every namespace in the cluster.
 //
 // Use case: distributing shared configuration (CA certificates,
-	// common environment variables, feature flags) to all namespaces
+// common environment variables, feature flags) to all namespaces
 // without manually creating ConfigMaps in each one.
 //
 // Key behaviors:
@@ -1798,7 +1801,7 @@ configuration (CA certificates, common environment variables, etc.).
 //   - When a new namespace is created, existing labeled ConfigMaps
 //     are copied into it.
 //   - Copies are owned by the source ConfigMap (via owner annotations,
-	//     since cross-namespace ownerReferences are not allowed).
+//     since cross-namespace ownerReferences are not allowed).
 //   - Copies have a label indicating they are managed by this controller,
 //     so they can be identified and cleaned up.
 //
@@ -1855,10 +1858,10 @@ type ConfigMapSyncReconciler struct {
 // whenever a source ConfigMap or any namespace changes.
 //
 // The reconciliation logic:
-//   1. Read the source ConfigMap.
-//   2. If deleted: list and delete all managed copies.
-//   3. If exists: list all namespaces, ensure a copy exists in each.
-//   4. For each namespace: create or update the copy to match source.
+//  1. Read the source ConfigMap.
+//  2. If deleted: list and delete all managed copies.
+//  3. If exists: list all namespaces, ensure a copy exists in each.
+//  4. For each namespace: create or update the copy to match source.
 func (r *ConfigMapSyncReconciler) Reconcile(
 	ctx context.Context,
 	req ctrl.Request,
@@ -1966,7 +1969,7 @@ func (r *ConfigMapSyncReconciler) ensureCopy(
 				copy.Annotations = make(map[string]string)
 			}
 			copy.Annotations[sourceAnnotation] =
-			source.Namespace + "/" + source.Name
+				source.Namespace + "/" + source.Name
 
 			// Copy the data.
 			copy.Data = source.Data
@@ -1983,8 +1986,8 @@ func (r *ConfigMapSyncReconciler) ensureCopy(
 // that were copied from the specified source.
 //
 // We identify copies by:
-//   1. The managed-by label (configmap-syncer/managed-by=configmap-syncer).
-//   2. The source annotation (configmap-syncer/source=namespace/name).
+//  1. The managed-by label (configmap-syncer/managed-by=configmap-syncer).
+//  2. The source annotation (configmap-syncer/source=namespace/name).
 func (r *ConfigMapSyncReconciler) cleanupCopies(
 	ctx context.Context,
 	source types.NamespacedName,
@@ -1994,10 +1997,10 @@ func (r *ConfigMapSyncReconciler) cleanupCopies(
 	// List all ConfigMaps with the managed-by label.
 	var copies corev1.ConfigMapList
 	err := r.List(ctx, &copies, &client.ListOptions{
-			LabelSelector: labels.SelectorFromSet(labels.Set{
-					managedByLabel: "configmap-syncer",
-				}),
-		})
+		LabelSelector: labels.SelectorFromSet(labels.Set{
+			managedByLabel: "configmap-syncer",
+		}),
+	})
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -2029,10 +2032,10 @@ func (r *ConfigMapSyncReconciler) namespaceToConfigMaps(
 	// List all source ConfigMaps (those with the sync label).
 	var sources corev1.ConfigMapList
 	err := r.List(ctx, &sources, &client.ListOptions{
-			LabelSelector: labels.SelectorFromSet(labels.Set{
-					syncLabel: "true",
-				}),
-		})
+		LabelSelector: labels.SelectorFromSet(labels.Set{
+			syncLabel: "true",
+		}),
+	})
 	if err != nil {
 		return nil
 	}
@@ -2055,9 +2058,9 @@ func main() {
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-			LeaderElection:   true,
-			LeaderElectionID: "configmap-syncer-leader",
-		})
+		LeaderElection:   true,
+		LeaderElectionID: "configmap-syncer-leader",
+	})
 	if err != nil {
 		ctrl.Log.Error(err, "unable to create manager")
 		os.Exit(1)
@@ -2075,19 +2078,19 @@ func main() {
 	//   resource. When a namespace is created, we map the event to
 	//   reconcile requests for all source ConfigMaps.
 	err = ctrl.NewControllerManagedBy(mgr).
-	For(&corev1.ConfigMap{},
-		builder.WithPredicates(predicate.NewPredicateFuncs(
+		For(&corev1.ConfigMap{},
+			builder.WithPredicates(predicate.NewPredicateFuncs(
 				func(obj client.Object) bool {
 					// Only reconcile ConfigMaps with sync=true label.
 					return obj.GetLabels()[syncLabel] == "true"
 				},
 			)),
-	).
-	Watches(
-		&corev1.Namespace{},
-		handler.EnqueueRequestsFromMapFunc(reconciler.namespaceToConfigMaps),
-	).
-	Complete(reconciler)
+		).
+		Watches(
+			&corev1.Namespace{},
+			handler.EnqueueRequestsFromMapFunc(reconciler.namespaceToConfigMaps),
+		).
+		Complete(reconciler)
 	if err != nil {
 		ctrl.Log.Error(err, "unable to create controller")
 		os.Exit(1)
@@ -2219,18 +2222,18 @@ func TestReconcile_CleansUpOnDelete(t *testing.T) {
 	}
 
 	fakeClient := fake.NewClientBuilder().
-	WithObjects(copy1, copy2).
-	Build()
+		WithObjects(copy1, copy2).
+		Build()
 
 	reconciler := &ConfigMapSyncReconciler{Client: fakeClient}
 
 	// Reconcile the (now-deleted) source ConfigMap.
 	result, err := reconciler.Reconcile(context.Background(), ctrl.Request{
-			NamespacedName: types.NamespacedName{
-				Namespace: "config",
-				Name:      "shared-config",
-			},
-		})
+		NamespacedName: types.NamespacedName{
+			Namespace: "config",
+			Name:      "shared-config",
+		},
+	})
 
 	if err != nil {
 		t.Fatalf("Reconcile failed: %v", err)
@@ -2365,18 +2368,19 @@ Controller-runtime makes this easy with `Owns()` and `Watches()`:
 // Owns() sets up a watch on the child resource and automatically maps
 // events back to the parent (using ownerReferences).
 ctrl.NewControllerManagedBy(mgr).
-For(&appsv1.Deployment{}).
-Owns(&appsv1.ReplicaSet{}).
-Complete(reconciler)
+	For(&appsv1.Deployment{}).
+	Owns(&appsv1.ReplicaSet{}).
+	Complete(reconciler)
 
 // Watches() is more flexible — you provide a custom mapping function.
 ctrl.NewControllerManagedBy(mgr).
-For(&myv1.Website{}).
-Watches(
-	&corev1.Service{},
-	handler.EnqueueRequestsFromMapFunc(mapServiceToWebsite),
-).
-Complete(reconciler)
+	For(&myv1.Website{}).
+	Watches(
+		&corev1.Service{},
+		handler.EnqueueRequestsFromMapFunc(mapServiceToWebsite),
+	).
+	Complete(reconciler)
+
 ```
 
 ### 32.9.2 Event Recording
@@ -2393,6 +2397,7 @@ recorder.Event(myObj, corev1.EventTypeNormal, "Synced",
 	"Successfully synced to all namespaces")
 recorder.Eventf(myObj, corev1.EventTypeWarning, "SyncFailed",
 	"Failed to sync to namespace %s: %v", ns, err)
+
 ```
 
 ### 32.9.3 Metrics
@@ -2428,6 +2433,7 @@ gvr := schema.GroupVersionResource{
 	Resource: "websites",
 }
 informer := dynamicFactory.ForResource(gvr)
+
 ```
 
 ---

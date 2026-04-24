@@ -1026,7 +1026,7 @@ services. This is instructive for understanding the CSI protocol.
 ```go
 // main.go
 //
-// Minimal CSI Driver Skeleton
+// # Minimal CSI Driver Skeleton
 //
 // This program implements a bare-minimum CSI (Container Storage Interface)
 // driver that serves the Identity and Controller gRPC services. It
@@ -1037,7 +1037,8 @@ services. This is instructive for understanding the CSI protocol.
 // a real storage API (AWS EBS, Ceph, etc.) to provision actual volumes.
 //
 // Usage:
-//   go run main.go --endpoint=unix:///csi/csi.sock --nodeid=node-1
+//
+//	go run main.go --endpoint=unix:///csi/csi.sock --nodeid=node-1
 package main
 
 import (
@@ -1210,7 +1211,7 @@ func (s *identityServer) Probe(
 // controllerServer implements the CSI Controller service.
 //
 // The Controller service runs centrally (usually as a Deployment with 1-2
-	// replicas) and handles volume lifecycle operations:
+// replicas) and handles volume lifecycle operations:
 //   - CreateVolume:              provision a new volume on the storage backend
 //   - DeleteVolume:              remove a volume from the storage backend
 //   - ControllerPublishVolume:   attach a volume to a specific node

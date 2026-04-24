@@ -511,7 +511,7 @@ kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/default/pods/*
 //
 // The key insight: HPA works best with instantaneous gauge values
 // (like queue depth) rather than counters (which require rate()
-	// computation). While the prometheus-adapter can compute rate(),
+// computation). While the prometheus-adapter can compute rate(),
 // exposing a pre-computed gauge is simpler and more reliable.
 package main
 
@@ -720,8 +720,8 @@ func main() {
 	// HTTP endpoints.
 	http.HandleFunc("/enqueue", handleEnqueue)
 	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprint(w, `{"status": "ok"}`)
-		})
+		fmt.Fprint(w, `{"status": "ok"}`)
+	})
 	http.Handle("/metrics", promhttp.Handler())
 
 	log.Println("Starting server on :8080")
@@ -1618,9 +1618,9 @@ import (
 // application should use.
 //
 // The key is http.Server.Shutdown(), which:
-//   1. Stops accepting new connections
-//   2. Waits for in-flight requests to complete
-//   3. Returns when all connections are closed or the context expires
+//  1. Stops accepting new connections
+//  2. Waits for in-flight requests to complete
+//  3. Returns when all connections are closed or the context expires
 //
 // The shutdownTimeout should be LESS than the pod's
 // terminationGracePeriodSeconds (default 30s) to ensure cleanup

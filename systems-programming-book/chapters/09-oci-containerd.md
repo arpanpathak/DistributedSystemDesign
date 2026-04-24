@@ -346,14 +346,14 @@ type Manifest struct {
 
 // ImageConfig represents the OCI image configuration. It describes
 // the default runtime parameters (environment variables, entrypoint,
-	// working directory) and the rootfs layer chain (as uncompressed
-	// diff_ids) used to reconstruct the container filesystem.
+// working directory) and the rootfs layer chain (as uncompressed
+// diff_ids) used to reconstruct the container filesystem.
 type ImageConfig struct {
-	Architecture string       `json:"architecture"`
-	OS           string       `json:"os"`
-	Config       RunConfig    `json:"config"`
-	RootFS       RootFS       `json:"rootfs"`
-	History      []HistEntry  `json:"history"`
+	Architecture string      `json:"architecture"`
+	OS           string      `json:"os"`
+	Config       RunConfig   `json:"config"`
+	RootFS       RootFS      `json:"rootfs"`
+	History      []HistEntry `json:"history"`
 }
 
 // RunConfig holds the default execution parameters that a container
@@ -604,9 +604,9 @@ import (
 // compatibility with Docker Hub, but the structure is very similar
 // to the OCI manifest format.
 type registryManifest struct {
-	SchemaVersion int             `json:"schemaVersion"`
-	MediaType     string          `json:"mediaType"`
-	Config        layerDescriptor `json:"config"`
+	SchemaVersion int               `json:"schemaVersion"`
+	MediaType     string            `json:"mediaType"`
+	Config        layerDescriptor   `json:"config"`
 	Layers        []layerDescriptor `json:"layers"`
 }
 
@@ -1882,8 +1882,9 @@ optimized for local communication). Key operations:
 // perform the full container lifecycle: pull an image, create a
 // container, start it as a task, wait for it to complete, and collect
 // its output. This is the programmatic equivalent of:
-//   ctr image pull docker.io/library/alpine:3.19
-//   ctr run --rm docker.io/library/alpine:3.19 demo /bin/echo "hello"
+//
+//	ctr image pull docker.io/library/alpine:3.19
+//	ctr run --rm docker.io/library/alpine:3.19 demo /bin/echo "hello"
 package main
 
 import (
@@ -1965,7 +1966,7 @@ func run() error {
 	// Step 5: Create a task from the container. A "task" is the actual
 	// running instance — it has a PID, consumes resources, and produces
 	// I/O. Creating a task sets up the namespaces and cgroups (via the
-		// shim → runc chain) but doesn't start the user process yet.
+	// shim → runc chain) but doesn't start the user process yet.
 	fmt.Println("Creating task...")
 	task, err := container.NewTask(ctx, cio.NewCreator(cio.WithStdio))
 	if err != nil {
@@ -2474,9 +2475,9 @@ func pullImage() error {
 
 	// Read the config blob from the content store.
 	configReader, err := cs.ReaderAt(ctx, ocispec.Descriptor{
-			Digest: configDesc.Digest,
-			Size:   configDesc.Size,
-		})
+		Digest: configDesc.Digest,
+		Size:   configDesc.Size,
+	})
 	if err != nil {
 		return fmt.Errorf("reading config: %w", err)
 	}

@@ -1419,7 +1419,7 @@ uses client-go to discover service endpoints dynamically.
 //
 // This program is designed to run inside a Kubernetes cluster (as a Pod).
 // It uses the in-cluster configuration (service account token mounted at
-	// /var/run/secrets/kubernetes.io/serviceaccount) to authenticate with the
+// /var/run/secrets/kubernetes.io/serviceaccount) to authenticate with the
 // API server.
 //
 // Usage:
@@ -1505,7 +1505,7 @@ func discoverEndpoints(
 			}
 
 			// Each endpoint may have multiple addresses (e.g., dual-stack
-				// IPv4 and IPv6). Combine each address with each port.
+			// IPv4 and IPv6). Combine each address with each port.
 			for _, addr := range ep.Addresses {
 				for _, port := range ports {
 					endpoints = append(endpoints,

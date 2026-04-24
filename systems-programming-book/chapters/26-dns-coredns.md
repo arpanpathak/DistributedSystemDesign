@@ -768,6 +768,7 @@ search domain expansion, eventually resolving to
 // "api.stripe.com." is treated as fully qualified.
 // ──────────────────────────────────────────────────────
 url := "https://api.stripe.com./v1/charges"
+
 ```
 
 2. **Lower ndots** — set `ndots:2` in Pod dnsConfig (see Section 26.6).

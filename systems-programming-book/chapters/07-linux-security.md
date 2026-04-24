@@ -258,7 +258,8 @@ a file — owner, group, permissions, and special bits:
 // on every file access.
 //
 // Usage:
-//   go run file_permissions.go /etc/passwd /usr/bin/passwd /tmp
+//
+//	go run file_permissions.go /etc/passwd /usr/bin/passwd /tmp
 package main
 
 import (
@@ -273,24 +274,24 @@ import (
 // We extract this from syscall.Stat_t, which maps directly to the
 // kernel's struct stat returned by the stat(2) system call.
 type fileSecurityInfo struct {
-	Path       string      // Filesystem path of the file
-	Mode       os.FileMode // Go's file mode (includes type + permissions)
-	RawMode    uint32      // Raw mode bits from stat(2) — includes setuid/setgid/sticky
-	UID        uint32      // Numeric user ID of the file owner
-	GID        uint32      // Numeric group ID of the file's group
-	UserName   string      // Resolved username (or "unknown" if lookup fails)
-	GroupName  string      // Resolved group name (or "unknown" if lookup fails)
-	IsSetuid   bool        // Whether the setuid bit (04000) is set
-	IsSetgid   bool        // Whether the setgid bit (02000) is set
-	IsSticky   bool        // Whether the sticky bit (01000) is set
-	Size       int64       // File size in bytes
-	LinkCount  uint64      // Number of hard links (nlink from stat)
+	Path      string      // Filesystem path of the file
+	Mode      os.FileMode // Go's file mode (includes type + permissions)
+	RawMode   uint32      // Raw mode bits from stat(2) — includes setuid/setgid/sticky
+	UID       uint32      // Numeric user ID of the file owner
+	GID       uint32      // Numeric group ID of the file's group
+	UserName  string      // Resolved username (or "unknown" if lookup fails)
+	GroupName string      // Resolved group name (or "unknown" if lookup fails)
+	IsSetuid  bool        // Whether the setuid bit (04000) is set
+	IsSetgid  bool        // Whether the setgid bit (02000) is set
+	IsSticky  bool        // Whether the sticky bit (01000) is set
+	Size      int64       // File size in bytes
+	LinkCount uint64      // Number of hard links (nlink from stat)
 }
 
 // inspectFile performs a stat(2) on the given path and extracts all
 // security-relevant metadata. This demonstrates the critical difference
 // between Go's os.Stat (which returns an os.FileInfo with abstracted
-	// permissions) and the raw syscall.Stat_t which gives us the actual
+// permissions) and the raw syscall.Stat_t which gives us the actual
 // UID, GID, and raw mode bits that the kernel uses for access decisions.
 //
 // The key insight: os.FileInfo.Mode() gives you permission bits, but
@@ -743,9 +744,10 @@ everything else. Here's how to do it in Go:
 // drop the rest.
 //
 // Build and test:
-//   go build -o drop_caps drop_caps.go
-//   sudo setcap 'cap_net_bind_service,cap_net_raw,cap_sys_admin=+ep' ./drop_caps
-//   ./drop_caps
+//
+//	go build -o drop_caps drop_caps.go
+//	sudo setcap 'cap_net_bind_service,cap_net_raw,cap_sys_admin=+ep' ./drop_caps
+//	./drop_caps
 package main
 
 import (
@@ -817,11 +819,12 @@ const lastCap = 40
 // constructing the __user_cap_header_struct manually.
 //
 // The /proc/self/status file contains lines like:
-//   CapInh: 0000000000000000
-//   CapPrm: 0000003fffffffff
-//   CapEff: 0000003fffffffff
-//   CapBnd: 0000003fffffffff
-//   CapAmb: 0000000000000000
+//
+//	CapInh: 0000000000000000
+//	CapPrm: 0000003fffffffff
+//	CapEff: 0000003fffffffff
+//	CapBnd: 0000003fffffffff
+//	CapAmb: 0000000000000000
 //
 // Each value is a hex bitmask where bit N corresponds to capability N.
 func listCaps() {
@@ -881,7 +884,7 @@ func dropBoundingCap(cap uintptr) error {
 //
 // Note: Linux capabilities use two 32-bit words to represent the full
 // 64-bit bitmask (for historical reasons — the original API only
-	// supported 32 capabilities). We must set both words correctly.
+// supported 32 capabilities). We must set both words correctly.
 func setCaps(capMask uint64) error {
 	// Version 0x20080522 is _LINUX_CAPABILITY_VERSION_3, which supports
 	// up to 64 capabilities using two data structures.
@@ -967,12 +970,14 @@ on port 80 without running as root:
 // without running as root, using only the CAP_NET_BIND_SERVICE capability.
 //
 // Traditional approach (DANGEROUS):
-//   sudo ./webserver  ← runs entire process as root
+//
+//	sudo ./webserver  ← runs entire process as root
 //
 // Capability approach (SAFE):
-//   go build -o webserver bind_port80.go
-//   sudo setcap 'cap_net_bind_service=+ep' ./webserver
-//   ./webserver  ← runs as normal user, can bind port 80
+//
+//	go build -o webserver bind_port80.go
+//	sudo setcap 'cap_net_bind_service=+ep' ./webserver
+//	./webserver  ← runs as normal user, can bind port 80
 //
 // This is the same technique used by production web servers like nginx
 // and caddy. The capability is checked in the kernel's inet_bind()
@@ -1037,10 +1042,10 @@ func main() {
 	// This is useful for verifying the setup from a browser or curl.
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprintf(w, "Hello from port 80!\n")
-			fmt.Fprintf(w, "Running as UID: %d\n", os.Getuid())
-			fmt.Fprintf(w, "PID: %d\n", os.Getpid())
-		})
+		fmt.Fprintf(w, "Hello from port 80!\n")
+		fmt.Fprintf(w, "Running as UID: %d\n", os.Getuid())
+		fmt.Fprintf(w, "PID: %d\n", os.Getpid())
+	})
 
 	// Bind to port 80.
 	// Without CAP_NET_BIND_SERVICE, this would fail with:
@@ -1048,7 +1053,7 @@ func main() {
 	//
 	// The kernel checks CAP_NET_BIND_SERVICE in net/ipv4/af_inet.c:
 	//   if (snum && inet_port_requires_bind_service(net, snum) &&
-		//       !ns_capable(net->user_ns, CAP_NET_BIND_SERVICE))
+	//       !ns_capable(net->user_ns, CAP_NET_BIND_SERVICE))
 	//       goto out;
 	listener, err := net.Listen("tcp", ":80")
 	if err != nil {
@@ -1199,6 +1204,7 @@ computation — pure number crunching that only reads input and writes output.
 // it's too restrictive. The process can't even open files or
 // allocate memory.
 unix.Prctl(unix.PR_SET_SECCOMP, unix.SECCOMP_MODE_STRICT, 0, 0, 0)
+
 ```
 
 **Seccomp-BPF (seccomp mode 2):**
@@ -1402,8 +1408,9 @@ Here's a complete Go program that installs a seccomp-BPF filter:
 // 5. Attempts a blocked syscall (which kills the process)
 //
 // Build and run:
-//   go build -o seccomp_filter seccomp_filter.go
-//   ./seccomp_filter
+//
+//	go build -o seccomp_filter seccomp_filter.go
+//	./seccomp_filter
 //
 // NOTE: The process will be killed by SIGSYS when it attempts the
 // blocked syscall — this is expected behavior.
@@ -1464,8 +1471,9 @@ const (
 // Statements are used for LOAD and RETURN operations.
 //
 // Examples:
-//   bpfStmt(bpfLD|bpfW|bpfABS, offsetNR) — Load syscall number
-//   bpfStmt(bpfRET|bpfK, SECCOMP_RET_ALLOW) — Return ALLOW
+//
+//	bpfStmt(bpfLD|bpfW|bpfABS, offsetNR) — Load syscall number
+//	bpfStmt(bpfRET|bpfK, SECCOMP_RET_ALLOW) — Return ALLOW
 func bpfStmt(code uint16, k uint32) unix.SockFilter {
 	return unix.SockFilter{Code: code, Jt: 0, Jf: 0, K: k}
 }
@@ -1475,9 +1483,10 @@ func bpfStmt(code uint16, k uint32) unix.SockFilter {
 // If false, jump forward 'jf' instructions.
 //
 // Example:
-//   bpfJump(bpfJMP|bpfJEQ|bpfK, SYS_READ, 0, 1)
-//   — If accumulator == SYS_READ, continue (jt=0),
-//     else skip 1 instruction (jf=1)
+//
+//	bpfJump(bpfJMP|bpfJEQ|bpfK, SYS_READ, 0, 1)
+//	— If accumulator == SYS_READ, continue (jt=0),
+//	  else skip 1 instruction (jf=1)
 func bpfJump(code uint16, k uint32, jt, jf uint8) unix.SockFilter {
 	return unix.SockFilter{Code: code, Jt: jt, Jf: jf, K: k}
 }
@@ -1547,7 +1556,7 @@ func buildSeccompFilter() []unix.SockFilter {
 		// If arch != X86_64, kill the process.
 		// This prevents "syscall confusion" attacks where a process
 		// uses int 0x80 to invoke 32-bit syscalls (which have
-			// different numbers than 64-bit syscalls).
+		// different numbers than 64-bit syscalls).
 		bpfJump(bpfJMP|bpfJEQ|bpfK, auditArchX86_64, 1, 0),
 		bpfStmt(bpfRET|bpfK, 0x00000000), // SECCOMP_RET_KILL_PROCESS
 
@@ -1861,7 +1870,8 @@ var syscallNames = map[int]string{
 // syscalls your application needs in its seccomp profile.
 //
 // Each audit log line for seccomp looks like:
-//   type=SECCOMP ... syscall=NNN comm="myapp" ...
+//
+//	type=SECCOMP ... syscall=NNN comm="myapp" ...
 func parseSeccompAuditLog(logPath string) error {
 	f, err := os.Open(logPath)
 	if err != nil {
@@ -2239,11 +2249,14 @@ need to account for:
 // (kernel 5.6+) or /proc/self/attr/current (older kernels).
 //
 // In production, log this at startup:
-//   "AppArmor profile: mygoserver (enforce)"
+//
+//	"AppArmor profile: mygoserver (enforce)"
+//
 // This confirms the security policy is active and correctly applied.
 //
 // Usage:
-//   go run apparmor_check.go
+//
+//	go run apparmor_check.go
 package main
 
 import (
@@ -2256,13 +2269,14 @@ import (
 // from the proc filesystem. The kernel exposes this information in
 // two possible locations:
 //
-//   /proc/self/attr/apparmor/current — preferred (kernel 5.6+)
-//   /proc/self/attr/current — fallback (older kernels)
+//	/proc/self/attr/apparmor/current — preferred (kernel 5.6+)
+//	/proc/self/attr/current — fallback (older kernels)
 //
 // The content is a string like:
-//   "mygoserver (enforce)"
-//   "mygoserver (complain)"
-//   "unconfined"
+//
+//	"mygoserver (enforce)"
+//	"mygoserver (complain)"
+//	"unconfined"
 //
 // Returns the profile name and mode, or "unconfined" if no profile
 // is applied.
@@ -2296,8 +2310,8 @@ func getAppArmorProfile() (name string, mode string, err error) {
 
 	// Parse "profile_name (mode)" format
 	if idx := strings.LastIndex(profile, " ("); idx != -1 {
-			name = profile[:idx]
-			mode = strings.Trim(profile[idx+2:], ")")
+		name = profile[:idx]
+		mode = strings.Trim(profile[idx+2:], ")")
 		return name, mode, nil
 	}
 
@@ -2632,11 +2646,13 @@ sudo semanage port -l | grep http
 // errors that are caused by SELinux policy rather than DAC permissions.
 //
 // The program reads contexts from:
-//   /proc/self/attr/current — process's own SELinux label
-//   Extended attributes — file SELinux labels (security.selinux xattr)
+//
+//	/proc/self/attr/current — process's own SELinux label
+//	Extended attributes — file SELinux labels (security.selinux xattr)
 //
 // Usage:
-//   go run selinux_context.go /etc/passwd /etc/shadow /var/www/html
+//
+//	go run selinux_context.go /etc/passwd /etc/shadow /var/www/html
 package main
 
 import (
@@ -2699,7 +2715,7 @@ func getProcessContext() (SELinuxContext, error) {
 // getFileContext reads a file's SELinux context from its extended
 // attributes. SELinux stores the label in the "security.selinux"
 // xattr, which is set when the file is created (based on the parent
-	// directory's context and the policy) and can be changed with chcon
+// directory's context and the policy) and can be changed with chcon
 // or restorecon.
 //
 // We use unix.Lgetxattr (not Getxattr) to avoid following symlinks —
@@ -3211,8 +3227,9 @@ it, a seccomp filter could be used to subvert setuid programs).
 // it as: securityContext.allowPrivilegeEscalation: false
 //
 // Usage:
-//   go run no_new_privs.go
-//   # Then try: exec'ing /usr/bin/passwd → it won't gain root
+//
+//	go run no_new_privs.go
+//	# Then try: exec'ing /usr/bin/passwd → it won't gain root
 package main
 
 import (
@@ -3244,14 +3261,17 @@ func getNoNewPrivs() (bool, error) {
 // child processes will inherit it.
 //
 // This is the Go equivalent of:
-//   prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0)
+//
+//	prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0)
 //
 // In Docker, this is enabled with:
-//   docker run --security-opt no-new-privileges myimage
+//
+//	docker run --security-opt no-new-privileges myimage
 //
 // In Kubernetes:
-//   securityContext:
-//     allowPrivilegeEscalation: false
+//
+//	securityContext:
+//	  allowPrivilegeEscalation: false
 func setNoNewPrivs() error {
 	return unix.Prctl(unix.PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0)
 }
@@ -3442,7 +3462,8 @@ sudo aureport -x --summary
 // full audit rule management.
 //
 // Usage:
-//   sudo go run audit_setup.go
+//
+//	sudo go run audit_setup.go
 package main
 
 import (
@@ -3538,11 +3559,11 @@ func securityAuditRules() []auditRule {
 		// ── Container-specific ──
 		{
 			Description: "Monitor Docker socket access",
-			Args: []string{"-w", "/var/run/docker.sock", "-p", "rwxa", "-k", "docker_socket"},
+			Args:        []string{"-w", "/var/run/docker.sock", "-p", "rwxa", "-k", "docker_socket"},
 		},
 		{
 			Description: "Monitor containerd socket access",
-			Args: []string{"-w", "/run/containerd/containerd.sock", "-p", "rwxa", "-k", "containerd_socket"},
+			Args:        []string{"-w", "/run/containerd/containerd.sock", "-p", "rwxa", "-k", "containerd_socket"},
 		},
 	}
 }
@@ -3709,11 +3730,12 @@ mount -o bind,ro /sys
 // directories that should not be writable.
 //
 // Usage:
-//   # On host (everything accessible):
-//   go run proc_masking.go
 //
-//   # In Docker (paths masked):
-//   docker run --rm -v $(pwd):/app -w /app golang:1.22 go run proc_masking.go
+//	# On host (everything accessible):
+//	go run proc_masking.go
+//
+//	# In Docker (paths masked):
+//	docker run --rm -v $(pwd):/app -w /app golang:1.22 go run proc_masking.go
 package main
 
 import (
@@ -3808,9 +3830,9 @@ func sensitivePaths() []procPath {
 
 // checkPath examines a /proc or /sys path to determine its
 // accessibility status. It performs three checks:
-//   1. Can we stat the path? (Does it exist / is it masked?)
-//   2. Can we read the path? (Is it readable?)
-//   3. Can we write to the path? (Is it writable? — most dangerous)
+//  1. Can we stat the path? (Does it exist / is it masked?)
+//  2. Can we read the path? (Is it readable?)
+//  3. Can we write to the path? (Is it writable? — most dangerous)
 //
 // Returns a status string: MASKED, READ-ONLY, ACCESSIBLE, or ERROR.
 func checkPath(path string) (status string, detail string) {
@@ -3881,9 +3903,9 @@ func isInContainer() bool {
 	if err == nil {
 		content := string(data)
 		if strings.Contains(content, "docker") ||
-		strings.Contains(content, "containerd") ||
-		strings.Contains(content, "kubepods") ||
-		strings.Contains(content, "lxc") {
+			strings.Contains(content, "containerd") ||
+			strings.Contains(content, "kubepods") ||
+			strings.Contains(content, "lxc") {
 			return true
 		}
 	}

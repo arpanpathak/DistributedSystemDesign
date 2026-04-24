@@ -1427,7 +1427,7 @@ func main() {
 
 	// Create the ConfigMap using the dynamic client.
 	configMapGVR := schema.GroupVersionResource{
-		Group:    "",       // Core group (empty string)
+		Group:    "", // Core group (empty string)
 		Version:  "v1",
 		Resource: "configmaps",
 	}
@@ -1936,6 +1936,7 @@ pod, err := podLister.Pods("default").Get("nginx")
 // vs. using the Clientset directly — makes an HTTP request to API server.
 // This creates network traffic and load on the API server.
 pod, err := clientset.CoreV1().Pods("default").Get(ctx, "nginx", metav1.GetOptions{})
+
 ```
 
 Controllers should **always** use Listers for reads and the Clientset for writes.
@@ -1975,6 +1976,7 @@ if err != nil {
 	queue.Done(key)
 	queue.Forget(key) // Reset rate limit counter
 }
+
 ```
 
 ### 10.10.5 Hands-On: Full client-go Example — List/Watch Pods with Informers
@@ -2045,46 +2047,46 @@ func main() {
 	// added, updated, or deleted. In a real controller, these would
 	// enqueue the pod's key (namespace/name) into a work queue.
 	podInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-			// AddFunc is called when a new pod appears in the cache.
-			// This fires for ALL existing pods on initial list, and for
-			// newly created pods after that.
-			AddFunc: func(obj interface{}) {
-				pod := obj.(*v1.Pod)
-				fmt.Printf("[ADD]    %-50s  Phase=%-12s  Node=%s\n",
-					pod.Namespace+"/"+pod.Name,
-					pod.Status.Phase,
-					pod.Spec.NodeName,
+		// AddFunc is called when a new pod appears in the cache.
+		// This fires for ALL existing pods on initial list, and for
+		// newly created pods after that.
+		AddFunc: func(obj interface{}) {
+			pod := obj.(*v1.Pod)
+			fmt.Printf("[ADD]    %-50s  Phase=%-12s  Node=%s\n",
+				pod.Namespace+"/"+pod.Name,
+				pod.Status.Phase,
+				pod.Spec.NodeName,
+			)
+		},
+
+		// UpdateFunc is called when a pod in the cache is modified.
+		// It receives both the old and new versions of the object.
+		// In a real controller, you'd compare them to decide whether
+		// to reconcile.
+		UpdateFunc: func(oldObj, newObj interface{}) {
+			oldPod := oldObj.(*v1.Pod)
+			newPod := newObj.(*v1.Pod)
+
+			// Only print if something meaningful changed.
+			if oldPod.Status.Phase != newPod.Status.Phase {
+				fmt.Printf("[UPDATE] %-50s  Phase: %s → %s\n",
+					newPod.Namespace+"/"+newPod.Name,
+					oldPod.Status.Phase,
+					newPod.Status.Phase,
 				)
-			},
+			}
+		},
 
-			// UpdateFunc is called when a pod in the cache is modified.
-			// It receives both the old and new versions of the object.
-			// In a real controller, you'd compare them to decide whether
-			// to reconcile.
-			UpdateFunc: func(oldObj, newObj interface{}) {
-				oldPod := oldObj.(*v1.Pod)
-				newPod := newObj.(*v1.Pod)
-
-				// Only print if something meaningful changed.
-				if oldPod.Status.Phase != newPod.Status.Phase {
-					fmt.Printf("[UPDATE] %-50s  Phase: %s → %s\n",
-						newPod.Namespace+"/"+newPod.Name,
-						oldPod.Status.Phase,
-						newPod.Status.Phase,
-					)
-				}
-			},
-
-			// DeleteFunc is called when a pod is removed from the cache.
-			// The object may be a *v1.Pod or a DeletedFinalStateUnknown
-			// (if the watch was disconnected when the delete happened).
-			DeleteFunc: func(obj interface{}) {
-				pod := obj.(*v1.Pod)
-				fmt.Printf("[DELETE] %-50s\n",
-					pod.Namespace+"/"+pod.Name,
-				)
-			},
-		})
+		// DeleteFunc is called when a pod is removed from the cache.
+		// The object may be a *v1.Pod or a DeletedFinalStateUnknown
+		// (if the watch was disconnected when the delete happened).
+		DeleteFunc: func(obj interface{}) {
+			pod := obj.(*v1.Pod)
+			fmt.Printf("[DELETE] %-50s\n",
+				pod.Namespace+"/"+pod.Name,
+			)
+		},
+	})
 
 	// Create a stop channel. When this channel is closed, all informers
 	// will stop their list/watch loops and shut down cleanly.
@@ -2147,14 +2149,14 @@ import (
 // CrashLoopBackOff state and logs alerts. It demonstrates the
 // full controller pattern used by every Kubernetes controller:
 //
-//   Informer (List+Watch) → Event Handler → Work Queue → Worker → Reconcile
+//	Informer (List+Watch) → Event Handler → Work Queue → Worker → Reconcile
 //
 // This is production-quality structure — the same pattern used in
 // kube-controller-manager, the scheduler, and most operators.
 type PodMonitor struct {
 	// clientset provides typed access to the Kubernetes API.
 	// Used for reads that bypass the cache (e.g., getting the very latest
-		// status) and for writes (creating, updating, deleting objects).
+	// status) and for writes (creating, updating, deleting objects).
 	clientset kubernetes.Interface
 
 	// podLister provides cached, indexed read access to pods.
@@ -2195,25 +2197,25 @@ func NewPodMonitor(clientset kubernetes.Interface, factory informers.SharedInfor
 	// and add it to the work queue. The actual reconciliation logic
 	// runs in the worker goroutines.
 	podInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-			AddFunc: func(obj interface{}) {
-				key, err := cache.MetaNamespaceKeyFunc(obj)
-				if err == nil {
-					monitor.queue.Add(key)
-				}
-			},
-			UpdateFunc: func(_, newObj interface{}) {
-				key, err := cache.MetaNamespaceKeyFunc(newObj)
-				if err == nil {
-					monitor.queue.Add(key)
-				}
-			},
-			DeleteFunc: func(obj interface{}) {
-				key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
-				if err == nil {
-					monitor.queue.Add(key)
-				}
-			},
-		})
+		AddFunc: func(obj interface{}) {
+			key, err := cache.MetaNamespaceKeyFunc(obj)
+			if err == nil {
+				monitor.queue.Add(key)
+			}
+		},
+		UpdateFunc: func(_, newObj interface{}) {
+			key, err := cache.MetaNamespaceKeyFunc(newObj)
+			if err == nil {
+				monitor.queue.Add(key)
+			}
+		},
+		DeleteFunc: func(obj interface{}) {
+			key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
+			if err == nil {
+				monitor.queue.Add(key)
+			}
+		},
+	})
 
 	return monitor
 }
@@ -2245,7 +2247,7 @@ func (m *PodMonitor) Run(workers int, stopCh <-chan struct{}) error {
 	klog.Infof("Starting %d workers", workers)
 	for i := 0; i < workers; i++ {
 		// wait.Until runs the function repeatedly (with no delay between
-			// iterations) until the stop channel is closed.
+		// iterations) until the stop channel is closed.
 		go wait.Until(m.runWorker, time.Second, stopCh)
 	}
 
@@ -2334,12 +2336,12 @@ func (m *PodMonitor) reconcile(key string) error {
 	// Check each container's status for CrashLoopBackOff.
 	for _, cs := range pod.Status.ContainerStatuses {
 		if cs.State.Waiting != nil &&
-		cs.State.Waiting.Reason == "CrashLoopBackOff" {
+			cs.State.Waiting.Reason == "CrashLoopBackOff" {
 
 			// Alert! In production, this could send to PagerDuty, Slack, etc.
 			klog.Warningf(
 				"🚨 ALERT: Pod %s/%s container %q is in CrashLoopBackOff "+
-				"(restarts: %d, message: %s)",
+					"(restarts: %d, message: %s)",
 				namespace, name,
 				cs.Name,
 				cs.RestartCount,

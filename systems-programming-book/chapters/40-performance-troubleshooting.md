@@ -888,8 +888,8 @@ func main() {
 	// Your main application server runs on a different port.
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("ok"))
-		})
+		w.Write([]byte("ok"))
+	})
 	mux.HandleFunc("/api/data", handleData)
 
 	log.Println("Application server listening on :8080")
@@ -1241,26 +1241,26 @@ func main() {
 
 	// Leaky endpoint — each request spawns an immortal goroutine
 	mux.HandleFunc("/leaky", func(w http.ResponseWriter, r *http.Request) {
-			leaky.Process("data")
-			leaky.mu.Lock()
-			count := leaky.workers
-			leaky.mu.Unlock()
-			fmt.Fprintf(w, "Workers: %d\n", count)
-		})
+		leaky.Process("data")
+		leaky.mu.Lock()
+		count := leaky.workers
+		leaky.mu.Unlock()
+		fmt.Fprintf(w, "Workers: %d\n", count)
+	})
 
 	// Fixed endpoint — bounded worker pool with proper cleanup
 	mux.HandleFunc("/fixed", func(w http.ResponseWriter, r *http.Request) {
-			ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
-			defer cancel()
-			if err := fixed.Process(ctx, "data"); err != nil {
-				http.Error(w, err.Error(), http.StatusServiceUnavailable)
-				return
-			}
-			fixed.mu.Lock()
-			count := fixed.workers
-			fixed.mu.Unlock()
-			fmt.Fprintf(w, "Workers: %d\n", count)
-		})
+		ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+		defer cancel()
+		if err := fixed.Process(ctx, "data"); err != nil {
+			http.Error(w, err.Error(), http.StatusServiceUnavailable)
+			return
+		}
+		fixed.mu.Lock()
+		count := fixed.workers
+		fixed.mu.Unlock()
+		fmt.Fprintf(w, "Workers: %d\n", count)
+	})
 
 	log.Println("Server at :8080")
 	http.ListenAndServe(":8080", mux)
@@ -1293,7 +1293,7 @@ go tool pprof http://localhost:6060/debug/pprof/heap
 ```go
 // Package main demonstrates a common goroutine leak pattern: a producer
 // goroutine sends to a channel, but the consumer gives up (e.g., due to
-	// timeout), leaving the producer blocked forever on a send.
+// timeout), leaving the producer blocked forever on a send.
 package main
 
 import (
@@ -1359,24 +1359,24 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/leaky", func(w http.ResponseWriter, r *http.Request) {
-			result, err := fetchDataLeaky()
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusGatewayTimeout)
-				return
-			}
-			fmt.Fprint(w, result)
-		})
+		result, err := fetchDataLeaky()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusGatewayTimeout)
+			return
+		}
+		fmt.Fprint(w, result)
+	})
 
 	mux.HandleFunc("/fixed", func(w http.ResponseWriter, r *http.Request) {
-			ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
-			defer cancel()
-			result, err := fetchDataFixed(ctx)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusGatewayTimeout)
-				return
-			}
-			fmt.Fprint(w, result)
-		})
+		ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+		defer cancel()
+		result, err := fetchDataFixed(ctx)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusGatewayTimeout)
+			return
+		}
+		fmt.Fprint(w, result)
+	})
 
 	log.Println("Server at :8080")
 	http.ListenAndServe(":8080", mux)
@@ -1526,8 +1526,8 @@ func BenchmarkStringBuilder(b *testing.B) {
 // BenchmarkHashMD5 benchmarks MD5 hashing of a 1KB payload.
 func BenchmarkHashMD5(b *testing.B) {
 	data := []byte(strings.Repeat("a", 1024))
-	b.ResetTimer()           // Exclude setup time from the benchmark
-	b.SetBytes(1024)         // Report throughput in MB/s
+	b.ResetTimer()   // Exclude setup time from the benchmark
+	b.SetBytes(1024) // Report throughput in MB/s
 	for i := 0; i < b.N; i++ {
 		md5.Sum(data)
 	}
@@ -1550,10 +1550,10 @@ func BenchmarkStringBuilder_Sizes(b *testing.B) {
 	sizes := []int{10, 100, 1000, 10000}
 	for _, size := range sizes {
 		b.Run(fmt.Sprintf("n=%d", size), func(b *testing.B) {
-				for i := 0; i < b.N; i++ {
-					buildStringBuilder(size)
-				}
-			})
+			for i := 0; i < b.N; i++ {
+				buildStringBuilder(size)
+			}
+		})
 	}
 }
 

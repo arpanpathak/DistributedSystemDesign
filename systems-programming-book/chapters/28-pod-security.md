@@ -1884,34 +1884,34 @@ func ValidateRestrictedLevel(pod *corev1.Pod) []Violation {
 	// Check Pod-level securityContext exists.
 	if pod.Spec.SecurityContext == nil {
 		violations = append(violations, Violation{
-				Field:   "spec.securityContext",
-				Message: "Pod-level securityContext is not set. Set runAsNonRoot: true and seccompProfile.",
-				Level:   "restricted",
-			})
+			Field:   "spec.securityContext",
+			Message: "Pod-level securityContext is not set. Set runAsNonRoot: true and seccompProfile.",
+			Level:   "restricted",
+		})
 	} else {
 		// Check runAsNonRoot at Pod level.
 		if pod.Spec.SecurityContext.RunAsNonRoot == nil || !*pod.Spec.SecurityContext.RunAsNonRoot {
 			violations = append(violations, Violation{
-					Field:   "spec.securityContext.runAsNonRoot",
-					Message: "Pod must set runAsNonRoot: true at the Pod level.",
-					Level:   "restricted",
-				})
+				Field:   "spec.securityContext.runAsNonRoot",
+				Message: "Pod must set runAsNonRoot: true at the Pod level.",
+				Level:   "restricted",
+			})
 		}
 
 		// Check seccomp profile at Pod level.
 		if pod.Spec.SecurityContext.SeccompProfile == nil {
 			violations = append(violations, Violation{
-					Field:   "spec.securityContext.seccompProfile",
-					Message: "Pod must set seccompProfile.type to RuntimeDefault or Localhost.",
-					Level:   "restricted",
-				})
+				Field:   "spec.securityContext.seccompProfile",
+				Message: "Pod must set seccompProfile.type to RuntimeDefault or Localhost.",
+				Level:   "restricted",
+			})
 		} else if pod.Spec.SecurityContext.SeccompProfile.Type != corev1.SeccompProfileTypeRuntimeDefault &&
-		pod.Spec.SecurityContext.SeccompProfile.Type != corev1.SeccompProfileTypeLocalhost {
+			pod.Spec.SecurityContext.SeccompProfile.Type != corev1.SeccompProfileTypeLocalhost {
 			violations = append(violations, Violation{
-					Field:   "spec.securityContext.seccompProfile.type",
-					Message: fmt.Sprintf("Pod seccompProfile.type must be RuntimeDefault or Localhost, got %q.", pod.Spec.SecurityContext.SeccompProfile.Type),
-					Level:   "restricted",
-				})
+				Field:   "spec.securityContext.seccompProfile.type",
+				Message: fmt.Sprintf("Pod seccompProfile.type must be RuntimeDefault or Localhost, got %q.", pod.Spec.SecurityContext.SeccompProfile.Type),
+				Level:   "restricted",
+			})
 		}
 	}
 
@@ -1920,35 +1920,35 @@ func ValidateRestrictedLevel(pod *corev1.Pod) []Violation {
 	// Check hostNetwork.
 	if pod.Spec.HostNetwork {
 		violations = append(violations, Violation{
-				Field:   "spec.hostNetwork",
-				Message: "hostNetwork must be false or unset.",
-				Level:   "baseline",
-			})
+			Field:   "spec.hostNetwork",
+			Message: "hostNetwork must be false or unset.",
+			Level:   "baseline",
+		})
 	}
 
 	// Check hostPID.
 	if pod.Spec.HostPID {
 		violations = append(violations, Violation{
-				Field:   "spec.hostPID",
-				Message: "hostPID must be false or unset.",
-				Level:   "baseline",
-			})
+			Field:   "spec.hostPID",
+			Message: "hostPID must be false or unset.",
+			Level:   "baseline",
+		})
 	}
 
 	// Check hostIPC.
 	if pod.Spec.HostIPC {
 		violations = append(violations, Violation{
-				Field:   "spec.hostIPC",
-				Message: "hostIPC must be false or unset.",
-				Level:   "baseline",
-			})
+			Field:   "spec.hostIPC",
+			Message: "hostIPC must be false or unset.",
+			Level:   "baseline",
+		})
 	}
 
 	// ── Volume Checks ────────────────────────────────────────────
 
 	// Restricted level only allows specific volume types.
 	allowedVolumeTypes := map[string]bool{
-		"configMap":              true,
+		"configMap":             true,
 		"csi":                   true,
 		"downwardAPI":           true,
 		"emptyDir":              true,
@@ -1962,10 +1962,10 @@ func ValidateRestrictedLevel(pod *corev1.Pod) []Violation {
 		volType := getVolumeType(vol)
 		if !allowedVolumeTypes[volType] {
 			violations = append(violations, Violation{
-					Field:   fmt.Sprintf("spec.volumes[%d]", i),
-					Message: fmt.Sprintf("Volume %q uses type %q which is not allowed under Restricted level. Allowed types: configMap, csi, downwardAPI, emptyDir, ephemeral, persistentVolumeClaim, projected, secret.", vol.Name, volType),
-					Level:   "restricted",
-				})
+				Field:   fmt.Sprintf("spec.volumes[%d]", i),
+				Message: fmt.Sprintf("Volume %q uses type %q which is not allowed under Restricted level. Allowed types: configMap, csi, downwardAPI, emptyDir, ephemeral, persistentVolumeClaim, projected, secret.", vol.Name, volType),
+				Level:   "restricted",
+			})
 		}
 	}
 
@@ -1997,7 +1997,7 @@ func ValidateRestrictedLevel(pod *corev1.Pod) []Violation {
 // Parameters:
 //   - c: The container specification to validate.
 //   - prefix: The JSON path prefix for this container (e.g.,
-	//     "spec.containers[0]") used in violation field paths.
+//     "spec.containers[0]") used in violation field paths.
 //
 // Returns a slice of Violations for this specific container.
 func validateContainer(c corev1.Container, prefix string) []Violation {
@@ -2006,10 +2006,10 @@ func validateContainer(c corev1.Container, prefix string) []Violation {
 	// Check that securityContext exists.
 	if c.SecurityContext == nil {
 		violations = append(violations, Violation{
-				Field:   prefix + ".securityContext",
-				Message: fmt.Sprintf("Container %q must have a securityContext.", c.Name),
-				Level:   "restricted",
-			})
+			Field:   prefix + ".securityContext",
+			Message: fmt.Sprintf("Container %q must have a securityContext.", c.Name),
+			Level:   "restricted",
+		})
 		return violations // Can't check fields on nil securityContext
 	}
 
@@ -2018,46 +2018,46 @@ func validateContainer(c corev1.Container, prefix string) []Violation {
 	// ── Baseline: privileged ─────────────────────────────────────
 	if sc.Privileged != nil && *sc.Privileged {
 		violations = append(violations, Violation{
-				Field:   prefix + ".securityContext.privileged",
-				Message: fmt.Sprintf("Container %q must not set privileged: true.", c.Name),
-				Level:   "baseline",
-			})
+			Field:   prefix + ".securityContext.privileged",
+			Message: fmt.Sprintf("Container %q must not set privileged: true.", c.Name),
+			Level:   "baseline",
+		})
 	}
 
 	// ── Restricted: runAsNonRoot ─────────────────────────────────
 	if sc.RunAsNonRoot == nil || !*sc.RunAsNonRoot {
 		violations = append(violations, Violation{
-				Field:   prefix + ".securityContext.runAsNonRoot",
-				Message: fmt.Sprintf("Container %q must set runAsNonRoot: true.", c.Name),
-				Level:   "restricted",
-			})
+			Field:   prefix + ".securityContext.runAsNonRoot",
+			Message: fmt.Sprintf("Container %q must set runAsNonRoot: true.", c.Name),
+			Level:   "restricted",
+		})
 	}
 
 	// ── Restricted: runAsUser ────────────────────────────────────
 	if sc.RunAsUser != nil && *sc.RunAsUser == 0 {
 		violations = append(violations, Violation{
-				Field:   prefix + ".securityContext.runAsUser",
-				Message: fmt.Sprintf("Container %q must not run as root (UID 0).", c.Name),
-				Level:   "restricted",
-			})
+			Field:   prefix + ".securityContext.runAsUser",
+			Message: fmt.Sprintf("Container %q must not run as root (UID 0).", c.Name),
+			Level:   "restricted",
+		})
 	}
 
 	// ── Restricted: allowPrivilegeEscalation ─────────────────────
 	if sc.AllowPrivilegeEscalation == nil || *sc.AllowPrivilegeEscalation {
 		violations = append(violations, Violation{
-				Field:   prefix + ".securityContext.allowPrivilegeEscalation",
-				Message: fmt.Sprintf("Container %q must set allowPrivilegeEscalation: false.", c.Name),
-				Level:   "restricted",
-			})
+			Field:   prefix + ".securityContext.allowPrivilegeEscalation",
+			Message: fmt.Sprintf("Container %q must set allowPrivilegeEscalation: false.", c.Name),
+			Level:   "restricted",
+		})
 	}
 
 	// ── Restricted: capabilities ─────────────────────────────────
 	if sc.Capabilities == nil {
 		violations = append(violations, Violation{
-				Field:   prefix + ".securityContext.capabilities",
-				Message: fmt.Sprintf("Container %q must set capabilities.drop: [\"ALL\"].", c.Name),
-				Level:   "restricted",
-			})
+			Field:   prefix + ".securityContext.capabilities",
+			Message: fmt.Sprintf("Container %q must set capabilities.drop: [\"ALL\"].", c.Name),
+			Level:   "restricted",
+		})
 	} else {
 		// Check that ALL is dropped.
 		hasDropAll := false
@@ -2069,20 +2069,20 @@ func validateContainer(c corev1.Container, prefix string) []Violation {
 		}
 		if !hasDropAll {
 			violations = append(violations, Violation{
-					Field:   prefix + ".securityContext.capabilities.drop",
-					Message: fmt.Sprintf("Container %q must include \"ALL\" in capabilities.drop.", c.Name),
-					Level:   "restricted",
-				})
+				Field:   prefix + ".securityContext.capabilities.drop",
+				Message: fmt.Sprintf("Container %q must include \"ALL\" in capabilities.drop.", c.Name),
+				Level:   "restricted",
+			})
 		}
 
 		// Check that only NET_BIND_SERVICE is added (if any).
 		for _, cap := range sc.Capabilities.Add {
 			if string(cap) != "NET_BIND_SERVICE" {
 				violations = append(violations, Violation{
-						Field:   prefix + ".securityContext.capabilities.add",
-						Message: fmt.Sprintf("Container %q adds capability %q. Only NET_BIND_SERVICE is allowed under Restricted level.", c.Name, cap),
-						Level:   "restricted",
-					})
+					Field:   prefix + ".securityContext.capabilities.add",
+					Message: fmt.Sprintf("Container %q adds capability %q. Only NET_BIND_SERVICE is allowed under Restricted level.", c.Name, cap),
+					Level:   "restricted",
+				})
 			}
 		}
 	}
@@ -2092,12 +2092,12 @@ func validateContainer(c corev1.Container, prefix string) []Violation {
 		// Only a violation if Pod-level seccomp is also not set
 		// (caller should check Pod-level separately)
 	} else if sc.SeccompProfile.Type != corev1.SeccompProfileTypeRuntimeDefault &&
-	sc.SeccompProfile.Type != corev1.SeccompProfileTypeLocalhost {
+		sc.SeccompProfile.Type != corev1.SeccompProfileTypeLocalhost {
 		violations = append(violations, Violation{
-				Field:   prefix + ".securityContext.seccompProfile.type",
-				Message: fmt.Sprintf("Container %q seccompProfile.type must be RuntimeDefault or Localhost, got %q.", c.Name, sc.SeccompProfile.Type),
-				Level:   "restricted",
-			})
+			Field:   prefix + ".securityContext.seccompProfile.type",
+			Message: fmt.Sprintf("Container %q seccompProfile.type must be RuntimeDefault or Localhost, got %q.", c.Name, sc.SeccompProfile.Type),
+			Level:   "restricted",
+		})
 	}
 
 	return violations

@@ -428,8 +428,8 @@ func main() {
 	// Use the label selector to find matching Pods.
 	labelSelector := labels.Set{"app": "demo"}.AsSelector().String()
 	pods, err := clientset.CoreV1().Pods(*namespace).List(ctx, metav1.ListOptions{
-			LabelSelector: labelSelector,
-		})
+		LabelSelector: labelSelector,
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error listing pods: %v\n", err)
 		os.Exit(1)
@@ -487,8 +487,8 @@ func main() {
 	// Delete the ReplicaSet and its Pods (foreground cascading delete).
 	propagation := metav1.DeletePropagationForeground
 	err = clientset.AppsV1().ReplicaSets(*namespace).Delete(ctx, "demo-rs", metav1.DeleteOptions{
-			PropagationPolicy: &propagation,
-		})
+		PropagationPolicy: &propagation,
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error deleting ReplicaSet: %v\n", err)
 		os.Exit(1)
@@ -1258,9 +1258,9 @@ import (
 func isDeploymentComplete(d *appsv1.Deployment) bool {
 	desired := *d.Spec.Replicas
 	return d.Status.UpdatedReplicas == desired &&
-	d.Status.AvailableReplicas == desired &&
-	d.Status.Replicas == desired &&
-	d.Status.ObservedGeneration >= d.Generation
+		d.Status.AvailableReplicas == desired &&
+		d.Status.Replicas == desired &&
+		d.Status.ObservedGeneration >= d.Generation
 }
 
 // getDeploymentCondition returns the condition with the given type,
@@ -1791,8 +1791,8 @@ func (dm *DeploymentManager) WaitForRollout(ctx context.Context) error {
 
 	// Start watching the specific Deployment.
 	watcher, err := dm.client.AppsV1().Deployments(dm.config.Namespace).Watch(ctx, metav1.ListOptions{
-			FieldSelector: fmt.Sprintf("metadata.name=%s", dm.config.Name),
-		})
+		FieldSelector: fmt.Sprintf("metadata.name=%s", dm.config.Name),
+	})
 	if err != nil {
 		return fmt.Errorf("starting watch: %w", err)
 	}
@@ -1817,20 +1817,20 @@ func (dm *DeploymentManager) WaitForRollout(ctx context.Context) error {
 			// Check for failure: progress deadline exceeded.
 			for _, cond := range d.Status.Conditions {
 				if cond.Type == appsv1.DeploymentProgressing &&
-				cond.Status == corev1.ConditionFalse {
+					cond.Status == corev1.ConditionFalse {
 					return fmt.Errorf("rollout failed: %s", cond.Message)
 				}
 				if cond.Type == appsv1.DeploymentReplicaFailure &&
-				cond.Status == corev1.ConditionTrue {
+					cond.Status == corev1.ConditionTrue {
 					return fmt.Errorf("replica failure: %s", cond.Message)
 				}
 			}
 
 			// Check for success: all replicas updated and available.
 			if d.Status.UpdatedReplicas == *d.Spec.Replicas &&
-			d.Status.AvailableReplicas == *d.Spec.Replicas &&
-			d.Status.Replicas == *d.Spec.Replicas &&
-			d.Status.ObservedGeneration >= d.Generation {
+				d.Status.AvailableReplicas == *d.Spec.Replicas &&
+				d.Status.Replicas == *d.Spec.Replicas &&
+				d.Status.ObservedGeneration >= d.Generation {
 				fmt.Println("✅ Rollout complete!")
 				return nil
 			}
@@ -1905,8 +1905,8 @@ func (dm *DeploymentManager) Rollback(ctx context.Context) error {
 
 	// List all ReplicaSets owned by this Deployment.
 	rsList, err := dm.client.AppsV1().ReplicaSets(dm.config.Namespace).List(ctx, metav1.ListOptions{
-			LabelSelector: fmt.Sprintf("app=%s", dm.config.Name),
-		})
+		LabelSelector: fmt.Sprintf("app=%s", dm.config.Name),
+	})
 	if err != nil {
 		return fmt.Errorf("listing replicasets: %w", err)
 	}

@@ -460,8 +460,8 @@ var httpRequestsTotal = promauto.NewCounterVec(
 // Example PromQL (99th-percentile latency):
 //
 //	histogram_quantile(0.99,
-	//	  sum by (le, handler) (rate(myapp_http_request_duration_seconds_bucket[5m]))
-	//	)
+//	  sum by (le, handler) (rate(myapp_http_request_duration_seconds_bucket[5m]))
+//	)
 var httpRequestDuration = promauto.NewHistogramVec(
 	prometheus.HistogramOpts{
 		Namespace: "myapp",
@@ -528,27 +528,27 @@ var businessOrdersTotal = promauto.NewCounterVec(
 // Returns an http.Handler that records metrics before delegating to next.
 func instrumentHandler(handlerName string, next http.HandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Track in-flight requests with a gauge.
-			httpRequestsInFlight.Inc()
-			defer httpRequestsInFlight.Dec()
+		// Track in-flight requests with a gauge.
+		httpRequestsInFlight.Inc()
+		defer httpRequestsInFlight.Dec()
 
-			// Start the timer for request duration.
-			start := time.Now()
+		// Start the timer for request duration.
+		start := time.Now()
 
-			// Wrap the ResponseWriter to capture the status code and response size.
-			wrapped := &responseWriter{ResponseWriter: w, statusCode: http.StatusOK}
+		// Wrap the ResponseWriter to capture the status code and response size.
+		wrapped := &responseWriter{ResponseWriter: w, statusCode: http.StatusOK}
 
-			// Delegate to the actual handler.
-			next.ServeHTTP(wrapped, r)
+		// Delegate to the actual handler.
+		next.ServeHTTP(wrapped, r)
 
-			// Record metrics after the handler completes.
-			duration := time.Since(start).Seconds()
-			status := fmt.Sprintf("%d", wrapped.statusCode)
+		// Record metrics after the handler completes.
+		duration := time.Since(start).Seconds()
+		status := fmt.Sprintf("%d", wrapped.statusCode)
 
-			httpRequestsTotal.WithLabelValues(r.Method, handlerName, status).Inc()
-			httpRequestDuration.WithLabelValues(r.Method, handlerName).Observe(duration)
-			httpResponseSizeBytes.WithLabelValues(r.Method, handlerName).Observe(float64(wrapped.bytesWritten))
-		})
+		httpRequestsTotal.WithLabelValues(r.Method, handlerName, status).Inc()
+		httpRequestDuration.WithLabelValues(r.Method, handlerName).Observe(duration)
+		httpResponseSizeBytes.WithLabelValues(r.Method, handlerName).Observe(float64(wrapped.bytesWritten))
+	})
 }
 
 // responseWriter wraps http.ResponseWriter to capture the status code
@@ -1280,7 +1280,7 @@ var meter = otel.Meter("myapp/server")
 
 // otelRequestCount tracks the total number of requests processed,
 // recorded via OpenTelemetry metrics (which can be exported to
-	// Prometheus via the OTLP-to-Prometheus pipeline).
+// Prometheus via the OTLP-to-Prometheus pipeline).
 var otelRequestCount metric.Int64Counter
 
 // otelRequestDuration records request latency in milliseconds via
@@ -1353,9 +1353,9 @@ func handleGetOrder(w http.ResponseWriter, r *http.Request) {
 
 	// Add a span event to mark a milestone in the request processing.
 	span.AddEvent("order fetched", otelTrace.WithAttributes(
-			attribute.String("order.id", order.ID),
-			attribute.String("order.status", order.Status),
-		))
+		attribute.String("order.id", order.ID),
+		attribute.String("order.status", order.Status),
+	))
 
 	// Call a downstream service with trace context propagation.
 	enrichErr := enrichOrderFromInventory(ctx, order)
@@ -1685,7 +1685,8 @@ and continues the trace:
 // created in this service become children of the order service's span.
 //
 // This creates a complete distributed trace:
-//   Order Service → Inventory Service → DB Lookup
+//
+//	Order Service → Inventory Service → DB Lookup
 package main
 
 import (
@@ -1905,26 +1906,26 @@ func NewLogger(level slog.Level, serviceName, version string) *slog.Logger {
 	levelVar.Set(level)
 
 	handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-			// AddSource includes the source file and line number in each
-			// log entry. Useful for debugging, but adds ~5% overhead.
-			AddSource: true,
-			// Level controls the minimum level. Using a LevelVar allows
-			// runtime adjustment without restarting the process.
-			Level: levelVar,
-			// ReplaceAttr customizes how attributes are formatted.
-			ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
-				// Rename the built-in "time" key to "@timestamp" for
-				// compatibility with Elasticsearch/ELK stack.
-				if a.Key == slog.TimeKey {
-					a.Key = "@timestamp"
-				}
-				// Format time in RFC3339 with nanosecond precision.
-				if a.Key == "@timestamp" {
-					a.Value = slog.StringValue(a.Value.Time().Format(time.RFC3339Nano))
-				}
-				return a
-			},
-		})
+		// AddSource includes the source file and line number in each
+		// log entry. Useful for debugging, but adds ~5% overhead.
+		AddSource: true,
+		// Level controls the minimum level. Using a LevelVar allows
+		// runtime adjustment without restarting the process.
+		Level: levelVar,
+		// ReplaceAttr customizes how attributes are formatted.
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			// Rename the built-in "time" key to "@timestamp" for
+			// compatibility with Elasticsearch/ELK stack.
+			if a.Key == slog.TimeKey {
+				a.Key = "@timestamp"
+			}
+			// Format time in RFC3339 with nanosecond precision.
+			if a.Key == "@timestamp" {
+				a.Value = slog.StringValue(a.Value.Time().Format(time.RFC3339Nano))
+			}
+			return a
+		},
+	})
 
 	// Wrap the handler to add default attributes to every log entry.
 	// These attributes identify the service and are invaluable when
@@ -1989,20 +1990,20 @@ func (h *traceContextHandler) WithGroup(name string) slog.Handler {
 // Example output:
 //
 //	{
-	//	  "@timestamp": "2024-01-15T14:03:22.123456789Z",
-	//	  "level": "INFO",
-	//	  "msg": "order created",
-	//	  "service": "order-service",
-	//	  "trace_id": "0af7651916cd43dd8448eb211c80319c",
-	//	  "span_id": "b7ad6b7169203331",
-	//	  "trace_sampled": true,
-	//	  "order_id": "abc-123"
-	//	}
+//	  "@timestamp": "2024-01-15T14:03:22.123456789Z",
+//	  "level": "INFO",
+//	  "msg": "order created",
+//	  "service": "order-service",
+//	  "trace_id": "0af7651916cd43dd8448eb211c80319c",
+//	  "span_id": "b7ad6b7169203331",
+//	  "trace_sampled": true,
+//	  "order_id": "abc-123"
+//	}
 func NewLoggerWithTraceContext(level slog.Level, serviceName, version string) *slog.Logger {
 	jsonHandler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-			AddSource: true,
-			Level:     level,
-		})
+		AddSource: true,
+		Level:     level,
+	})
 
 	traceHandler := &traceContextHandler{inner: jsonHandler}
 
@@ -2013,51 +2014,51 @@ func NewLoggerWithTraceContext(level slog.Level, serviceName, version string) *s
 }
 
 // LoggingMiddleware returns an HTTP middleware that:
-//   1. Creates a child logger with request-specific attributes
-//   2. Stores the logger in the request context for downstream handlers
-//   3. Logs the request completion with duration and status code
+//  1. Creates a child logger with request-specific attributes
+//  2. Stores the logger in the request context for downstream handlers
+//  3. Logs the request completion with duration and status code
 //
 // This ensures that all log entries within a request handler automatically
 // include the request method, path, and request ID.
 func LoggingMiddleware(logger *slog.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				start := time.Now()
+			start := time.Now()
 
-				// Create a child logger with request-specific attributes.
-				requestLogger := logger.With(
-					slog.String("method", r.Method),
-					slog.String("path", r.URL.Path),
-					slog.String("remote_addr", r.RemoteAddr),
-					slog.String("user_agent", r.UserAgent()),
-				)
+			// Create a child logger with request-specific attributes.
+			requestLogger := logger.With(
+				slog.String("method", r.Method),
+				slog.String("path", r.URL.Path),
+				slog.String("remote_addr", r.RemoteAddr),
+				slog.String("user_agent", r.UserAgent()),
+			)
 
-				// Extract or generate a request/correlation ID.
-				requestID := r.Header.Get("X-Request-ID")
-				if requestID == "" {
-					requestID = r.Header.Get("X-Correlation-ID")
-				}
-				if requestID != "" {
-					requestLogger = requestLogger.With(slog.String("request_id", requestID))
-				}
+			// Extract or generate a request/correlation ID.
+			requestID := r.Header.Get("X-Request-ID")
+			if requestID == "" {
+				requestID = r.Header.Get("X-Correlation-ID")
+			}
+			if requestID != "" {
+				requestLogger = requestLogger.With(slog.String("request_id", requestID))
+			}
 
-				// Wrap the ResponseWriter to capture the status code.
-				wrapped := &responseWriter{ResponseWriter: w, statusCode: http.StatusOK}
+			// Wrap the ResponseWriter to capture the status code.
+			wrapped := &responseWriter{ResponseWriter: w, statusCode: http.StatusOK}
 
-				// Log the request start at Debug level (to avoid noise in production).
-				requestLogger.DebugContext(r.Context(), "request started")
+			// Log the request start at Debug level (to avoid noise in production).
+			requestLogger.DebugContext(r.Context(), "request started")
 
-				// Serve the request.
-				next.ServeHTTP(wrapped, r)
+			// Serve the request.
+			next.ServeHTTP(wrapped, r)
 
-				// Log the request completion with duration and status.
-				duration := time.Since(start)
-				requestLogger.InfoContext(r.Context(), "request completed",
-					slog.Int("status", wrapped.statusCode),
-					slog.Duration("duration", duration),
-					slog.Int("bytes", wrapped.bytesWritten),
-				)
-			})
+			// Log the request completion with duration and status.
+			duration := time.Since(start)
+			requestLogger.InfoContext(r.Context(), "request completed",
+				slog.Int("status", wrapped.statusCode),
+				slog.Duration("duration", duration),
+				slog.Int("bytes", wrapped.bytesWritten),
+			)
+		})
 	}
 }
 
@@ -2068,8 +2069,8 @@ func LoggingMiddleware(logger *slog.Logger) func(http.Handler) http.Handler {
 // Usage:
 //
 //	logger.Info("user authenticated",
-	//	    slog.Any("email", SensitiveValue{Value: user.Email}),
-	//	)
+//	    slog.Any("email", SensitiveValue{Value: user.Email}),
+//	)
 //
 // Output: {"msg": "user authenticated", "email": "j***@example.com"}
 type SensitiveValue struct {

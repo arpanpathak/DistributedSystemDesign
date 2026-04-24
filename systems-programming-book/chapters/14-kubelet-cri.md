@@ -827,7 +827,7 @@ First, a Go server that implements proper health endpoints:
 //
 //   - Startup delay: the server needs time to load data before it can serve.
 //   - Readiness toggle: the server can become temporarily unready (e.g.,
-	//     during a cache rebuild or database reconnection).
+//     during a cache rebuild or database reconnection).
 //   - Liveness: as long as the process is not deadlocked, it reports alive.
 //
 // These endpoints return HTTP 200 for healthy and HTTP 503 for unhealthy,
@@ -858,12 +858,12 @@ type server struct {
 
 	// ready is set to 1 (atomically) when the server can handle traffic.
 	// It may toggle between 0 and 1 during the server's lifetime (e.g.,
-		// when a backend dependency becomes temporarily unavailable).
+	// when a backend dependency becomes temporarily unavailable).
 	// The readiness probe checks this field.
 	ready atomic.Int32
 
 	// mu protects mutable non-atomic state (currently unused but
-		// reserved for future extension, e.g., connection pool state).
+	// reserved for future extension, e.g., connection pool state).
 	mu sync.Mutex
 }
 
@@ -1492,10 +1492,10 @@ var activeRequests atomic.Int64
 // how many requests are still in progress.
 func requestTracker(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			activeRequests.Add(1)
-			defer activeRequests.Add(-1)
-			next.ServeHTTP(w, r)
-		})
+		activeRequests.Add(1)
+		defer activeRequests.Add(-1)
+		next.ServeHTTP(w, r)
+	})
 }
 
 // handleWork simulates a slow request handler. In production, this
@@ -1536,9 +1536,9 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/work", handleWork)
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			fmt.Fprintln(w, "ok")
-		})
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintln(w, "ok")
+	})
 
 	srv := &http.Server{
 		Addr:    ":8080",

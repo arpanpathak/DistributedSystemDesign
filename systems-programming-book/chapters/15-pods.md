@@ -1244,7 +1244,7 @@ kubectl describe resourcequota team-quota -n quota-demo
 // Package main implements a Kubernetes resource usage monitor.
 //
 // This program connects to the Kubernetes Metrics API (provided by
-	// metrics-server) and reports CPU and memory usage for every Pod in
+// metrics-server) and reports CPU and memory usage for every Pod in
 // a given namespace. It compares actual usage against the resource
 // requests and limits defined in the PodSpec, highlighting containers
 // that are close to their limits.
@@ -1645,8 +1645,8 @@ func (s *server) handleShutdown(w http.ResponseWriter, r *http.Request) {
 
 	// Signal the main goroutine to begin shutdown.
 	s.shutdownOnce.Do(func() {
-			close(s.shutdownCh)
-		})
+		close(s.shutdownCh)
+	})
 }
 
 func main() {
@@ -2414,8 +2414,8 @@ var (
 func init() {
 	// Configure structured JSON logging for production use.
 	logger = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-				Level: slog.LevelInfo,
-			}))
+		Level: slog.LevelInfo,
+	}))
 	slog.SetDefault(logger)
 }
 
@@ -2431,14 +2431,14 @@ func writeJSON(w http.ResponseWriter, code int, v interface{}) {
 func handleStartup(w http.ResponseWriter, r *http.Request) {
 	if state.started.Load() {
 		writeJSON(w, http.StatusOK, statusResponse{
-				Status:    "started",
-				Timestamp: time.Now().UTC().Format(time.RFC3339),
-			})
+			Status:    "started",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
 	} else {
 		writeJSON(w, http.StatusServiceUnavailable, statusResponse{
-				Status:    "starting",
-				Timestamp: time.Now().UTC().Format(time.RFC3339),
-			})
+			Status:    "starting",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
 	}
 }
 
@@ -2446,15 +2446,15 @@ func handleStartup(w http.ResponseWriter, r *http.Request) {
 func handleLiveness(w http.ResponseWriter, r *http.Request) {
 	if state.healthy.Load() {
 		writeJSON(w, http.StatusOK, statusResponse{
-				Status:    "alive",
-				Timestamp: time.Now().UTC().Format(time.RFC3339),
-				Uptime:    time.Since(startTime).Round(time.Second).String(),
-			})
+			Status:    "alive",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+			Uptime:    time.Since(startTime).Round(time.Second).String(),
+		})
 	} else {
 		writeJSON(w, http.StatusServiceUnavailable, statusResponse{
-				Status:    "unhealthy",
-				Timestamp: time.Now().UTC().Format(time.RFC3339),
-			})
+			Status:    "unhealthy",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
 	}
 }
 
@@ -2462,14 +2462,14 @@ func handleLiveness(w http.ResponseWriter, r *http.Request) {
 func handleReadiness(w http.ResponseWriter, r *http.Request) {
 	if state.ready.Load() {
 		writeJSON(w, http.StatusOK, statusResponse{
-				Status:    "ready",
-				Timestamp: time.Now().UTC().Format(time.RFC3339),
-			})
+			Status:    "ready",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
 	} else {
 		writeJSON(w, http.StatusServiceUnavailable, statusResponse{
-				Status:    "not_ready",
-				Timestamp: time.Now().UTC().Format(time.RFC3339),
-			})
+			Status:    "not_ready",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
 	}
 }
 
@@ -2477,11 +2477,11 @@ func handleReadiness(w http.ResponseWriter, r *http.Request) {
 func handleRoot(w http.ResponseWriter, r *http.Request) {
 	hostname, _ := os.Hostname()
 	writeJSON(w, http.StatusOK, map[string]string{
-			"message":    "Hello from the Pod!",
-			"hostname":   hostname,
-			"go_version": runtime.Version(),
-			"uptime":     time.Since(startTime).Round(time.Second).String(),
-		})
+		"message":    "Hello from the Pod!",
+		"hostname":   hostname,
+		"go_version": runtime.Version(),
+		"uptime":     time.Since(startTime).Round(time.Second).String(),
+	})
 }
 
 func main() {

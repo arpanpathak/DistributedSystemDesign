@@ -661,14 +661,14 @@ my-cni-plugin/
 // Example configuration:
 //
 //	{
-	//	    "cniVersion": "1.0.0",
-	//	    "name": "my-network",
-	//	    "type": "my-cni-plugin",
-	//	    "bridge": "cni0",
-	//	    "subnet": "10.244.0.0/24",
-	//	    "gateway": "10.244.0.1",
-	//	    "mtu": 1500
-	//	}
+//	    "cniVersion": "1.0.0",
+//	    "name": "my-network",
+//	    "type": "my-cni-plugin",
+//	    "bridge": "cni0",
+//	    "subnet": "10.244.0.0/24",
+//	    "gateway": "10.244.0.1",
+//	    "mtu": 1500
+//	}
 package main
 
 import (
@@ -780,7 +780,7 @@ func parseConfig(data []byte) (*PluginConf, error) {
 //
 // For example, nextIP(10.244.1.0) returns 10.244.1.1.
 // This is used to compute the default gateway address (first usable
-	// IP in the subnet).
+// IP in the subnet).
 //
 // Note: This function does not handle overflow — it assumes the input
 // is not the broadcast address of a subnet.
@@ -868,7 +868,7 @@ type IPAMState struct {
 //
 // File locking (flock) is used to prevent race conditions when multiple
 // CNI ADD operations run concurrently (which happens during Pod startup
-	// storms).
+// storms).
 //
 // Parameters:
 //   - conf: the parsed plugin configuration (contains subnet and gateway)
@@ -999,7 +999,7 @@ func allocateIP(conf *PluginConf, containerID string) (net.IP, *net.IPNet, error
 // allocations.
 //
 // Idempotency: If the container has no allocation (because DEL was
-	// already called, or ADD was never called), this function succeeds
+// already called, or ADD was never called), this function succeeds
 // silently. This satisfies the CNI spec requirement that DEL must be
 // idempotent.
 //
@@ -1128,7 +1128,7 @@ import (
 // and configures it with the specified gateway IP address and MTU.
 //
 // If the bridge already exists (e.g., from a previous CNI ADD on the
-	// same node), this function verifies it's up and returns it.
+// same node), this function verifies it's up and returns it.
 //
 // The bridge serves as a virtual switch connecting all containers on
 // this network. It gets the gateway IP address, making it the default
@@ -1284,21 +1284,21 @@ func createVethPair(bridge *netlink.Bridge, containerNS string, ifName string, m
 	// the interface.
 	//
 	// ns.Do() locks the current goroutine to its OS thread (required
-		// because network namespaces are per-thread in Linux), switches to
+	// because network namespaces are per-thread in Linux), switches to
 	// the target namespace, executes the function, and switches back.
 	err = netNS.Do(func(_ ns.NetNS) error {
-			// Rename the temporary interface to the requested name (usually "eth0")
-			containerLink, err := netlink.LinkByName(veth.PeerName)
-			if err != nil {
-				return fmt.Errorf("failed to find veth in container: %w", err)
-			}
+		// Rename the temporary interface to the requested name (usually "eth0")
+		containerLink, err := netlink.LinkByName(veth.PeerName)
+		if err != nil {
+			return fmt.Errorf("failed to find veth in container: %w", err)
+		}
 
-			if err := netlink.LinkSetName(containerLink, ifName); err != nil {
-				return fmt.Errorf("failed to rename interface to %s: %w", ifName, err)
-			}
+		if err := netlink.LinkSetName(containerLink, ifName); err != nil {
+			return fmt.Errorf("failed to rename interface to %s: %w", ifName, err)
+		}
 
-			return nil
-		})
+		return nil
+	})
 	if err != nil {
 		return "", err
 	}
@@ -1337,57 +1337,57 @@ func configureContainerNetworking(containerNS string, ifName string, ipAddr *net
 	// from within the namespace. If we did it from the host namespace,
 	// the operations would apply to the host's network stack instead.
 	err = netNS.Do(func(_ ns.NetNS) error {
-			// Lock the goroutine to its OS thread. This is critical because
-			// network namespace switches are per-thread, and Go's goroutine
-			// scheduler can migrate goroutines between OS threads.
-			runtime.LockOSThread()
+		// Lock the goroutine to its OS thread. This is critical because
+		// network namespace switches are per-thread, and Go's goroutine
+		// scheduler can migrate goroutines between OS threads.
+		runtime.LockOSThread()
 
-			// Get the interface by name
-			link, err := netlink.LinkByName(ifName)
-			if err != nil {
-				return fmt.Errorf("failed to find %s in container: %w", ifName, err)
-			}
+		// Get the interface by name
+		link, err := netlink.LinkByName(ifName)
+		if err != nil {
+			return fmt.Errorf("failed to find %s in container: %w", ifName, err)
+		}
 
-			// Assign the IP address to the interface.
-			// This is equivalent to: ip addr add 10.244.1.5/24 dev eth0
-			addr := &netlink.Addr{IPNet: ipAddr}
-			if err := netlink.AddrAdd(link, addr); err != nil {
-				return fmt.Errorf("failed to assign IP %s to %s: %w",
-					ipAddr.String(), ifName, err)
-			}
+		// Assign the IP address to the interface.
+		// This is equivalent to: ip addr add 10.244.1.5/24 dev eth0
+		addr := &netlink.Addr{IPNet: ipAddr}
+		if err := netlink.AddrAdd(link, addr); err != nil {
+			return fmt.Errorf("failed to assign IP %s to %s: %w",
+				ipAddr.String(), ifName, err)
+		}
 
-			// Bring the interface up.
-			// This is equivalent to: ip link set eth0 up
-			if err := netlink.LinkSetUp(link); err != nil {
-				return fmt.Errorf("failed to bring %s up: %w", ifName, err)
-			}
+		// Bring the interface up.
+		// This is equivalent to: ip link set eth0 up
+		if err := netlink.LinkSetUp(link); err != nil {
+			return fmt.Errorf("failed to bring %s up: %w", ifName, err)
+		}
 
-			// Also bring up the loopback interface.
-			// Without this, localhost (127.0.0.1) won't work in the container.
-			lo, err := netlink.LinkByName("lo")
-			if err == nil {
-				netlink.LinkSetUp(lo)
-			}
+		// Also bring up the loopback interface.
+		// Without this, localhost (127.0.0.1) won't work in the container.
+		lo, err := netlink.LinkByName("lo")
+		if err == nil {
+			netlink.LinkSetUp(lo)
+		}
 
-			// Add a default route via the gateway.
-			// This is equivalent to: ip route add default via 10.244.1.1
-			defaultRoute := &netlink.Route{
-				Dst: &net.IPNet{
-					IP:   net.IPv4zero,           // 0.0.0.0
-					Mask: net.CIDRMask(0, 32),    // /0 — matches everything
-				},
-				Gw:        gateway,               // Next hop: the bridge IP
-				LinkIndex: link.Attrs().Index,
-			}
-			if err := netlink.RouteAdd(defaultRoute); err != nil {
-				return fmt.Errorf("failed to add default route: %w", err)
-			}
+		// Add a default route via the gateway.
+		// This is equivalent to: ip route add default via 10.244.1.1
+		defaultRoute := &netlink.Route{
+			Dst: &net.IPNet{
+				IP:   net.IPv4zero,        // 0.0.0.0
+				Mask: net.CIDRMask(0, 32), // /0 — matches everything
+			},
+			Gw:        gateway, // Next hop: the bridge IP
+			LinkIndex: link.Attrs().Index,
+		}
+		if err := netlink.RouteAdd(defaultRoute); err != nil {
+			return fmt.Errorf("failed to add default route: %w", err)
+		}
 
-			// Capture the MAC address for the result
-			macAddr = link.Attrs().HardwareAddr.String()
+		// Capture the MAC address for the result
+		macAddr = link.Attrs().HardwareAddr.String()
 
-			return nil
-		})
+		return nil
+	})
 
 	return macAddr, err
 }
@@ -1418,20 +1418,20 @@ func deleteContainerVeth(containerNS string, ifName string) error {
 	defer netNS.Close()
 
 	return netNS.Do(func(_ ns.NetNS) error {
-			link, err := netlink.LinkByName(ifName)
-			if err != nil {
-				// Interface doesn't exist — already cleaned up. Not an error.
-				return nil
-			}
-
-			// Deleting the container-side veth automatically deletes the
-			// host-side veth too (kernel handles this for veth pairs).
-			if err := netlink.LinkDel(link); err != nil {
-				return fmt.Errorf("failed to delete %s: %w", ifName, err)
-			}
-
+		link, err := netlink.LinkByName(ifName)
+		if err != nil {
+			// Interface doesn't exist — already cleaned up. Not an error.
 			return nil
-		})
+		}
+
+		// Deleting the container-side veth automatically deletes the
+		// host-side veth too (kernel handles this for veth pairs).
+		if err := netlink.LinkDel(link); err != nil {
+			return fmt.Errorf("failed to delete %s: %w", ifName, err)
+		}
+
+		return nil
+	})
 }
 
 // randomVethName generates a random name for the host-side veth interface.
